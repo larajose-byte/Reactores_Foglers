@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Notebooks — Diseño de Reactores | Maestría Ingeniería Química</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── Variables ─────────────────────────────────────────── */
+:root {
+  --ink:       #18202C;
+  --ink-soft:  #3D4D60;
+  --muted:     #7A8A9A;
+  --border:    #DDE4EE;
+  --bg-page:   #F0F4F9;
+  --bg-card:   #FFFFFF;
+  --bg-alt:    #F7FAFD;
+
+  /* Accent per notebook */
+  --c1:  #1A56C4;  --c1l: #EBF0FD;  --c1m: #3B72E0;
+  --c2:  #B5320D;  --c2l: #FDEEE9;  --c2m: #D94E2A;
+  --c3:  #1A7A42;  --c3l: #E7F6ED;  --c3m: #2EA05A;
+  --c4:  #5E28A0;  --c4l: #F1EBFA;  --c4m: #7B42C2;
+  --c5:  #0E6F7E;  --c5l: #E5F4F7;  --c5m: #1892A5;
+  --c6:  #A01C1C;  --c6l: #FAE8E8;  --c6m: #C83030;
+}
+
+/* ─── Reset ─────────────────────────────────────────────── */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'IBM Plex Sans', sans-serif;
+  background: var(--bg-page);
+  color: var(--ink);
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+/* ─── Utility ────────────────────────────────────────────── */
+.mono { font-family:'IBM Plex Mono', monospace; }
+code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
+        background:#EEF3FA; color:#1A56C4; padding:.12em .42em;
+        border-radius:4px; }
+
+/* ─── HERO ───────────────────────────────────────────────── */
+.hero {
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--border);
+  padding: 3.8rem 2rem 3rem;
+  text-align: center;
+}
+.hero-eyebrow {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:.72rem; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase;
+  color: var(--muted); margin-bottom:1.1rem;
+}
+.hero h1 {
+  font-family:'Lora', serif; font-weight:700;
+  font-size: clamp(2rem,4.5vw,3.2rem);
+  color: var(--ink); line-height:1.15;
+  margin-bottom:.9rem;
+}
+.hero h1 em { font-style:italic; color: var(--c1); }
+.hero-desc {
+  font-size:1.02rem; color: var(--ink-soft);
+  max-width:600px; margin:0 auto 2rem;
+  font-weight:300;
+}
+.hero-chips {
+  display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center;
+}
+.chip {
+  background: var(--bg-alt);
+  border:1px solid var(--border);
+  border-radius:100px;
+  padding:.3rem .9rem;
+  font-size:.78rem; font-weight:500;
+  color: var(--ink-soft);
+}
+
+/* ─── TOP NAV ────────────────────────────────────────────── */
+.top-nav {
+  position:sticky; top:0; z-index:80;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:.6rem 1rem;
+  display:flex; gap:.4rem; flex-wrap:wrap; justify-content:center;
+}
+.nav-btn {
+  display:inline-flex; align-items:center; gap:.35rem;
+  padding:.32rem .85rem;
+  border-radius:6px;
+  font-size:.74rem; font-weight:600;
+  text-decoration:none; border:none; cursor:pointer;
+  transition: background .18s, transform .12s;
+  border: 1.5px solid transparent;
+}
+.nav-btn:hover { transform:translateY(-1px); }
+
+/* ─── MAIN LAYOUT ────────────────────────────────────────── */
+.page-wrap { max-width:980px; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+
+/* ─── NOTEBOOK CARD ──────────────────────────────────────── */
+.nb {
+  background: var(--bg-card);
+  border-radius:14px;
+  border:1px solid var(--border);
+  margin-bottom:3.5rem;
+  overflow:hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  animation: riseIn .45s ease both;
+}
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.nb:nth-child(1){animation-delay:.05s}
+.nb:nth-child(2){animation-delay:.10s}
+.nb:nth-child(3){animation-delay:.15s}
+.nb:nth-child(4){animation-delay:.20s}
+.nb:nth-child(5){animation-delay:.25s}
+.nb:nth-child(6){animation-delay:.30s}
+
+/* ─── CARD HEADER ────────────────────────────────────────── */
+.nb-head {
+  padding:1.8rem 2rem 1.4rem;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; gap:1.2rem;
+}
+.nb-badge {
+  width:52px; height:52px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.55rem; flex-shrink:0;
+}
+.nb-head-text { flex:1; }
+.nb-num {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:.68rem; font-weight:500; letter-spacing:.12em;
+  text-transform:uppercase; margin-bottom:.3rem;
+}
+.nb-title {
+  font-family:'Lora', serif; font-weight:700;
+  font-size:1.42rem; line-height:1.2; color:var(--ink);
+  margin-bottom:.25rem;
+}
+.nb-sub {
+  font-size:.82rem; color:var(--muted); font-style:italic;
+}
+.nb-tags { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.65rem; }
+.tag {
+  font-size:.68rem; font-weight:600; padding:.2rem .6rem;
+  border-radius:20px; letter-spacing:.04em; text-transform:uppercase;
+}
+
+/* ─── CARD BODY ──────────────────────────────────────────── */
+.nb-body { padding:1.8rem 2rem; }
+
+/* ─── SECTION HEADINGS ───────────────────────────────────── */
+.sec-head {
+  font-family:'Lora', serif; font-weight:700;
+  font-size:1rem; color:var(--ink);
+  display:flex; align-items:center; gap:.6rem;
+  margin:2rem 0 .9rem;
+}
+.sec-head::after {
+  content:''; flex:1; height:1px; background:var(--border);
+}
+
+/* ─── PROSE ──────────────────────────────────────────────── */
+.prose {
+  font-size:.94rem; color: var(--ink-soft);
+  line-height:1.78; margin-bottom:.9rem;
+}
+.prose strong { color:var(--ink); font-weight:600; }
+
+/* ─── STEPS ──────────────────────────────────────────────── */
+.steps { display:flex; flex-direction:column; gap:.8rem; margin:1rem 0; }
+.step {
+  display:flex; gap:1rem; align-items:flex-start;
+  padding:.9rem 1.1rem;
+  background: var(--bg-alt);
+  border-radius:10px;
+  border-left:3px solid transparent;
+}
+.step-n {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:.75rem; font-weight:500;
+  flex-shrink:0; margin-top:.05rem;
+}
+.step-txt { flex:1; }
+.step-title { font-weight:600; font-size:.92rem; margin-bottom:.25rem; }
+.step-desc  { font-size:.87rem; color:var(--ink-soft); line-height:1.65; }
+
+/* ─── EQ BOX ─────────────────────────────────────────────── */
+.eq {
+  background:#FFFDF0;
+  border:1.5px solid #DEBB50;
+  border-radius:8px;
+  padding:.85rem 1.1rem;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:.86rem; color:#3A2800; line-height:1.65;
+  margin:.8rem 0;
+}
+.eq-lbl {
+  font-family:'IBM Plex Sans', sans-serif;
+  font-size:.68rem; font-weight:600; text-transform:uppercase;
+  letter-spacing:.08em; color:#8A6500; margin-bottom:.35rem;
+}
+
+/* ─── DATA TABLE ─────────────────────────────────────────── */
+.dtable { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.87rem; }
+.dtable th {
+  background:var(--ink); color:#fff;
+  padding:.55rem .9rem; text-align:left;
+  font-size:.76rem; letter-spacing:.05em; text-transform:uppercase; font-weight:500;
+}
+.dtable td {
+  padding:.5rem .9rem; border-bottom:1px solid var(--border); color:var(--ink-soft);
+}
+.dtable tr:hover td { background:#F8FBFF; }
+.dtable tr:last-child td { border-bottom:none; }
+
+/* ─── TWO-COL COMPARE ────────────────────────────────────── */
+.compare {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:.8rem; margin:1rem 0;
+}
+@media(max-width:640px){ .compare{grid-template-columns:1fr;} }
+.compare-col {
+  border-radius:10px; padding:1.1rem 1.2rem;
+  border:1px solid var(--border);
+}
+.compare-col h4 { font-size:.85rem; font-weight:600; margin-bottom:.55rem; }
+.compare-col li {
+  font-size:.84rem; color:var(--ink-soft);
+  list-style:none; padding:.18rem 0 .18rem 1rem;
+  position:relative;
+}
+.compare-col li::before { content:'·'; position:absolute; left:0; font-weight:700; }
+
+/* ─── INFO / WARN / DANGER ───────────────────────────────── */
+.callout {
+  display:flex; gap:.9rem; padding:.95rem 1.1rem;
+  border-radius:0 10px 10px 0; margin:1rem 0;
+  border-left:4px solid;
+}
+.callout-ico { font-size:1.2rem; flex-shrink:0; padding-top:.1rem; }
+.callout-txt { font-size:.88rem; line-height:1.65; }
+.callout.info  { background:#EBF5FB; border-color:#1A56C4; }
+.callout.info .callout-txt  { color:#0D2D5A; }
+.callout.warn  { background:#FEF9EC; border-color:#D4920A; }
+.callout.warn .callout-txt  { color:#4A3000; }
+.callout.danger{ background:#FEF0EE; border-color:#B5320D; }
+.callout.danger .callout-txt{ color:#4A0D05; }
+
+/* ─── QUESTIONS SECTION ──────────────────────────────────── */
+.q-section {
+  margin-top:2rem;
+  border-top:2px dashed var(--border);
+  padding-top:1.8rem;
+}
+.q-header {
+  display:flex; align-items:center; gap:.75rem; margin-bottom:1.3rem;
+}
+.q-header h3 {
+  font-family:'Lora', serif; font-size:1.08rem; font-weight:700;
+}
+.q-count {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:.68rem; font-weight:500; padding:.22rem .65rem;
+  border-radius:20px; text-transform:uppercase; letter-spacing:.06em;
+}
+.q-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:.9rem;
+}
+@media(max-width:680px){ .q-grid{grid-template-columns:1fr;} }
+
+.q-card {
+  border-radius:10px; padding:1.1rem 1.2rem;
+  border:1.5px solid transparent;
+  transition: box-shadow .18s, transform .14s;
+  position:relative; overflow:hidden;
+}
+.q-card:hover { transform:translateY(-2px); box-shadow:0 6px 22px rgba(0,0,0,.10); }
+.q-card::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+}
+.q-num {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:.67rem; font-weight:500;
+  letter-spacing:.1em; text-transform:uppercase;
+  margin-bottom:.45rem; opacity:.65;
+}
+.q-text { font-size:.92rem; font-weight:600; line-height:1.5; margin-bottom:.65rem; }
+.q-hint {
+  font-size:.82rem; line-height:1.6;
+  opacity:.7; border-top:1px solid rgba(0,0,0,.06);
+  padding-top:.55rem; margin-top:.1rem;
+}
+.q-level {
+  display:inline-block; font-size:.65rem; font-weight:600;
+  padding:.18rem .55rem; border-radius:10px;
+  text-transform:uppercase; letter-spacing:.06em; margin-top:.5rem;
+}
+
+/* ─── THEME COLORS ───────────────────────────────────────── */
+/* NB1 — blue */
+.t1 .nb-badge { background:#EBF0FD; }
+.t1 .nb-num   { color:var(--c1); }
+.t1 .tag.a    { background:#D6E3FF; color:#0C3A9A; }
+.t1 .tag.b    { background:#EBF0FD; color:#1A56C4; }
+.t1 .step     { border-left-color:var(--c1); }
+.t1 .step-n   { background:#EBF0FD; color:var(--c1); }
+.t1 .q-card   { background:#F6F9FF; border-color:#CFD9F5; }
+.t1 .q-card::before { background:var(--c1); }
+.t1 .q-num    { color:var(--c1); }
+.t1 .q-level  { background:#D6E3FF; color:#0C3A9A; }
+.t1 .q-count  { background:#D6E3FF; color:#0C3A9A; }
+.t1 .nav-btn  { background:#EBF0FD; color:var(--c1); border-color:#BDD0F5; }
+.t1 .nav-btn:hover { background:var(--c1); color:#fff; }
+
+/* NB2 — rust */
+.t2 .nb-badge { background:#FDEEE9; }
+.t2 .nb-num   { color:var(--c2); }
+.t2 .tag.a    { background:#FFD8CC; color:#6A1500; }
+.t2 .tag.b    { background:#FDEEE9; color:var(--c2); }
+.t2 .step     { border-left-color:var(--c2); }
+.t2 .step-n   { background:#FDEEE9; color:var(--c2); }
+.t2 .q-card   { background:#FFF5F2; border-color:#F5C9BC; }
+.t2 .q-card::before { background:var(--c2); }
+.t2 .q-num    { color:var(--c2); }
+.t2 .q-level  { background:#FFD8CC; color:#6A1500; }
+.t2 .q-count  { background:#FFD8CC; color:#6A1500; }
+.t2 .nav-btn  { background:#FDEEE9; color:var(--c2); border-color:#F5C9BC; }
+.t2 .nav-btn:hover { background:var(--c2); color:#fff; }
+
+/* NB3 — green */
+.t3 .nb-badge { background:#E7F6ED; }
+.t3 .nb-num   { color:var(--c3); }
+.t3 .tag.a    { background:#C8EDDA; color:#0A3D20; }
+.t3 .tag.b    { background:#E7F6ED; color:var(--c3); }
+.t3 .step     { border-left-color:var(--c3); }
+.t3 .step-n   { background:#E7F6ED; color:var(--c3); }
+.t3 .q-card   { background:#F3FBF6; border-color:#B8DFC8; }
+.t3 .q-card::before { background:var(--c3); }
+.t3 .q-num    { color:var(--c3); }
+.t3 .q-level  { background:#C8EDDA; color:#0A3D20; }
+.t3 .q-count  { background:#C8EDDA; color:#0A3D20; }
+.t3 .nav-btn  { background:#E7F6ED; color:var(--c3); border-color:#B8DFC8; }
+.t3 .nav-btn:hover { background:var(--c3); color:#fff; }
+
+/* NB4 — purple */
+.t4 .nb-badge { background:#F1EBFA; }
+.t4 .nb-num   { color:var(--c4); }
+.t4 .tag.a    { background:#DCCCF5; color:#2E1060; }
+.t4 .tag.b    { background:#F1EBFA; color:var(--c4); }
+.t4 .step     { border-left-color:var(--c4); }
+.t4 .step-n   { background:#F1EBFA; color:var(--c4); }
+.t4 .q-card   { background:#F8F4FE; border-color:#D4BCF2; }
+.t4 .q-card::before { background:var(--c4); }
+.t4 .q-num    { color:var(--c4); }
+.t4 .q-level  { background:#DCCCF5; color:#2E1060; }
+.t4 .q-count  { background:#DCCCF5; color:#2E1060; }
+.t4 .nav-btn  { background:#F1EBFA; color:var(--c4); border-color:#D4BCF2; }
+.t4 .nav-btn:hover { background:var(--c4); color:#fff; }
+
+/* CASO1 — teal */
+.t5 .nb-badge { background:#E5F4F7; }
+.t5 .nb-num   { color:var(--c5); }
+.t5 .tag.a    { background:#BEE8EF; color:#073D48; }
+.t5 .tag.b    { background:#E5F4F7; color:var(--c5); }
+.t5 .step     { border-left-color:var(--c5); }
+.t5 .step-n   { background:#E5F4F7; color:var(--c5); }
+.t5 .q-card   { background:#F1FAFC; border-color:#A8D8DF; }
+.t5 .q-card::before { background:var(--c5); }
+.t5 .q-num    { color:var(--c5); }
+.t5 .q-level  { background:#BEE8EF; color:#073D48; }
+.t5 .q-count  { background:#BEE8EF; color:#073D48; }
+.t5 .nav-btn  { background:#E5F4F7; color:var(--c5); border-color:#A8D8DF; }
+.t5 .nav-btn:hover { background:var(--c5); color:#fff; }
+
+/* CASO2 — red */
+.t6 .nb-badge { background:#FAE8E8; }
+.t6 .nb-num   { color:var(--c6); }
+.t6 .tag.a    { background:#F5C2C2; color:#500000; }
+.t6 .tag.b    { background:#FAE8E8; color:var(--c6); }
+.t6 .step     { border-left-color:var(--c6); }
+.t6 .step-n   { background:#FAE8E8; color:var(--c6); }
+.t6 .q-card   { background:#FDF3F3; border-color:#F0BEBE; }
+.t6 .q-card::before { background:var(--c6); }
+.t6 .q-num    { color:var(--c6); }
+.t6 .q-level  { background:#F5C2C2; color:#500000; }
+.t6 .q-count  { background:#F5C2C2; color:#500000; }
+.t6 .nav-btn  { background:#FAE8E8; color:var(--c6); border-color:#F0BEBE; }
+.t6 .nav-btn:hover { background:var(--c6); color:#fff; }
+
+/* ─── FOOTER ─────────────────────────────────────────────── */
+.footer {
+  text-align:center; padding:2.5rem 1.5rem;
+  border-top:1px solid var(--border);
+  background:#fff; color:var(--muted); font-size:.84rem;
+}
+.footer strong { color:var(--ink); }
+
+@media(max-width:600px){
+  .nb-head { flex-direction:column; }
+  .nb-body { padding:1.2rem; }
+  .nb-head { padding:1.3rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ HERO ══════ -->
+<div class="hero">
+  <div class="hero-eyebrow">740484 · Maestría en Ingeniería Química · Universidad del Valle</div>
+  <h1>Guía de <em>Notebooks</em><br>Diseño de Reactores</h1>
+  <p class="hero-desc">Explicación detallada del contenido de cada cuaderno Jupyter, contexto industrial y preguntas de reflexión orientadas a la práctica profesional del ingeniero químico.</p>
+  <div class="hero-chips">
+    <span class="chip">⚗️ 6 notebooks</span>
+    <span class="chip">🏭 4 tipos de reactor</span>
+    <span class="chip">🔬 2 casos petroquímicos reales</span>
+    <span class="chip">❓ 42 preguntas industriales</span>
+    <span class="chip">📚 Fogler 4ª Ed.</span>
+  </div>
+</div>
+
+<!-- ══════ NAVIGATION ══════ -->
+<nav class="top-nav">
+  <a href="#nb1" class="nav-btn t1">⚗️ NB1 · CSTR Isotérmico</a>
+  <a href="#nb2" class="nav-btn t2">🔥 NB2 · CSTR No Isotérmico</a>
+  <a href="#nb3" class="nav-btn t3">🔩 NB3 · PFR</a>
+  <a href="#nb4" class="nav-btn t4">🧪 NB4 · Batch</a>
+  <a href="#caso1" class="nav-btn t5">🏭 Caso 1 · Estireno</a>
+  <a href="#caso2" class="nav-btn t6">🔥 Caso 2 · Etileno</a>
+</nav>
+
+<!-- ══════ MAIN ══════ -->
+<div class="page-wrap">
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     NOTEBOOK 1 — CSTR ISOTÉRMICO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="nb t1" id="nb1">
+  <div class="nb-head">
+    <div class="nb-badge">⚗️</div>
+    <div class="nb-head-text">
+      <div class="nb-num">Notebook 1 · Fogler Cap. 2, 3, 5, 13</div>
+      <div class="nb-title">CSTR Isotérmico</div>
+      <div class="nb-sub">Reactor de Tanque Agitado Continuo — operación a temperatura constante</div>
+      <div class="nb-tags">
+        <span class="tag a">CSTR</span>
+        <span class="tag b">Levenspiel</span>
+        <span class="tag b">Damköhler</span>
+        <span class="tag b">Cascadas en serie</span>
+        <span class="tag b">Tabla estequiométrica</span>
+        <span class="tag b">DTR</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nb-body">
+
+    <div class="sec-head">📋 ¿Qué contiene este notebook?</div>
+    <p class="prose">Es el cuaderno fundacional del curso. Parte del balance molar más general posible —el teorema de transporte de Reynolds— y construye la ecuación algebraica de diseño del CSTR paso a paso, justificando cada suposición. Todo lo demás —Levenspiel, cascadas, DTR— es consecuencia de entender por qué el CSTR opera siempre a la <strong>concentración de salida</strong>, la más baja del proceso.</p>
+
+    <div class="sec-head">🔬 Secciones en detalle</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-txt">
+          <div class="step-title">Derivación rigurosa de la ecuación de diseño</div>
+          <div class="step-desc">Del balance F<sub>A0</sub>−F<sub>A</sub>+r<sub>A</sub>V = dN<sub>A</sub>/dt, imponiendo cuatro suposiciones (mezcla perfecta, estado estacionario, volumen constante, T y P uniformes), se obtiene <strong>V = F<sub>A0</sub>X / (−r<sub>A</sub>|<sub>sal</sub>)</strong>. Se define el número de Damköhler Da = kτ y se construye una tabla de regímenes según Da.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-txt">
+          <div class="step-title">Fogler Example 5-1 — Producción de Propilenglicol (Dow, BASF)</div>
+          <div class="step-desc">Caso industrial real: hidrólisis de óxido de propileno. Con k = 0.257 min⁻¹, C<sub>A0</sub> = 2.05 mol/dm³ y v₀ = 46.8 dm³/min se calcula V = <strong>728 dm³</strong> para X = 0.80. Se verifica con Da = 4.00 y se grafica cómo escalar de 80% a 90% de conversión cuesta <strong>2.25 veces más volumen</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-txt">
+          <div class="step-title">Diagrama de Levenspiel interactivo — comparación CSTR vs PFR</div>
+          <div class="step-desc">El CSTR es un <strong>rectángulo</strong> (sobreestimado); el PFR es el área exacta bajo la curva F<sub>A0</sub>/(−r<sub>A</sub>) vs X. Widget con 5 sliders (orden n, k, C<sub>A0</sub>, X deseada, v₀). Demuestra que V<sub>CSTR</sub>/V<sub>PFR</sub> crece explosivamente con el orden n y la conversión: para n=2 y X=0.80, el CSTR requiere <strong>5× más volumen</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-txt">
+          <div class="step-title">Cascadas de CSTRs en serie — diagrama de escalera</div>
+          <div class="step-desc">Demuestra que lim(N→∞) cascada = PFR, porque (1+kτ/N)^N → e^(kτ). Diagrama de escalera interactivo con N rectángulos decrecientes. Con N = 4–6 reactores iguales se alcanza el <strong>95-98% del rendimiento del PFR</strong>. Incluye tabla de estados por etapa (X<sub>entrada</sub>, X<sub>salida</sub>, τ<sub>i</sub>, C<sub>A</sub>).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-txt">
+          <div class="step-title">Tabla estequiométrica gaseosa — parámetro ε (Fogler §3.4)</div>
+          <div class="step-desc">Para reacciones con cambio de número de moles: ε = y<sub>A0</sub>·δ, y las concentraciones toman la forma C<sub>j</sub> = C<sub>A0</sub>(expr. estequiométrica)/(1+εX). Widget con coeficientes a, b, c, d: muestra cómo ignorar ε puede generar errores de hasta 30-50% en el volumen del reactor.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">6</div>
+        <div class="step-txt">
+          <div class="step-title">Distribución de Tiempos de Residencia (DTR) — Cap. 13</div>
+          <div class="step-desc">Derivación de E(t) = (1/τ)e<sup>−t/τ</sup> desde el balance del trazador. El <strong>63.2% del fluido sale antes del tiempo espacial nominal</strong> (F(τ) = 0.632). Diagnóstico de patologías: bypass, zonas muertas y recirculación interna. Comparación con la DTR del PFR (delta de Dirac).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">📊 Datos clave — Example 5-1</div>
+    <table class="dtable">
+      <tr><th>Parámetro</th><th>Valor</th><th>Significado</th></tr>
+      <tr><td>k (300 K)</td><td><code>0.257 min⁻¹</code></td><td>Cinética pseudo-1er orden en exceso de agua</td></tr>
+      <tr><td>Volumen CSTR</td><td><code>728 dm³</code></td><td>Reactor de ~730 L para X = 80%</td></tr>
+      <tr><td>Tiempo espacial τ</td><td><code>15.56 min</code></td><td>Tiempo que permanece el fluido en el reactor</td></tr>
+      <tr><td>Damköhler Da</td><td><code>4.00</code></td><td>Zona de diseño eficiente (3 < Da < 10 es típico)</td></tr>
+      <tr><td>Verificación X</td><td><code>Da/(1+Da) = 0.800 ✓</code></td><td>La ecuación algebraica cierra exactamente</td></tr>
+    </table>
+
+    <div class="eq">
+      <div class="eq-lbl">Ecuaciones clave del notebook</div>
+      V_CSTR  = F_A0 · X / (−r_A|sal)   ← Algebraica, no ODE<br>
+      Da      = k·τ·C_A0^(n−1)          ← Adimensional universal<br>
+      X       = Da/(1+Da)               ← Solo 1er orden<br>
+      C_A,N   = C_A0/(1+k·τᵢ)^N        ← N CSTRs en serie<br>
+      E(t)    = (1/τ)·exp(−t/τ)          ← DTR del CSTR ideal
+    </div>
+
+    <div class="callout info">
+      <div class="callout-ico">💡</div>
+      <div class="callout-txt"><strong>Insight central:</strong> El CSTR opera siempre a la velocidad de reacción más baja posible porque la mezcla perfecta lleva toda la concentración al nivel de la salida. Es como hacer correr a todo un equipo a la velocidad del jugador más lento. Por eso V<sub>CSTR</sub> > V<sub>PFR</sub> siempre que n > 0, y la diferencia crece dramáticamente cerca de X = 1.</div>
+    </div>
+
+    <!-- PREGUNTAS NB1 -->
+    <div class="q-section">
+      <div class="q-header">
+        <h3>Preguntas de reflexión — aplicación industrial</h3>
+        <span class="q-count t1">7 preguntas</span>
+      </div>
+      <div class="q-grid">
+
+        <div class="q-card t1">
+          <div class="q-num">Q-01 · Diseño de planta</div>
+          <div class="q-text">Una planta de Dow Chemical necesita duplicar la producción de propilenglicol sin construir un nuevo reactor. Usando el modelo del Example 5-1, identifique <em>dos palancas operacionales</em> disponibles (sin cambiar V ni el catalizador) y cuantifique cuál tiene mayor impacto en la conversión.</div>
+          <div class="q-hint">Pista: considere qué variables aparecen en Da = kτ. ¿Qué ocurre si aumenta la temperatura (vía Arrhenius) o si se concentra la alimentación? Calcule el nuevo V para cada escenario.</div>
+          <span class="q-level t1">Nivel: aplicación directa</span>
+        </div>
+
+        <div class="q-card t1">
+          <div class="q-num">Q-02 · Escalado</div>
+          <div class="q-text">En planta piloto a 2 L se midió k = 0.257 min⁻¹ y se quiere escalar a 50,000 L. El ingeniero novato propone mantener el mismo τ; el senior propone mantener el mismo Da. ¿Son equivalentes? ¿Qué suposición oculta hay en el enfoque del novato?</div>
+          <div class="q-hint">Pista: si k no depende de la escala (cinética intrínseca), ambos criterios convergen. ¿Cuándo divergirían? Piense en la transferencia de calor al escalar: ¿es el CSTR realmente isotérmico en 50,000 L?</div>
+          <span class="q-level t1">Nivel: análisis crítico</span>
+        </div>
+
+        <div class="q-card t1">
+          <div class="q-num">Q-03 · Diagnóstico DTR</div>
+          <div class="q-text">Un CSTR industrial de 10,000 L muestra en la prueba de trazador un t̄<sub>medido</sub> = 8.2 min contra τ<sub>nominal</sub> = 12 min. ¿Qué volumen de zona muerta tiene el reactor? ¿Cómo impacta esto en la conversión real versus la diseñada?</div>
+          <div class="q-hint">Pista: V<sub>ef</sub> = v₀·t̄<sub>medido</sub>. Luego recalcule Da con V<sub>ef</sub> y compare X<sub>real</sub> vs X<sub>diseño</sub>. ¿Cuánto producto mensual se está perdiendo?</div>
+          <span class="q-level t1">Nivel: diagnóstico operacional</span>
+        </div>
+
+        <div class="q-card t1">
+          <div class="q-num">Q-04 · Cascadas</div>
+          <div class="q-text">Una planta de SBR (caucho) opera 5 CSTRs en serie con τ<sub>total</sub> = 120 min. El gerente propone reducir a 3 CSTRs más grandes para ahorrar CAPEX en agitadores. Con k = 0.03 min⁻¹, ¿cuánto cae la conversión? ¿Es económicamente justificable el ahorro?</div>
+          <div class="q-hint">Pista: calcule X(N=5, τᵢ=24 min) y X(N=3, τᵢ=40 min). La diferencia en moles producidos por hora, multiplicada por el precio del producto, es el OPEX perdido por ciclo. Compare con el costo de 2 agitadores industriales.</div>
+          <span class="q-level t1">Nivel: optimización económica</span>
+        </div>
+
+        <div class="q-card t1">
+          <div class="q-num">Q-05 · Error de fase gaseosa</div>
+          <div class="q-text">Para A → B + C (gas, δ = +1, y<sub>A0</sub> = 0.5), un ingeniero calcula el volumen del CSTR usando C<sub>A</sub> = C<sub>A0</sub>(1−X) en lugar de la fórmula con ε. ¿En qué porcentaje subestima el volumen real si X = 0.70 y la cinética es de 2do orden?</div>
+          <div class="q-hint">Pista: con ε = 0.5×1 = 0.5, la concentración correcta a X=0.70 es C<sub>A0</sub>·0.30/1.35 en lugar de C<sub>A0</sub>·0.30. La velocidad incorrecta es mayor, por lo que el V calculado es menor. Cuantifique el error.</div>
+          <span class="q-level t1">Nivel: error cuantitativo</span>
+        </div>
+
+        <div class="q-card t1">
+          <div class="q-num">Q-06 · Levenspiel avanzado</div>
+          <div class="q-text">Una reacción autocatalítica (−r<sub>A</sub> tiene un <em>máximo</em> a conversión intermedia) hace que la curva de Levenspiel tenga forma de "U". ¿Qué configuración de reactor minimiza el volumen total? Justifique geométricamente sin cálculo numérico.</div>
+          <div class="q-hint">Pista: en la curva en U, el rectángulo del CSTR puede "saltar" la zona de baja velocidad y operar en el mínimo. Un PFR puro debe integrar toda la zona inicial de alta resistencia. ¿Cuál combinación CSTR→PFR minimiza la suma de áreas?</div>
+          <span class="q-level t1">Nivel: síntesis conceptual</span>
+        </div>
+
+        <div class="q-card t1">
+          <div class="q-num">Q-07 · Económico</div>
+          <div class="q-text">El propilenglicol se vende a USD 1.50/kg (MM = 76 g/mol). Con el diseño del Example 5-1 operando 22 h/día, estime la facturación diaria. Si el CAPEX del CSTR es USD 850/dm³ instalado, ¿en cuántos días de operación se paga el reactor?</div>
+          <div class="q-hint">Pista: F<sub>PG</sub> = F<sub>A0</sub>·X → kg/h → USD/día. Payback = CAPEX / (facturación − costos operativos). Asuma costos operativos = 40% de la facturación bruta.</div>
+          <span class="q-level t1">Nivel: análisis económico</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     NOTEBOOK 2 — CSTR NO ISOTÉRMICO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="nb t2" id="nb2">
+  <div class="nb-head">
+    <div class="nb-badge">🔥</div>
+    <div class="nb-head-text">
+      <div class="nb-num">Notebook 2 · Fogler Cap. 8 y 9</div>
+      <div class="nb-title">CSTR No Isotérmico — Balance de Energía, Multiplicidad y Seguridad</div>
+      <div class="nb-sub">Cuando la temperatura flota: estados estacionarios múltiples, estabilidad térmica y riesgo de runaway</div>
+      <div class="nb-tags">
+        <span class="tag a">Balance de energía</span>
+        <span class="tag b">Multiplicidad SS</span>
+        <span class="tag b">Van Heerden</span>
+        <span class="tag b">ΔT adiabático</span>
+        <span class="tag b">Histéresis</span>
+        <span class="tag b">TMR · Seguridad</span>
+      </div>
+    </div>
+  </div>
+  <div class="nb-body">
+
+    <div class="sec-head">📋 ¿Qué contiene este notebook?</div>
+    <p class="prose">Acopla el balance de masa con el <strong>Primer Principio de la Termodinámica</strong> para sistemas abiertos. El resultado es un sistema de dos ecuaciones cuya solución simultánea puede producir <strong>1 o 3 estados estacionarios</strong> — uno de los fenómenos más contraintuitivos y relevantes del diseño de reactores. El cuaderno culmina con el análisis de seguridad del reactor batch no isotérmico y el concepto de <em>Tiempo de Máxima Velocidad (t<sub>mr</sub>)</em>.</p>
+
+    <div class="sec-head">🔬 Secciones en detalle</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-txt">
+          <div class="step-title">Derivación del balance de energía — §8.1</div>
+          <div class="step-desc">Desde Q̇ − Ẇ<sub>s</sub> + ΣF<sub>i0</sub>Ĥ<sub>i0</sub> − ΣF<sub>i</sub>Ĥ<sub>i</sub> = 0, se llega a la forma Q̇ = F<sub>A0</sub>[ΣΘ<sub>i</sub>C<sub>pi</sub>(T−T₀) + ΔH<sub>rx</sub>X]. Esto define X<sub>BE</sub>(T) —<em>lineal en T</em>— y X<sub>BM</sub>(T) —<em>sigmoide por Arrhenius</em>. Los estados estacionarios son sus intersecciones.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-txt">
+          <div class="step-title">Fogler Example 8-4 — Multiplicidad para propilenglicol — §8.3</div>
+          <div class="step-desc">Sin control isotérmico, el mismo proceso del NB1 revela <strong>3 estados estacionarios</strong>: SS bajo (~540 R, X≈0.06, estable), SS medio (~580 R, X≈0.37, inestable) y SS alto (~620 R, X≈0.93, estable). Se califica cada uno con el criterio de Van Heerden: estable ↔ dR/dT > dG/dT. Diagrama de histéresis T<sub>sal</sub> vs τ.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-txt">
+          <div class="step-title">Curvas G(T) vs R(T) — Criterio de Van Heerden interactivo — §8.3.1</div>
+          <div class="step-desc">G(T) = (−ΔH<sub>rx</sub>)·X<sub>BM</sub>(T) es una sigmoide; R(T) es una recta. Widget con 4 sliders (τ, UA, T<sub>a</sub>, T₀): al aumentar UA la recta R tiene mayor pendiente y puede haber solo 1 intersección (zona segura). Muestra geométricamente por qué el SS bajo/alto son estables y el SS medio es un <em>punto de silla</em>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-txt">
+          <div class="step-title">CSTR adiabático — línea adiabática — §8.2</div>
+          <div class="step-desc">Para UA = 0: T = T₀ + ΔT<sub>ad</sub>·X. El parámetro ΔT<sub>ad</sub> clasifica la severidad térmica: &lt;50 K benigno, 50-200 K moderado (requiere control), 200-500 K alto (parada de emergencia obligatoria), >500 K extremo. Widget con análisis de sensibilidad y curva de ignición T<sub>sal</sub> vs τ.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-txt">
+          <div class="step-title">Batch no isotérmico y TMR — §9.1-§9.2</div>
+          <div class="step-desc">Sistema de ODEs acopladas dX/dt y dT/dt con 6 sliders. Cuatro paneles: X(t), T(t), espacio de fase X-T y perfil de velocidad −r<sub>A</sub>(t). El <strong>TMR</strong> (tiempo al máximo de velocidad) marca el umbral de seguridad: antes de t<sub>mr</sub>, una falla del enfriamiento puede disparar un runaway térmico. Clasificación automática de criticidad.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">🔍 Los tres estados estacionarios — Example 8-4</div>
+    <table class="dtable">
+      <tr><th>Estado</th><th>T (R)</th><th>T (°F)</th><th>X<sub>A</sub></th><th>Tipo</th><th>Decisión operacional</th></tr>
+      <tr><td>SS Bajo</td><td>≈ 540</td><td>≈ 80°F</td><td>≈ 0.06</td><td style="color:#1A7A42;font-weight:600">✓ Estable</td><td>Reactor "apagado" — inútil productivamente</td></tr>
+      <tr><td>SS Medio</td><td>≈ 580</td><td>≈ 120°F</td><td>≈ 0.37</td><td style="color:#B5320D;font-weight:600">✗ Inestable</td><td>No operable sin control activo de alta demanda</td></tr>
+      <tr><td>SS Alto</td><td>≈ 620</td><td>≈ 160°F</td><td>≈ 0.93</td><td style="color:#1A7A42;font-weight:600">✓ Estable</td><td>Objetivo de diseño: arrancar con T₀ alta para "saltar" aquí</td></tr>
+    </table>
+
+    <div class="callout danger">
+      <div class="callout-ico">⚠️</div>
+      <div class="callout-txt"><strong>Relevancia histórica de seguridad:</strong> Los accidentes de Seveso (1976), Bhopal (1984), T2 Laboratories (2007) y West Fertilizer (2013) comparten una causa raíz: pérdida de control térmico en reactores exotérmicos. El análisis de multiplicidad de estados y el cálculo de ΔT<sub>ad</sub> y t<sub>mr</sub> son las herramientas básicas de HAZOP, LOPA y análisis de riesgos de proceso (PHA).</div>
+    </div>
+
+    <!-- PREGUNTAS NB2 -->
+    <div class="q-section">
+      <div class="q-header">
+        <h3>Preguntas de reflexión — aplicación industrial</h3>
+        <span class="q-count t2">7 preguntas</span>
+      </div>
+      <div class="q-grid">
+
+        <div class="q-card t2">
+          <div class="q-num">Q-01 · Arranque de planta</div>
+          <div class="q-text">La planta del Example 8-4 siempre arranca en el SS bajo (X ≈ 0.06). Proponga una estrategia de arranque paso a paso para migrar al SS alto, indicando qué variable manipular (T₀, T<sub>a</sub>, o UA) y por qué el SS medio no puede usarse como punto de tránsito controlado.</div>
+          <div class="q-hint">Pista: el SS medio es inestable — cualquier perturbación lo aleja. La estrategia típica es elevar T₀ o T<sub>a</sub> temporalmente para "saltar" el SS medio, luego regresar a condiciones normales. ¿Cuánto tiempo debe mantenerse la perturbación?</div>
+          <span class="q-level t2">Nivel: operación de planta</span>
+        </div>
+
+        <div class="q-card t2">
+          <div class="q-num">Q-02 · Fouling y Van Heerden</div>
+          <div class="q-text">El CSTR opera en el SS alto (X = 0.88). Por ensuciamiento (fouling) de la camisa, UA cae un 30%. ¿Puede el reactor caer al SS bajo? Derive la condición crítica de UA mínimo para garantizar operación estable en el SS alto, y proponga un criterio de mantenimiento preventivo.</div>
+          <div class="q-hint">Pista: al bajar UA, la recta R(T) rota (menor pendiente). Existe un UA<sub>crítico</sub> cuando dR/dT = dG/dT<sub>máx</sub> (tangente a G). Por debajo de ese UA, el SS alto desaparece — extinción. Monitorear ΔT del refrigerante es la clave de mantenimiento.</div>
+          <span class="q-level t2">Nivel: ingeniería de control</span>
+        </div>
+
+        <div class="q-card t2">
+          <div class="q-num">Q-03 · Severidad térmica</div>
+          <div class="q-text">Una nitración aromática tiene ΔH<sub>rx</sub> = −160 kJ/mol y C<sub>A0</sub> = 3 mol/L. La densidad de mezcla es 1,200 kg/m³ y Cp = 1.8 kJ/(kg·K). Calcule ΔT<sub>ad</sub>, clasifique la severidad y determine qué nivel de integridad de seguridad (SIL) requeriría la norma IEC-61511.</div>
+          <div class="q-hint">Pista: ΔT<sub>ad</sub> = (−ΔH<sub>rx</sub>·C<sub>A0</sub>·MM)/(ρ·Cp). Si ΔT<sub>ad</sub> > 200 K, la norma requiere SIL-2 o superior con doble redundancia. Si ΔT<sub>ad</sub> > 400 K, se requieren sistemas de despresurización de emergencia.</div>
+          <span class="q-level t2">Nivel: normativa de seguridad</span>
+        </div>
+
+        <div class="q-card t2">
+          <div class="q-num">Q-04 · TMR y tiempo de respuesta</div>
+          <div class="q-text">Para un batch con Ea = 110 kJ/mol y T₀ = 60°C, el TMR adiabático es 3.5 h. A t = 1 h, el agitador de la camisa falla. ¿Tiene el operador tiempo de intervención? Calcule el nuevo TMR si T₀ sube 15°C por la falla y estime la temperatura máxima sin intervención.</div>
+          <div class="q-hint">Pista: con Ea/R ≈ 13,230 K, un aumento de 15°C a T=333 K reduce TMR por factor exp(−Ea·ΔT/(R·T²)) ≈ 1/2.2. Si el nuevo TMR < 2.5 h de margen disponible, la intervención es crítica. T<sub>máx</sub> sin intervención ≈ T₀ + ΔT<sub>ad</sub>.</div>
+          <span class="q-level t2">Nivel: seguridad crítica</span>
+        </div>
+
+        <div class="q-card t2">
+          <div class="q-num">Q-05 · Histéresis y control</div>
+          <div class="q-text">En la curva de histéresis T<sub>sal</sub> vs τ, la planta opera cerca del punto de extinción (reducción de τ por alto caudal). ¿Qué perturbación mínima puede precipitar la caída al SS bajo? ¿Cómo diseñaría el lazo de control para prevenir la extinción involuntaria?</div>
+          <div class="q-hint">Pista: el punto de extinción es donde la rama alta "desaparece". Una perturbación de T₀ o T<sub>a</sub> puede cruzar ese punto. El control recomendado es un cascade loop: controlador de conversión (inferida por T) manipulando T<sub>a</sub>, con alarma de baja X.</div>
+          <span class="q-level t2">Nivel: control de procesos</span>
+        </div>
+
+        <div class="q-card t2">
+          <div class="q-num">Q-06 · Escalado térmico</div>
+          <div class="q-text">Una polimerización exotérmica se transfiere de 100 L (ΔT<sub>camisa</sub> = 5°C, estable) a 10,000 L. Calcule la razón A/V para ambas escalas y explique por qué el ingeniero puede esperar inestabilidad térmica en el reactor grande aunque la cinética sea idéntica.</div>
+          <div class="q-hint">Pista: para geometría cilíndrica (h = D), A/V = 4/D. Al escalar 100× en volumen, D crece por 100^(1/3) ≈ 4.6× y A/V cae ~4.6×. La remoción de calor se vuelve el cuello de botella: el mismo proceso que era controlable a escala pequeña se vuelve inestable.</div>
+          <span class="q-level t2">Nivel: escalado industrial</span>
+        </div>
+
+        <div class="q-card t2">
+          <div class="q-num">Q-07 · Reacción endotérmica</div>
+          <div class="q-text">Para una reacción endotérmica (ΔH<sub>rx</sub> = +80 kJ/mol) en un CSTR adiabático, ¿aumenta o disminuye la conversión respecto al caso isotérmico? ¿Puede existir multiplicidad de estados estacionarios? Argumente usando el comportamiento de la línea adiabática.</div>
+          <div class="q-hint">Pista: la línea adiabática para reacción endotérmica tiene pendiente negativa en el plano X-T: al aumentar X, T baja, reduciendo k y frenando la reacción (retroalimentación negativa). Esta retroalimentación negativa impide la multiplicidad, que es característica exclusiva de reacciones exotérmicas.</div>
+          <span class="q-level t2">Nivel: conceptual-analítico</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     NOTEBOOK 3 — PFR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="nb t3" id="nb3">
+  <div class="nb-head">
+    <div class="nb-badge">🔩</div>
+    <div class="nb-head-text">
+      <div class="nb-num">Notebook 3 · Fogler Cap. 2, 5, 6, 8</div>
+      <div class="nb-title">PFR Isotérmico y No Isotérmico</div>
+      <div class="nb-sub">Reactor de Flujo Pistón — ODEs, Selectividad y Reacciones Múltiples</div>
+      <div class="nb-tags">
+        <span class="tag a">PFR · Flujo Pistón</span>
+        <span class="tag b">ODEs acopladas</span>
+        <span class="tag b">Espacio de fase X-T</span>
+        <span class="tag b">Selectividad paralelo</span>
+        <span class="tag b">Serie A→B→C</span>
+        <span class="tag b">Volumen óptimo</span>
+      </div>
+    </div>
+  </div>
+  <div class="nb-body">
+
+    <div class="sec-head">📋 ¿Qué contiene este notebook?</div>
+    <p class="prose">Introduce la complejidad matemática central: <strong>en el PFR ya no se resuelven ecuaciones algebraicas sino ODEs</strong>. La concentración y (en el caso no isotérmico) la temperatura varían continuamente con la posición axial, lo que hace imposible el cálculo directo. Este cuaderno enseña a resolver numéricamente esos sistemas con <code>scipy.integrate.odeint</code>, analizar el espacio de fase X-T, y tomar decisiones de selectividad para reacciones múltiples.</p>
+
+    <div class="sec-head">🔬 Secciones en detalle</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-txt">
+          <div class="step-title">Ecuación de diseño y comparación con CSTR — §2.2</div>
+          <div class="step-desc">Derivación diferencial: F<sub>A0</sub>dX/dV = −r<sub>A</sub>. Tabla comparativa: CSTR = álgebra vs PFR = ODE; concentración uniforme vs gradiente; control térmico excelente vs difícil; V<sub>CSTR</sub> > V<sub>PFR</sub> para n > 0. Figura esquemática del tubo con gradiente de color azul→verde→rojo.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-txt">
+          <div class="step-title">PFR no isotérmico — 4 paneles interactivos — §8.6</div>
+          <div class="step-desc">ODEs acopladas: dX/dV = −r<sub>A</sub>/F<sub>A0</sub> y dT/dV = [Ua(T<sub>a</sub>−T) + (−r<sub>A</sub>)(−ΔH<sub>rx</sub>)] / (F<sub>A0</sub>·ΣΘ<sub>i</sub>C<sub>pi</sub>). 4 paneles: X(V), T(V), <strong>espacio de fase X-T</strong> con línea adiabática de referencia, y perfil log-escala de k(T). Permite comparar isotérmico vs no isotérmico vs adiabático simultáneamente.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-txt">
+          <div class="step-title">Reacciones en paralelo — selectividad — §6.1</div>
+          <div class="step-desc">A→D (deseado, orden α₁) y A→U (indeseado, orden α₂). Selectividad instantánea S̃<sub>D/U</sub> = (k₁/k₂)·C<sub>A</sub><sup>α₁−α₂</sup>. Regla: si α₁ > α₂ → usar PFR (alta C<sub>A</sub> favorece D); si α₁ < α₂ → usar CSTR (baja C<sub>A</sub> suprime U). Widget con recomendación automática del reactor óptimo.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-txt">
+          <div class="step-title">Reacciones en serie A→B→C — volumen óptimo — §6.2</div>
+          <div class="step-desc">Solución analítica: C<sub>B</sub> = C<sub>A0</sub>·k₁/(k₂−k₁)·(e<sup>−k₁τ</sup>−e<sup>−k₂τ</sup>). Tiempo óptimo: τ<sub>opt</sub> = ln(k₂/k₁)/(k₂−k₁). Widget con k₁, k₂ ajustables: muestra perfiles de C<sub>A</sub>, C<sub>B</sub>, C<sub>C</sub>, el marcador de V<sub>opt</sub> y la sensibilidad de C<sub>B,max</sub> vs k₂/k₁ en escala log.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">⚖️ Casos límite del PFR no isotérmico</div>
+    <div class="compare">
+      <div class="compare-col" style="background:#F3FBF6; border-color:#B8DFC8;">
+        <h4 style="color:#1A7A42">Ua → ∞ (Isotérmico)</h4>
+        <ul>
+          <li>T constante = T<sub>a</sub> en todo el reactor</li>
+          <li>X máxima para el τ dado</li>
+          <li>k constante → ODE simple</li>
+          <li>Uso: reacciones muy sensibles a T, catalizador con Ea alta</li>
+        </ul>
+      </div>
+      <div class="compare-col" style="background:#FEF9EC; border-color:#DEBB50;">
+        <h4 style="color:#8A6500">Ua = 0 (Adiabático)</h4>
+        <ul>
+          <li>Trayectoria sigue la línea adiabática en X-T</li>
+          <li>T sube con X (exotérmico): k se acelera</li>
+          <li>Riesgo de hotspot si ΔT<sub>ad</sub> es grande</li>
+          <li>Uso: reformado catalítico (con reheaters entre camas)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PREGUNTAS NB3 -->
+    <div class="q-section">
+      <div class="q-header">
+        <h3>Preguntas de reflexión — aplicación industrial</h3>
+        <span class="q-count t3">7 preguntas</span>
+      </div>
+      <div class="q-grid">
+
+        <div class="q-card t3">
+          <div class="q-num">Q-01 · Selectividad industrial</div>
+          <div class="q-text">En la síntesis de óxido de etileno sobre plata (reacción deseada de orden 1, combustión indeseada de mayor orden en C<sub>A</sub>), ¿qué concentración de etileno conviene mantener? ¿Por qué los hornos industriales operan con conversiones bajas (25-30%) por pasada y usan reciclo?</div>
+          <div class="q-hint">Pista: si α₁(EO) &lt; α₂(combustión), el CSTR favorecería la selectividad al mantener C<sub>A</sub> baja. Pero a escala industrial se usa PFR con reciclo de gas (diluye y protege la selectividad). La baja conversión por pasada limita el calor generado y protege la selectividad al mismo tiempo.</div>
+          <span class="q-level t3">Nivel: industrial petroquímico</span>
+        </div>
+
+        <div class="q-card t3">
+          <div class="q-num">Q-02 · A→B→C en cloración</div>
+          <div class="q-text">Para monoclorobenceno (B) desde benceno (A): k₁ = 0.8 min⁻¹, k₂ = 0.15 min⁻¹. Calcule τ<sub>opt</sub> y C<sub>B,max</sub>/C<sub>A0</sub>. Si k₂ aumentara a 0.8 min⁻¹ (igual a k₁), ¿cuánto caería el rendimiento máximo? ¿Qué estrategia de separación compensaría la pérdida?</div>
+          <div class="q-hint">Pista: para k₁ = k₂, τ<sub>opt</sub> = 1/k₁ y C<sub>B,max</sub>/C<sub>A0</sub> = 1/e ≈ 0.368. La separación aguas abajo (destilación benceno/MCB/DCB) puede compensar si el benceno no convertido se recircula, pero el costo de destilación puede superar el beneficio del mayor rendimiento.</div>
+          <span class="q-level t3">Nivel: diseño y economía</span>
+        </div>
+
+        <div class="q-card t3">
+          <div class="q-num">Q-03 · Hotspot en PFR</div>
+          <div class="q-text">En un PFR no isotérmico exotérmico, el perfil T(V) muestra un máximo (hotspot) a V/V<sub>total</sub> = 0.3. Si la temperatura máxima excede el límite del catalizador, proponga dos estrategias de mitigación sin rediseñar el reactor. Evalúe con los sliders del widget.</div>
+          <div class="q-hint">Pista: estrategias posibles incluyen (1) aumentar Ua (mejor refrigeración), (2) bajar C<sub>A0</sub> (dilución), (3) dividir la alimentación (cross-flow), o (4) usar camisa segmentada con T<sub>a</sub> variable por zona. Cada una mueve el hotspot en T y en posición axial.</div>
+          <span class="q-level t3">Nivel: ingeniería de proceso</span>
+        </div>
+
+        <div class="q-card t3">
+          <div class="q-num">Q-04 · Espacio de fase</div>
+          <div class="q-text">En el espacio de fase X-T del PFR no isotérmico, ¿qué significa que la trayectoria se "curve hacia la derecha" (T crece más que X)? ¿Y si se curva hacia la izquierda? Identifique las condiciones de Ua, ΔH y T<sub>a</sub> que producen cada caso.</div>
+          <div class="q-hint">Pista: curva a la derecha → reacción exotérmica con Ua insuficiente (generación supera remoción). Curva a la izquierda → reacción endotérmica o exotérmica con Ua muy alto y T<sub>a</sub> &lt; T<sub>0</sub>. La línea adiabática (Ua = 0) es el caso límite de referencia.</div>
+          <span class="q-level t3">Nivel: análisis conceptual</span>
+        </div>
+
+        <div class="q-card t3">
+          <div class="q-num">Q-05 · Alimentación distribuida</div>
+          <div class="q-text">Para A + B → D (deseado) con A + B → U (indeseado, α<sub>B</sub> = 2 para U vs α<sub>B</sub> = 1 para D), proponga un reactor PFR con inyecciones laterales de B a lo largo del tubo. Explique por qué este diseño mejora la selectividad frente a una alimentación convencional.</div>
+          <div class="q-hint">Pista: al inyectar B en dosis pequeñas, C<sub>B</sub> se mantiene baja en todo el tubo. Como la reacción indeseada tiene orden 2 en B, su velocidad cae cuadráticamente con C<sub>B</sub>, mientras la deseada cae linealmente. La selectividad instantánea r<sub>D</sub>/r<sub>U</sub> ∝ 1/C<sub>B</sub> mejora al reducir C<sub>B</sub>.</div>
+          <span class="q-level t3">Nivel: diseño avanzado</span>
+        </div>
+
+        <div class="q-card t3">
+          <div class="q-num">Q-06 · Comparación económica</div>
+          <div class="q-text">Para n = 2.5 y X = 0.75, calcule V<sub>CSTR</sub>/V<sub>PFR</sub>. Si el PFR cuesta USD 1,200/dm³ instalado vs USD 800/dm³ el CSTR, ¿a partir de qué escala de producción el PFR es económicamente preferible? Asuma que el beneficio del producto deseado es USD 0.50/mol.</div>
+          <div class="q-hint">Pista: integre numéricamente V<sub>CSTR</sub>/V<sub>PFR</sub> para n=2.5 y X=0.75. Costo<sub>PFR</sub> = V<sub>PFR</sub>·1200, Costo<sub>CSTR</sub> = V<sub>CSTR</sub>·800. El PFR conviene cuando el ahorro en OPEX (mayor selectividad) supera la diferencia en CAPEX anualizado.</div>
+          <span class="q-level t3">Nivel: análisis económico</span>
+        </div>
+
+        <div class="q-card t3">
+          <div class="q-num">Q-07 · Steam Cracking</div>
+          <div class="q-text">En el craqueo de etano (Ea = 272 kJ/mol), ¿cuánto debe subir la temperatura (actualmente 800°C) para compensar un aumento del 20% en el caudal manteniendo el mismo V<sub>PFR</sub>? ¿Hay margen si T<sub>pared,max</sub> = 900°C?</div>
+          <div class="q-hint">Pista: para mismo V y 20% más caudal, τ cae 20%, por lo que k·τ debe mantenerse constante → k debe subir 25%. Con Ea = 272 kJ/mol y T = 1073 K: ΔT = (R·T²/Ea)·ln(1.25) ≈ 7.5°C. El margen hasta 900°C es 100°C, suficiente si la incrustación de coque no es factor.</div>
+          <span class="q-level t3">Nivel: cálculo industrial</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     NOTEBOOK 4 — BATCH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="nb t4" id="nb4">
+  <div class="nb-head">
+    <div class="nb-badge">🧪</div>
+    <div class="nb-head-text">
+      <div class="nb-num">Notebook 4 · Fogler Cap. 4, 7, 9</div>
+      <div class="nb-title">Reactor Batch — Cinética Experimental, Diseño por Lotes y Seguridad Térmica</div>
+      <div class="nb-sub">Cómo obtener la cinética de datos reales, optimizar lotes y evaluar el riesgo térmico</div>
+      <div class="nb-tags">
+        <span class="tag a">Reactor Batch</span>
+        <span class="tag b">Método diferencial</span>
+        <span class="tag b">Método integral</span>
+        <span class="tag b">Productividad óptima</span>
+        <span class="tag b">TMR · Seguridad</span>
+        <span class="tag b">Comparación CSTR/PFR</span>
+      </div>
+    </div>
+  </div>
+  <div class="nb-body">
+
+    <div class="sec-head">📋 ¿Qué contiene este notebook?</div>
+    <p class="prose">Aborda tres dimensiones que los notebooks anteriores no tratan: <strong>cómo obtener la cinética desde datos experimentales reales</strong> (los datos de planta nunca vienen con un k dado), <strong>cómo optimizar la operación por lotes</strong> (el tiempo inactivo pesa tanto como el de reacción), y <strong>cómo evaluar el riesgo térmico</strong> (el batch no isotérmico es históricamente la configuración de mayor riesgo en química fina y farmacéutica).</p>
+
+    <div class="sec-head">🔬 Secciones en detalle</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-txt">
+          <div class="step-title">Ecuación de diseño y ciclo de operación — §4.1</div>
+          <div class="step-desc">Derivación t<sub>rxn</sub> = C<sub>A0</sub>∫dX/(−r<sub>A</sub>) y equivalencia matemática exacta con el PFR (τ<sub>PFR</sub> = t<sub>batch</sub>). Ciclo completo: t<sub>ciclo</sub> = t<sub>rxn</sub> + t<sub>carga</sub> + t<sub>calentamiento</sub> + t<sub>descarga</sub> + t<sub>limpieza</sub>. Demuestra que la X* que maximiza la productividad Pr = C<sub>A0</sub>·V<sub>R</sub>·X/t<sub>ciclo</sub> no es X = 1.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-txt">
+          <div class="step-title">Fogler Example 4-1 — Etilenglicol con widget de 7 sliders — §4.2</div>
+          <div class="step-desc">Hidrólisis de óxido de etileno: k = 0.311 min⁻¹, C<sub>A0</sub> = 16.1 mol/dm³, V<sub>R</sub> = 1,000 dm³, t<sub>inactivo</sub> = 45 min. Widget con 7 sliders: muestra Levenspiel batch (área = t<sub>rxn</sub>), X(t), <strong>curva de productividad vs X con X<sub>opt</sub> automático</strong>, y producción acumulada por lotes con zonas de tiempo inactivo.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-txt">
+          <div class="step-title">Determinación cinética — métodos diferencial e integral — §7.2</div>
+          <div class="step-desc">Datos del Example 7-2: descomposición de H₂O₂ en reactor batch. <strong>Diferencial</strong>: regresión log-log de ln(−r<sub>A</sub>) vs ln(C<sub>A</sub>) → n y k sin suponer el orden. <strong>Integral</strong>: linealización para ordenes 0, 1, 2 → R² como criterio. Análisis de residuos: un patrón sistemático revela modelo incorrecto aunque R² sea alto.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-txt">
+          <div class="step-title">Batch no isotérmico y análisis de seguridad — §9.1-§9.2</div>
+          <div class="step-desc">ODEs acopladas dX/dt y dT/dt con 6 sliders. Cuatro paneles: X(t), T(t), espacio de fase X-T con línea adiabática, y curva de velocidad −r<sub>A</sub>(t) con zona crítica (antes del TMR, zona roja) vs zona segura (después del TMR, zona verde). Clasificación automática de criticidad (baja/moderada/alta).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-txt">
+          <div class="step-title">Comparación CSTR / PFR / Batch — §5.3 y §4.2</div>
+          <div class="step-desc">Para misma cinética: t<sub>batch</sub> = τ<sub>PFR</sub> &lt; τ<sub>CSTR</sub>. Widget con n y k: muestra τ(X) para los tres reactores, razón V<sub>CSTR</sub>/V<sub>PFR</sub> con anotaciones numéricas, y Diagrama de Levenspiel comparativo. Tabla de selección por criterios industriales: escala, control térmico, sólidos, flexibilidad y CAPEX.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head">🔍 Comparación de métodos cinéticos — Example 7-2 (H₂O₂)</div>
+    <table class="dtable">
+      <tr><th>Método</th><th>n</th><th>k</th><th>Criterio</th><th>Fortaleza clave</th></tr>
+      <tr><td>Diferencial (log-log)</td><td>Calculado sin suponer</td><td>exp(intercepto)</td><td>Regresión R²</td><td>No requiere asumir el orden a priori</td></tr>
+      <tr><td>Integral — 1er orden</td><td>Supuesto = 1</td><td>Pendiente de ln(C₀/C) vs t</td><td>R² ≈ 0.999</td><td>Muy sensible a desviaciones del orden</td></tr>
+      <tr><td>Integral — 2do orden</td><td>Supuesto = 2</td><td>Pendiente de 1/C vs t</td><td>R² &lt; 0.990</td><td>Residuos sistemáticos → modelo incorrecto</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <div class="callout-ico">⚠️</div>
+      <div class="callout-txt"><strong>Regla de oro de la cinética experimental:</strong> Un R² = 0.98 puede verse bien pero ocultar un patrón sistemático en los residuos que indica que el modelo es fundamentalmente incorrecto. La industria farmacéutica (FDA 21 CFR Part 11) exige evidencia estadística completa del modelo cinético — incluyendo análisis de residuos y bandas de confianza de los parámetros.</div>
+    </div>
+
+    <!-- PREGUNTAS NB4 -->
+    <div class="q-section">
+      <div class="q-header">
+        <h3>Preguntas de reflexión — aplicación industrial</h3>
+        <span class="q-count t4">7 preguntas</span>
+      </div>
+      <div class="q-grid">
+
+        <div class="q-card t4">
+          <div class="q-num">Q-01 · Productividad óptima</div>
+          <div class="q-text">Un reactor batch de 2,000 L produce un API farmacéutico (k = 0.45 h⁻¹, t<sub>inactivo</sub> = 3 h). Calcule la X* que maximiza la productividad. El área de calidad exige X ≥ 0.95. ¿Cuánto cae la productividad respecto al óptimo? Proponga una alternativa que recupere productividad sin sacrificar conversión.</div>
+          <div class="q-hint">Pista: la condición óptima para 1er orden es k·t<sub>rxn</sub>(X*) = t<sub>inactivo</sub>/(1−X*) (derivada de Pr respecto a X igualada a cero). Numéricamente para estos datos X* ≈ 0.80. La alternativa para X ≥ 0.95: reducir t<sub>inactivo</sub> con sistema CIP (Clean-In-Place) automatizado.</div>
+          <span class="q-level t4">Nivel: optimización económica</span>
+        </div>
+
+        <div class="q-card t4">
+          <div class="q-num">Q-02 · Cinética de fermentación</div>
+          <div class="q-text">Datos de fermentación batch: t = [0,2,5,10,20,40] h; C<sub>A</sub> = [10, 8.2, 5.9, 3.5, 1.0, 0.10] g/L. Aplique el método diferencial e integral. ¿El orden fraccionario obtenido tiene sentido para un proceso enzimático? ¿Qué modelo alternativo evaluaría?</div>
+          <div class="q-hint">Pista: la regresión log-log probablemente dará n ≈ 0.5-0.7, indicando cinética de Michaelis-Menten en zona de saturación parcial. El modelo alternativo es Monod: −r<sub>A</sub> = μ<sub>max</sub>·C<sub>A</sub>/(K<sub>s</sub>+C<sub>A</sub>), que da 1er orden a baja C<sub>A</sub> y 0 orden a alta C<sub>A</sub>.</div>
+          <span class="q-level t4">Nivel: análisis de datos reales</span>
+        </div>
+
+        <div class="q-card t4">
+          <div class="q-num">Q-03 · Diseño Semibatch</div>
+          <div class="q-text">Una nitración exotérmica tiene ΔH = −200 kJ/mol y ΔT<sub>ad</sub> = 280 K. Seguridad rechaza el diseño batch. Proponga un diseño Semibatch "starved-feed" donde la tasa de adición de ácido nítrico se calcule para que el calor generado nunca supere el 80% de la capacidad de la camisa (UA·ΔT<sub>max</sub> = 50 kW).</div>
+          <div class="q-hint">Pista: Q̇<sub>máx permitido</sub> = 0.80 × 50 = 40 kW. En modo starved-feed: Q̇ ≈ (−ΔH<sub>rx</sub>)·v₀·C<sub>B0</sub>. Despejando: v₀ = Q̇<sub>máx</sub>/[(−ΔH<sub>rx</sub>)·C<sub>B0</sub>]. Con ΔH = 200 kJ/mol y C<sub>B0</sub> = 5 mol/L: v₀ ≈ 40/(200×5) = 0.04 L/s.</div>
+          <span class="q-level t4">Nivel: diseño de seguridad</span>
+        </div>
+
+        <div class="q-card t4">
+          <div class="q-num">Q-04 · Equivalencia Batch-PFR</div>
+          <div class="q-text">Una planta piloto batch de 50 L produce datos cinéticos a k = 0.25 min⁻¹ y X = 0.80. La planta industrial requiere 500 mol/min de producto. Diseñe el PFR continuo equivalente y un sistema de batchs en paralelo. ¿Cuál tiene menor huella ambiental y por qué?</div>
+          <div class="q-hint">Pista: τ<sub>PFR</sub> = t<sub>batch</sub> = −ln(0.2)/0.25 = 6.44 min. V<sub>PFR</sub> = (500/C<sub>A0</sub>·X)·τ<sub>PFR</sub>. Para los batchs en paralelo: N lotes simultáneos = F<sub>P</sub>·t<sub>ciclo</sub>/(C<sub>A0</sub>·V<sub>R</sub>·X). La huella ambiental considera energía de arranque por lote vs operación continua del PFR.</div>
+          <span class="q-level t4">Nivel: comparación de sistemas</span>
+        </div>
+
+        <div class="q-card t4">
+          <div class="q-num">Q-05 · Residuos y validación</div>
+          <div class="q-text">El método integral para H₂O₂ da R² = 0.997 para 1er orden pero los residuos muestran un patrón en arco (sistemático). Su colega concluye que el modelo es correcto. ¿Qué responde? ¿Qué modelo probaría y cómo lo validaría estadísticamente?</div>
+          <div class="q-hint">Pista: un patrón sistemático en residuos invalida el modelo aunque R² sea alto. Pruebe n = 1.5 (orden fraccionario) o Michaelis-Menten. Validación formal: test de rachas (runs test) para aleatoriedad de residuos, intervalos de confianza de k y n, y prueba F de significancia estadística.</div>
+          <span class="q-level t4">Nivel: estadística aplicada</span>
+        </div>
+
+        <div class="q-card t4">
+          <div class="q-num">Q-06 · Escalado no isotérmico</div>
+          <div class="q-text">Un batch de 10 L opera estable con UA/V = 2 kW/(m³·K). Al escalar a 5,000 L manteniendo la geometría cilíndrica (h = 2D), ¿cuánto cae UA/V? ¿Puede la camisa controlar un ΔT<sub>ad</sub> = 120 K a la escala grande?</div>
+          <div class="q-hint">Pista: UA/V ∝ A/V ∝ 1/R. Al escalar 500× en volumen, el diámetro crece por 500^(1/3) ≈ 7.9×, por lo que A/V cae ~7.9×: de 2 a ≈ 0.25 kW/(m³·K). La velocidad de remoción de calor cae 8× mientras ΔT<sub>ad</sub> permanece igual. El riesgo de runaway es real.</div>
+          <span class="q-level t4">Nivel: escalado crítico</span>
+        </div>
+
+        <div class="q-card t4">
+          <div class="q-num">Q-07 · Validación FDA</div>
+          <div class="q-text">Una empresa farmacéutica debe validar el proceso batch de un API bajo FDA 21 CFR Part 11. ¿Qué información cinética mínima debe presentar en el dossier? ¿Cómo los métodos diferencial e integral del notebook satisfacen esos requisitos y qué información adicional faltaría?</div>
+          <div class="q-hint">Pista: el dossier FDA requiere modelo cinético con parámetros estadísticamente significativos, rango de temperatura operacional (Design Space), parámetros de Arrhenius (k₀, Ea) determinados a múltiples temperaturas, análisis de incertidumbre y estudios de worst-case. El notebook cubre el modelo isotérmico; falta Arrhenius y el análisis estadístico formal de parámetros.</div>
+          <span class="q-level t4">Nivel: regulatorio farmacéutico</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CASO 1 — DESHIDROGENACIÓN ESTIRENO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="nb t5" id="caso1">
+  <div class="nb-head">
+    <div class="nb-badge">🏭</div>
+    <div class="nb-head-text">
+      <div class="nb-num">Caso Industrial 1 · Sector Petroquímico · ~30 Mt/año globales</div>
+      <div class="nb-title">Deshidrogenación Catalítica de Etilbenceno a Estireno</div>
+      <div class="nb-sub">Proceso Lummus / UOP / BASF — Catalizador Fe₂O₃/K₂O/Cr₂O₃ — 600°C — Cinética reversible</div>
+      <div class="nb-tags">
+        <span class="tag a">Petroquímica</span>
+        <span class="tag b">Cinética reversible</span>
+        <span class="tag b">Equilibrio termodinámico</span>
+        <span class="tag b">Batch + CSTR + PFR</span>
+        <span class="tag b">Cascada óptima</span>
+        <span class="tag b">X_eq como límite</span>
+      </div>
+    </div>
+  </div>
+  <div class="nb-body">
+
+    <div class="sec-head">🏭 Contexto industrial</div>
+    <p class="prose">El <strong>estireno</strong> (~30 Mt/año globales) es la materia prima de poliestireno, ABS, caucho SBR y resinas de poliéster insaturado. La deshidrogenación catalítica del etilbenceno representa el 90% de la producción mundial, operada sobre catalizadores de Fe₂O₃ promovido con K₂O y Cr₂O₃ a 550-650°C con inyección de vapor de agua como diluyente.</p>
+
+    <div class="eq">
+      <div class="eq-lbl">Reacción y cinética</div>
+      C₆H₅CH₂CH₃  ⇌  C₆H₅CH=CH₂  +  H₂     (ΔHrx = +117 kJ/mol, endotérmica)<br>
+      −r_EB = kf·C_EB − kr·C_S·C_H2<br>
+      kf = 0.030 min⁻¹   kr = 0.015 dm³/(mol·min)   Keq = 2.0 mol/dm³<br>
+      X_eq ≈ 0.55  ←  calculado con brentq como raíz de −r_EB = 0
+    </div>
+
+    <div class="sec-head">🔬 Pasos del notebook</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-txt">
+          <div class="step-title">Cinética reversible y Diagrama de Levenspiel con límite de equilibrio</div>
+          <div class="step-desc">La velocidad se anula en X = X<sub>eq</sub> → la curva F<sub>EB0</sub>/(−r<sub>EB</sub>) diverge al acercarse al equilibrio. <strong>Ningún reactor puede superar X<sub>eq</sub> con volumen finito.</strong> El diseño apunta a X = 0.45 = 81% de X<sub>eq</sub>. Tres paneles: velocidad vs X, Levenspiel, y comparativa V<sub>CSTR</sub>/V<sub>PFR</sub> vs X.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-txt">
+          <div class="step-title">Reactor Batch — producción anual para V<sub>R</sub> = 5,000 dm³</div>
+          <div class="step-desc">t<sub>inactivo</sub> = 120 min, 340 días/año, 20 h/día. Se calcula t<sub>rxn</sub> por integración numérica, lotes por día, kg de estireno por lote y toneladas anuales. Gráfico de producción acumulada con zonas de tiempo inactivo.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-txt">
+          <div class="step-title">Reactor CSTR — penalización severa por reversibilidad</div>
+          <div class="step-desc">V<sub>CSTR</sub> crece explosivamente al acercarse a X<sub>eq</sub>. La razón V<sub>CSTR</sub>/V<sub>PFR</sub> es mayor que en el caso irreversible porque los productos (estireno e H₂) frenan la reacción directa cuando el CSTR opera a la concentración de salida.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-txt">
+          <div class="step-title">Reactor PFR — integración numérica y perfil X(V)</div>
+          <div class="step-desc">V<sub>PFR</sub> calculado con np.trapz sobre el Levenspiel. Perfil X(V) por odeint. Comparativa final: tabla y gráfico de barras con t<sub>rxn</sub> Batch, V<sub>CSTR</sub> y V<sub>PFR</sub>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-txt">
+          <div class="step-title">Cascada de N CSTRs — iteración con brentq y diagrama de escalera</div>
+          <div class="step-desc">Para cinética reversible no hay fórmula cerrada: cada CSTR se resuelve iterativamente con brentq. Diagramas de escalera para N = 1, 2, 3. Con 3 CSTRs se logra un X cercano al PFR con mejor controlabilidad térmica.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">6</div>
+        <div class="step-txt">
+          <div class="step-title">Widget resumen — sensibilidad al punto de diseño</div>
+          <div class="step-desc">Slider de X<sub>objetivo</sub>: actualiza en tiempo real el Levenspiel comparativo, barras de volumen, razón V<sub>CSTR</sub>/V<sub>PFR</sub> y tabla resumen. Discusión: en planta real se usa PFR de lecho fijo con reheaters entre camas y reciclo de EB no convertido.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-ico">🏭</div>
+      <div class="callout-txt"><strong>El proceso industrial real (Lummus, UOP, BASF):</strong> Reactores de lecho fijo adiabáticos en serie con reheaters intermedios. Conversión por pasada del 55-70% (limitada por X<sub>eq</sub>), reciclo de EB no convertido, selectividad a estireno del 90-95%. El catalizador dura 2-5 años y se regenera in-situ con vapor de agua. La separación EB/estireno por destilación a vacío representa el 30-40% del CAPEX total.</div>
+    </div>
+
+    <!-- PREGUNTAS CASO1 -->
+    <div class="q-section">
+      <div class="q-header">
+        <h3>Preguntas de reflexión — aplicación industrial</h3>
+        <span class="q-count t5">7 preguntas</span>
+      </div>
+      <div class="q-grid">
+
+        <div class="q-card t5">
+          <div class="q-num">Q-01 · Equilibrio termodinámico</div>
+          <div class="q-text">El proceso opera a X = 0.55-0.70, limitado por X<sub>eq</sub> ≈ 0.55 a 600°C. Para desplazar el equilibrio y operar a X = 0.75, proponga dos estrategias termodinámicas y evalúe su impacto en el costo de operación. ¿Por qué la industria prefiere el reciclo de EB sobre estas estrategias?</div>
+          <div class="q-hint">Pista: estrategias: (1) aumentar T — K<sub>eq</sub> crece para reacción endotérmica (riesgo de degradación del catalizador); (2) reducir presión parcial de H₂ con membranas selectivas. El reciclo de EB es preferido porque opera con las mismas condiciones de T y P, evitando capex adicional y riesgo de reacciones secundarias.</div>
+          <span class="q-level t5">Nivel: termodinámica avanzada</span>
+        </div>
+
+        <div class="q-card t5">
+          <div class="q-num">Q-02 · Desactivación del catalizador</div>
+          <div class="q-text">El catalizador pierde actividad por coque: k<sub>f</sub>(t) = k<sub>f0</sub>·exp(−αt) con α = 0.002 h⁻¹. ¿Cuánto cae la conversión después de 1,000 h de operación? ¿Cuándo debe regenerarse el catalizador para que X no caiga por debajo de 0.40?</div>
+          <div class="q-hint">Pista: k<sub>f</sub>(1000h) = k<sub>f0</sub>·exp(−2.0) = 0.135·k<sub>f0</sub>. Calcule X con la nueva k<sub>f</sub> y el mismo τ. Para encontrar t<sub>regen</sub>: resuelva la ecuación de equilibrio con k<sub>f</sub>(t) tal que X<sub>eq</sub> efectivo sea 0.40/0.81 ≈ 0.49.</div>
+          <span class="q-level t5">Nivel: desactivación catalítica</span>
+        </div>
+
+        <div class="q-card t5">
+          <div class="q-num">Q-03 · Cascada vs PFR — economía</div>
+          <div class="q-text">La planta procesa v₀ = 120 dm³/min de EB. Compare el CAPEX de: (a) 1 PFR al costo calculado, (b) 3 CSTRs en serie de igual volumen total. Si PFR cuesta USD 1,200/dm³ y CSTR USD 700/dm³, ¿bajo qué condición de τ la cascada CSTR supera económicamente al PFR?</div>
+          <div class="q-hint">Pista: calcule V<sub>PFR</sub> y V<sub>3 CSTRs</sub> con X = 0.45. La cascada puede requerir más volumen total pero a menor costo unitario. El breakeven ocurre cuando V<sub>cascada</sub>·700 = V<sub>PFR</sub>·1200, es decir, cuando V<sub>cascada</sub>/V<sub>PFR</sub> < 1.71×.</div>
+          <span class="q-level t5">Nivel: análisis económico</span>
+        </div>
+
+        <div class="q-card t5">
+          <div class="q-num">Q-04 · Reacción en serie</div>
+          <div class="q-text">Existe una reacción secundaria: estireno → tolueno + etileno (k₃ &lt;&lt; k₁). ¿Qué impacto tiene en la elección del reactor? Use el concepto de τ<sub>opt</sub> de la serie A→B→C del NB3 para determinar si el τ de diseño actual es mayor o menor que el τ<sub>opt</sub> para estireno.</div>
+          <div class="q-hint">Pista: el sistema A→B→C con k₂/k₁ &lt;&lt; 1 tiene τ<sub>opt</sub> → ∞ (la degradación de estireno es muy lenta). Esto sugiere que el τ de diseño puede operarse sin riesgo significativo de pérdida de estireno por la reacción secundaria, y que la conversión de equilibrio es la restricción dominante, no la selectividad.</div>
+          <span class="q-level t5">Nivel: reacciones múltiples</span>
+        </div>
+
+        <div class="q-card t5">
+          <div class="q-num">Q-05 · Error en K_r</div>
+          <div class="q-text">Si por error el valor de k<sub>r</sub> se subestimó en 20%, el X<sub>eq</sub> real es 0.48 en lugar de 0.55. El reactor diseñado apunta a X = 0.45 = 81% del X<sub>eq</sub> nominal. ¿Cuál es ahora el porcentaje real de X<sub>eq</sub> en que opera? ¿Cómo afecta esto al volumen real vs el diseñado?</div>
+          <div class="q-hint">Pista: X = 0.45 sobre X<sub>eq</sub> = 0.48 significa operar al 93.8% del equilibrio real. A esa fracción, la velocidad de reacción es muy baja y el volumen real necesario para alcanzar X = 0.45 es mayor que el diseñado. Calcule el factor de corrección necesario para el volumen.</div>
+          <span class="q-level t5">Nivel: incertidumbre de diseño</span>
+        </div>
+
+        <div class="q-card t5">
+          <div class="q-num">Q-06 · Efecto del vapor de agua</div>
+          <div class="q-text">La planta co-alimenta vapor a razón de 10 mol de vapor por mol de EB para desplazar el equilibrio. Cuantifique el efecto del vapor sobre X<sub>eq</sub> usando K<sub>p</sub> = P<sub>S</sub>·P<sub>H2</sub>/P<sub>EB</sub>. ¿Cuánto aumenta X<sub>eq</sub> al pasar de 0 a 10 mol vapor/mol EB?</div>
+          <div class="q-hint">Pista: en presencia de inerte (vapor), las presiones parciales se reducen. Con razón vapor/EB = 10, y<sub>EB</sub> = 1/(1+10) = 0.091 al inicio. K<sub>p</sub> = K<sub>c</sub>·(RT)^Δn donde Δn = +1. Al reducir P parcial del H₂ y EB, el equilibrio se desplaza hacia mayor X<sub>eq</sub>. Calcule cuantitativamente con P total = 1 atm.</div>
+          <span class="q-level t5">Nivel: termodinámica de proceso</span>
+        </div>
+
+        <div class="q-card t5">
+          <div class="q-num">Q-07 · Integración proceso</div>
+          <div class="q-text">La corriente de salida contiene EB no convertido (55%), estireno (45%) y H₂. Diseñe conceptualmente el tren de separación aguas abajo: ¿cómo se separa el H₂? ¿Cómo se separa estireno de EB? ¿Qué pureza exige el mercado y cuánto representa la separación en el CAPEX total?</div>
+          <div class="q-hint">Pista: H₂ se separa por flash a baja T (diferencia de punto de ebullición muy grande). La separación EB/estireno es destilación a vacío (T<sub>eb</sub> estireno = 145°C, EB = 136°C; α ≈ 1.35, difícil). El mercado de polimerización exige ≥ 99.5% estireno. La destilación representa el 35-45% del CAPEX total del proceso.</div>
+          <span class="q-level t5">Nivel: integración proceso completo</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     CASO 2 — CRAQUEO TÉRMICO DE ETANO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="nb t6" id="caso2">
+  <div class="nb-head">
+    <div class="nb-badge">🔥</div>
+    <div class="nb-head-text">
+      <div class="nb-num">Caso Industrial 2 · Sector Olefinas · ~200 Mt/año de etileno</div>
+      <div class="nb-title">Craqueo Térmico de Etano a Etileno — Steam Cracking</div>
+      <div class="nb-sub">Proceso Linde / KBR / Lummus — Hornos tubulares — 800°C — Ea = 272 kJ/mol — Tiempo de residencia en milisegundos</div>
+      <div class="nb-tags">
+        <span class="tag a">Petroquímica · Olefinas</span>
+        <span class="tag b">Arrhenius extremo</span>
+        <span class="tag b">PFR único viable</span>
+        <span class="tag b">CSTR inviable</span>
+        <span class="tag b">τ en milisegundos</span>
+        <span class="tag b">Diseño de hornos</span>
+      </div>
+    </div>
+  </div>
+  <div class="nb-body">
+
+    <div class="sec-head">🏭 Contexto industrial</div>
+    <p class="prose">El <strong>etileno</strong> (~200 Mt/año) es el químico industrial más producido en el mundo y la materia prima de polietileno, PVC, PET, etilenglicol, estireno y muchos más. El steam cracking craquea etano a 750-900°C en tubos con tiempo de residencia de <strong>0.1–0.5 segundos</strong>. Este caso demuestra por qué el CSTR es técnicamente imposible en este proceso y cómo la altísima Ea hace que el reactor sea extremadamente sensible a la temperatura.</p>
+
+    <div class="eq">
+      <div class="eq-lbl">Cinética y parámetros de diseño (T = 800°C)</div>
+      C₂H₆  →  C₂H₄  +  H₂     (ΔHrx = +137 kJ/mol, irreversible a 800°C)<br>
+      k(T) = 4.65×10¹³ · exp(−272,000 / (R·T))   [s⁻¹]<br>
+      k(800°C)  ≈ 2.29 s⁻¹<br>
+      τ_PFR  = −ln(1−0.60)/k = 0.400 s = 400 ms<br>
+      τ_CSTR = 0.60/(k·0.40)  = 0.655 s = 655 ms<br>
+      Factor Arrhenius: cada +10°C multiplica k por ~2.5×
+    </div>
+
+    <div class="sec-head">🔬 Pasos del notebook</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-txt">
+          <div class="step-title">Arrhenius extremo — sensibilidad de k a la temperatura</div>
+          <div class="step-desc">Con Ea = 272 kJ/mol, cada +10°C multiplica k por ≈2.5×. El notebook grafica k(T) en escala log y cuantifica este factor de sensibilidad. Calcula τ<sub>PFR</sub> = 400 ms y τ<sub>CSTR</sub> = 655 ms para X = 0.60 a 800°C. La razón de 1.63× se vuelve enorme a conversiones altas.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-txt">
+          <div class="step-title">Reactor Batch — el absurdo de milisegundos</div>
+          <div class="step-desc">t<sub>rxn</sub> = −ln(1−X)/k = 262 ms para X = 0.60 a 800°C. El notebook concluye que el Batch solo tiene valor académico (cinética en microreactores de laboratorio): es imposible cargar, reaccionar y descargar en milisegundos a 800°C en escala industrial.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-txt">
+          <div class="step-title">Reactor CSTR — demostración cuantitativa de inviabilidad</div>
+          <div class="step-desc">Además de mayor volumen que el PFR (+63%), el CSTR requeriría un tanque agitado a 800°C en escala industrial — materialmente imposible. El notebook imprime el diagnóstico: "(a) 800°C en tanque agitado: imposible mecánica y térmicamente; (b) solo el PFR tubular es viable para este proceso".</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-txt">
+          <div class="step-title">Reactor PFR — diseño detallado y dimensionamiento</div>
+          <div class="step-desc">V<sub>PFR</sub> = v₀·(−ln(1−X))/k. Para D = 100 mm: longitud de tubo calculada. El notebook determina si se necesitan tubos en paralelo. Perfiles X(V) y −r<sub>A</sub>(V). Sensibilidad logarítmica de τ<sub>PFR</sub> y V<sub>PFR</sub> vs T: <strong>+100°C reduce el volumen por factor ~100×</strong>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-txt">
+          <div class="step-title">Widget interactivo — el operador del horno de craqueo</div>
+          <div class="step-desc">Sliders de T (700-900°C) y X<sub>des</sub> (0.10-0.90). Tres paneles: Levenspiel comparativo, perfil X(V) y τ(X) para ambos reactores. El estudiante descubre visualmente por qué los hornos industriales operan a la temperatura máxima posible y por qué cada grado cuenta.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <div class="callout-ico">🔥</div>
+      <div class="callout-txt"><strong>El reto industrial real:</strong> Los hornos de craqueo consumen ~40 GJ/ton de etileno — son las instalaciones más intensivas en energía de la química. La temperatura de pared de los tubos (900-1,100°C) limita la vida útil a 3-7 años. El coque depositado en las paredes aumenta la presión y reduce la transferencia de calor, requiriendo paradas de decoking cada 30-60 días. El diseño de estos hornos es una especialidad por sí misma (Linde, KBR, Lummus, Stone & Webster).</div>
+    </div>
+
+    <!-- PREGUNTAS CASO2 -->
+    <div class="q-section">
+      <div class="q-header">
+        <h3>Preguntas de reflexión — aplicación industrial</h3>
+        <span class="q-count t6">7 preguntas</span>
+      </div>
+      <div class="q-grid">
+
+        <div class="q-card t6">
+          <div class="q-num">Q-01 · Control de temperatura</div>
+          <div class="q-text">Con Ea = 272 kJ/mol, un aumento de 800°C a 810°C multiplica k por 2.5×. Si el sistema de control tiene precisión de ±3°C, ¿cuál es el rango de variación de la conversión de salida? ¿Cómo diseñaría el sistema de control del horno para compensar esta sensibilidad extrema?</div>
+          <div class="q-hint">Pista: factor por ±3°C = exp(±272×3/(0.00831×1073²)) ≈ ×1.82 / ÷1.82. Calcule el rango de X resultante. Para controlarlo: controladores de temperatura feedforward + feedback con múltiples zonas de calefacción, sensores de temperatura de alta precisión (termopar tipo K/S) y modelos predictivos del horno.</div>
+          <span class="q-level t6">Nivel: control e instrumentación</span>
+        </div>
+
+        <div class="q-card t6">
+          <div class="q-num">Q-02 · Decoking y operación</div>
+          <div class="q-text">El coque se deposita a 0.1 mm/mes en las paredes del tubo de 100 mm de diámetro. Calcule el cambio en τ y X después de 6 meses sin decoking. ¿Cuánto debe subir la temperatura del horno para compensar la pérdida de conversión?</div>
+          <div class="q-hint">Pista: el depósito de coque reduce D: D(t) = 100 − 2×0.1×t mm. La velocidad lineal del gas aumenta (misma Q, menor área seccional) → τ disminuye → X cae. Para compensar: ΔT = (R·T²/Ea)·ln(τ₀/τ(t)). También aumenta la caída de presión (Ergun). El decoking quema el coque con aire diluido a 500-600°C.</div>
+          <span class="q-level t6">Nivel: operación y mantenimiento</span>
+        </div>
+
+        <div class="q-card t6">
+          <div class="q-num">Q-03 · Reacciones secundarias</div>
+          <div class="q-text">El etileno formado puede degradarse: C₂H₄ → C₂H₂ + H₂ (acetileno, k₂ = 0.15·k₁) y C₂H₄ → coque (k₃ = 0.05·k₁). Para maximizar el rendimiento de etileno en la secuencia A→B→C, ¿cuál es el τ óptimo del PFR? ¿Por qué la industria usa conversiones del 60-65% por pasada?</div>
+          <div class="q-hint">Pista: con k₂/k₁ = 0.20 (suma de k₂+k₃), τ<sub>opt</sub> = ln(0.20/1.0)/(0.20−1.0)·(1/k₁) ≈ 2.01/k₁. Con k₁ ≈ 2.29 s⁻¹: τ<sub>opt</sub> ≈ 0.88 s. La industria usa τ = 0.4-0.5 s (X ≈ 60%) porque ese punto logra 85% del rendimiento óptimo con mucho menos coque y reacciones secundarias.</div>
+          <span class="q-level t6">Nivel: reacciones múltiples</span>
+        </div>
+
+        <div class="q-card t6">
+          <div class="q-num">Q-04 · Dimensionamiento de horno</div>
+          <div class="q-text">Un horno de craqueo industrial procesa 100,000 ton/año de etano. Calcule el caudal molar en mol/s, V<sub>PFR</sub> total y el número de tubos en paralelo (D = 100 mm, L = 60 m). ¿Por qué los diseñadores prefieren muchos tubos cortos en paralelo en lugar de pocos tubos largos?</div>
+          <div class="q-hint">Pista: 100,000 ton/año = 3,175 kg/s = 105.8 mol/s de etano. V<sub>PFR</sub> = (F<sub>A0</sub>/C<sub>A0</sub>)·τ<sub>PFR</sub>. N tubos = V<sub>total</sub>/(π/4·D²·L). Los tubos cortos en paralelo permiten: control de temperatura por zona, menor ΔP, facilidad de reemplazo individual y uniformidad de τ (evita dispersión de tiempos de residencia).</div>
+          <span class="q-level t6">Nivel: diseño de horno industrial</span>
+        </div>
+
+        <div class="q-card t6">
+          <div class="q-num">Q-05 · Sistema de quench</div>
+          <div class="q-text">Al salir del tubo a 800°C, el producto debe enfriarse a &lt;300°C en menos de 10 ms para detener reacciones secundarias (quench). Si se inyecta agua líquida a 25°C, calcule la cantidad de agua por mol de gas de proceso necesaria. ¿Qué implica esto en el diseño del equipo de quench?</div>
+          <div class="q-hint">Pista: balance de energía: m<sub>gas</sub>·Cp<sub>gas</sub>·ΔT<sub>gas</sub> = m<sub>agua</sub>·(Cp<sub>liq</sub>·ΔT<sub>vap</sub> + ΔH<sub>vap</sub> + Cp<sub>vap</sub>·ΔT<sub>vap</sub>). El quench debe garantizar contacto íntimo gas-agua en &lt;10 ms: se usan TLE (Transfer Line Exchangers) de doble tubo de diseño especial o quench con agua vaporizada.</div>
+          <span class="q-level t6">Nivel: diseño integrado de proceso</span>
+        </div>
+
+        <div class="q-card t6">
+          <div class="q-num">Q-06 · Comparación ambos casos</div>
+          <div class="q-text">Compare los Casos 1 y 2 en: (a) tipo de cinética, (b) restricción principal de diseño, (c) reactor industrial elegido y justificación, (d) viabilidad del CSTR, y (e) papel del Diagrama de Levenspiel. Identifique el principio de diseño común que comparten.</div>
+          <div class="q-hint">Pista: el principio común es que la curva del Levenspiel determina inequívocamente la topología óptima. Caso 1: la curva diverge en X<sub>eq</sub> — el diseño debe mantenerse lejos del equilibrio. Caso 2: la curva es monótonamente creciente pero las condiciones de proceso (800°C, τ en ms) hacen el CSTR mecánicamente imposible, no solo ineficiente.</div>
+          <span class="q-level t6">Nivel: síntesis comparativa</span>
+        </div>
+
+        <div class="q-card t6">
+          <div class="q-num">Q-07 · Análisis económico</div>
+          <div class="q-text">El etileno se vende a USD 1,200/ton. El etano vale USD 180/ton. Con X = 0.60 y selectividad del 80% a etileno (el resto es metano, H₂ y subproductos de menor valor), estime el margen bruto por tonelada de etano procesado. ¿Cómo impacta un 5% de mejora en selectividad al margen anual para una planta de 100,000 ton/año de etano?</div>
+          <div class="q-hint">Pista: masa de etileno por ton de etano = (1000/30)·0.60·0.80·28 = 448 kg (MM etano=30, etileno=28). Valor = 448·1.2 = USD 538/ton etano. Costo MP = USD 180. Margen bruto ≈ USD 358/ton. Un 5% más de selectividad: 448·1.05·1.2 = USD 564 → +USD 32/ton. Para 100,000 ton/año: +USD 3.2M/año de margen adicional.</div>
+          <span class="q-level t6">Nivel: economía de proceso</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page-wrap -->
+
+<!-- ══════ FOOTER ══════ -->
+<footer class="footer">
+  <p><strong>Diseño de Reactores — Maestría en Ingeniería Química</strong><br>
+  Universidad del Valle · Programa 740484 · Prof. José Antonio Lara Ramos<br>
+  Referencia principal: Fogler, S.H. — <em>Elements of Chemical Reaction Engineering</em>, 4ª Ed.</p>
+  <p style="margin-top:.7rem;font-size:.76rem;opacity:.6">
+    6 notebooks · 42 preguntas industriales · Generado con base en los archivos .ipynb del curso
+  </p>
+</footer>
+
+</body>
+</html>
