@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guía de Notebooks — Diseño de Reactores | Maestría Ingeniería Química</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Fuentes: stack serif para títulos, sans-serif para cuerpo, mono para código */
+</style>
 <style>
 /* ─── Variables ─────────────────────────────────────────── */
 :root {
@@ -30,7 +31,7 @@
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 html { scroll-behavior:smooth; }
 body {
-  font-family:'IBM Plex Sans', sans-serif;
+  font-family: 'Segoe UI', 'Liberation Sans', Arial, sans-serif;
   background: var(--bg-page);
   color: var(--ink);
   line-height: 1.65;
@@ -38,8 +39,8 @@ body {
 }
 
 /* ─── Utility ────────────────────────────────────────────── */
-.mono { font-family:'IBM Plex Mono', monospace; }
-code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
+.mono { font-family: 'Consolas', 'Courier New', monospace; }
+code  { font-family: 'Consolas', 'Courier New', monospace; font-size:.84em;
         background:#EEF3FA; color:#1A56C4; padding:.12em .42em;
         border-radius:4px; }
 
@@ -51,13 +52,13 @@ code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
   text-align: center;
 }
 .hero-eyebrow {
-  font-family:'IBM Plex Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   font-size:.72rem; font-weight:500;
   letter-spacing:.16em; text-transform:uppercase;
   color: var(--muted); margin-bottom:1.1rem;
 }
 .hero h1 {
-  font-family:'Lora', serif; font-weight:700;
+  font-family: Georgia, 'Times New Roman', serif; font-weight:700;
   font-size: clamp(2rem,4.5vw,3.2rem);
   color: var(--ink); line-height:1.15;
   margin-bottom:.9rem;
@@ -137,12 +138,12 @@ code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
 }
 .nb-head-text { flex:1; }
 .nb-num {
-  font-family:'IBM Plex Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   font-size:.68rem; font-weight:500; letter-spacing:.12em;
   text-transform:uppercase; margin-bottom:.3rem;
 }
 .nb-title {
-  font-family:'Lora', serif; font-weight:700;
+  font-family: Georgia, 'Times New Roman', serif; font-weight:700;
   font-size:1.42rem; line-height:1.2; color:var(--ink);
   margin-bottom:.25rem;
 }
@@ -160,7 +161,7 @@ code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
 
 /* ─── SECTION HEADINGS ───────────────────────────────────── */
 .sec-head {
-  font-family:'Lora', serif; font-weight:700;
+  font-family: Georgia, 'Times New Roman', serif; font-weight:700;
   font-size:1rem; color:var(--ink);
   display:flex; align-items:center; gap:.6rem;
   margin:2rem 0 .9rem;
@@ -188,7 +189,7 @@ code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
 .step-n {
   width:28px; height:28px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  font-family:'IBM Plex Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   font-size:.75rem; font-weight:500;
   flex-shrink:0; margin-top:.05rem;
 }
@@ -202,12 +203,12 @@ code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
   border:1.5px solid #DEBB50;
   border-radius:8px;
   padding:.85rem 1.1rem;
-  font-family:'IBM Plex Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   font-size:.86rem; color:#3A2800; line-height:1.65;
   margin:.8rem 0;
 }
 .eq-lbl {
-  font-family:'IBM Plex Sans', sans-serif;
+  font-family: 'Segoe UI', 'Liberation Sans', Arial, sans-serif;
   font-size:.68rem; font-weight:600; text-transform:uppercase;
   letter-spacing:.08em; color:#8A6500; margin-bottom:.35rem;
 }
@@ -268,10 +269,10 @@ code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
   display:flex; align-items:center; gap:.75rem; margin-bottom:1.3rem;
 }
 .q-header h3 {
-  font-family:'Lora', serif; font-size:1.08rem; font-weight:700;
+  font-family: Georgia, 'Times New Roman', serif; font-size:1.08rem; font-weight:700;
 }
 .q-count {
-  font-family:'IBM Plex Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   font-size:.68rem; font-weight:500; padding:.22rem .65rem;
   border-radius:20px; text-transform:uppercase; letter-spacing:.06em;
 }
@@ -292,7 +293,7 @@ code  { font-family:'IBM Plex Mono', monospace; font-size:.84em;
   top:0; left:0; right:0; height:3px;
 }
 .q-num {
-  font-family:'IBM Plex Mono', monospace;
+  font-family: 'Consolas', 'Courier New', monospace;
   font-size:.67rem; font-weight:500;
   letter-spacing:.1em; text-transform:uppercase;
   margin-bottom:.45rem; opacity:.65;
