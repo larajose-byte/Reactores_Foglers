@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demostración Rigurosa de las Ecuaciones de Diseño de Reactores Ideales</title>
+<style>
+/* ═══════════════════════════════════════════════════════
+   VARIABLES DE DISEÑO
+═══════════════════════════════════════════════════════ */
+:root {
+  /* Tipografía */
+  --f-serif: Georgia, 'Times New Roman', serif;
+  --f-sans:  'Segoe UI', 'Liberation Sans', Arial, sans-serif;
+  --f-mono:  'Consolas', 'Courier New', monospace;
+
+  /* Paleta base */
+  --ink:     #1A1F2E;
+  --ink2:    #3A4560;
+  --ink3:    #6B7A99;
+  --border:  #D8E0EE;
+  --bg:      #EFF3FA;
+  --card:    #FFFFFF;
+  --alt:     #F5F8FD;
+
+  /* Colores de acento por sección */
+  --a1: #1048B8;   --a1l: #E8EFFC;   --a1m: #3366D8;
+  --a2: #8B1A00;   --a2l: #FCE8E2;   --a2m: #C0341A;
+  --a3: #14632A;   --a3l: #E4F5E9;   --a3m: #22904A;
+  --a4: #4A1888;   --a4l: #F0E8FA;   --a4m: #7238C0;
+  --a5: #006070;   --a5l: #E0F4F7;   --a5m: #0090A8;
+
+  /* Funcionales */
+  --gold:    #B07800;
+  --goldb:   #FFF8E0;
+  --goldbr:  #DFC050;
+  --shadow:  rgba(10,20,60,.10);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET Y BASE
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--f-sans);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.70;
+}
+a { color: var(--a1); text-decoration: none; }
+strong { color: var(--ink); font-weight: 600; }
+em { font-style: italic; }
+
+/* ═══════════════════════════════════════════════════════
+   TOPNAV
+═══════════════════════════════════════════════════════ */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: .6rem 1rem;
+  display: flex; gap: .4rem; flex-wrap: wrap; justify-content: center;
+}
+.tnb {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .3rem .8rem; border-radius: 6px;
+  font-size: .72rem; font-weight: 600; font-family: var(--f-sans);
+  text-decoration: none; border: 1.5px solid transparent;
+  cursor: pointer; transition: all .18s;
+  white-space: nowrap;
+}
+.tnb:hover { transform: translateY(-1px); }
+.tnb.dark  { background:#1A2A4A; color:#7EB8FF; border-color:#2A4080; }
+.tnb.dark:hover { background:#2A4080; }
+.tnb.s1 { background:var(--a1l); color:var(--a1); border-color:#B0C8F0; }
+.tnb.s1:hover { background:var(--a1); color:#fff; }
+.tnb.s2 { background:var(--a2l); color:var(--a2); border-color:#F0B8A8; }
+.tnb.s2:hover { background:var(--a2); color:#fff; }
+.tnb.s3 { background:var(--a3l); color:var(--a3); border-color:#A8D8B8; }
+.tnb.s3:hover { background:var(--a3); color:#fff; }
+.tnb.s4 { background:var(--a4l); color:var(--a4); border-color:#C8A8F0; }
+.tnb.s4:hover { background:var(--a4); color:#fff; }
+.tnb.s5 { background:var(--a5l); color:var(--a5); border-color:#90D0DC; }
+.tnb.s5:hover { background:var(--a5); color:#fff; }
+
+/* ═══════════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════════ */
+.hero {
+  background: linear-gradient(160deg, #080C1A 0%, #0C1830 40%, #0A2050 70%, #102858 100%);
+  padding: 5rem 2.5rem 4.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 40%, rgba(30,80,200,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(0,120,180,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eye {
+  font-family: var(--f-mono);
+  font-size: .72rem; font-weight: 500;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: #5090C0; margin-bottom: 1.1rem;
+}
+.hero h1 {
+  font-family: var(--f-serif);
+  font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+  font-weight: 700; color: #E8F2FE;
+  line-height: 1.14; margin-bottom: 1rem;
+}
+.hero h1 span { color: #60B0FF; }
+.hero-lead {
+  font-size: 1.02rem; color: #7AA0C0;
+  max-width: 700px; margin: 0 auto 2rem;
+  line-height: 1.80;
+}
+.hero-chips {
+  display: flex; gap: .5rem; flex-wrap: wrap;
+  justify-content: center; margin-bottom: 2.2rem;
+}
+.chip {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(100,160,255,.25);
+  border-radius: 100px; padding: .3rem 1rem;
+  font-size: .74rem; color: #90B8D8; font-weight: 500;
+}
+.hero-actions {
+  display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .65rem 1.5rem; border-radius: 8px;
+  font-size: .88rem; font-weight: 600;
+  cursor: pointer; border: none;
+  transition: all .2s; text-decoration: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.btn-colab { background: #F9AB00; color: #1A1000; }
+.btn-dl    { background: var(--a1); color: #fff; }
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════ */
+.wrap { max-width: 1020px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+
+/* ═══════════════════════════════════════════════════════
+   SECCIÓN CARD
+═══════════════════════════════════════════════════════ */
+.sec {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 3.5rem;
+  overflow: hidden;
+  box-shadow: 0 3px 20px var(--shadow);
+  animation: fadeUp .5s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.sec:nth-child(1){animation-delay:.05s}
+.sec:nth-child(2){animation-delay:.10s}
+.sec:nth-child(3){animation-delay:.15s}
+.sec:nth-child(4){animation-delay:.20s}
+.sec:nth-child(5){animation-delay:.25s}
+.sec:nth-child(6){animation-delay:.30s}
+
+/* Cabecera de sección */
+.sec-hd {
+  padding: 1.8rem 2.2rem 1.4rem;
+  border-bottom: 1.5px solid var(--border);
+  display: flex; gap: 1.2rem; align-items: flex-start;
+}
+.sec-ico {
+  width: 52px; height: 52px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; flex-shrink: 0;
+}
+.sec-meta { flex: 1; }
+.sec-cap {
+  font-family: var(--f-mono);
+  font-size: .68rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  margin-bottom: .3rem;
+}
+.sec-tit {
+  font-family: var(--f-serif);
+  font-size: 1.28rem; font-weight: 700;
+  color: var(--ink); line-height: 1.22; margin-bottom: .25rem;
+}
+.sec-sub { font-size: .82rem; color: var(--ink3); font-style: italic; }
+
+/* Cuerpo */
+.sec-body { padding: 2rem 2.2rem; }
+@media (max-width:640px) {
+  .sec-hd   { padding: 1.3rem; }
+  .sec-body { padding: 1.3rem; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   TIPOGRAFÍA INTERNA
+═══════════════════════════════════════════════════════ */
+.h3 {
+  font-family: var(--f-serif);
+  font-size: .98rem; font-weight: 700;
+  color: var(--ink);
+  display: flex; align-items: center; gap: .7rem;
+  margin: 2.2rem 0 .95rem;
+}
+.h3:first-child { margin-top: 0; }
+.h3::after {
+  content: ''; flex: 1; height: 1.5px;
+  background: linear-gradient(90deg, rgba(0,0,0,.12), transparent);
+}
+.prose {
+  font-size: .94rem; color: var(--ink2);
+  line-height: 1.82; margin-bottom: 1rem;
+}
+.prose + .prose { margin-top: -.3rem; }
+
+/* ═══════════════════════════════════════════════════════
+   CAJAS DE ECUACIÓN — sistema completo
+═══════════════════════════════════════════════════════ */
+.eqbox {
+  background: #FFFDF5;
+  border: 1.5px solid var(--goldbr);
+  border-radius: 12px;
+  margin: 1.1rem 0 1.4rem;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(180,130,0,.08);
+}
+.eqbox-hd {
+  background: linear-gradient(90deg, #7A5600, #9A7200);
+  padding: .5rem 1.2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.eqlabel {
+  font-family: var(--f-mono);
+  font-size: .7rem; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: #FFE090;
+}
+.eqref {
+  font-family: var(--f-mono);
+  font-size: .66rem; color: #C8A050;
+  letter-spacing: .06em;
+}
+.eqbody { padding: 1.3rem 1.6rem 1.4rem; }
+
+/* Derivación paso a paso */
+.steps { display: flex; flex-direction: column; gap: .6rem; margin: .5rem 0; }
+.step  {
+  display: flex; gap: .9rem; align-items: baseline;
+  border-left: 3px solid var(--goldbr);
+  padding: .5rem 0 .5rem .9rem;
+}
+.step-n {
+  font-family: var(--f-mono);
+  font-size: .75rem; font-weight: 700;
+  color: var(--gold); flex-shrink: 0; width: 22px;
+}
+.step-body {
+  font-size: .9rem; color: var(--ink);
+  line-height: 1.95;
+}
+
+/* Resultado destacado */
+.eqresult {
+  background: linear-gradient(135deg, #F5ECC0, #EFE8A8);
+  border-radius: 8px;
+  padding: .8rem 1.2rem;
+  margin-top: .9rem;
+  font-size: .92rem; font-weight: 700;
+  color: #2A1800;
+  border-left: 4px solid var(--gold);
+  line-height: 1.85;
+}
+.eqresult mjx-container,
+.eqresult .MathJax { color: #2A1800 !important; }
+
+/* Nota interpretativa */
+.eqnote {
+  background: var(--goldb);
+  border: 1px dashed var(--goldbr);
+  border-radius: 7px;
+  padding: .65rem 1rem;
+  margin-top: .75rem;
+  font-size: .84rem; color: #5A4000;
+  line-height: 1.68;
+}
+.eqnote strong { color: #3A2800; }
+
+/* ═══════════════════════════════════════════════════════
+   TARJETAS DE SUPOSICIÓN
+═══════════════════════════════════════════════════════ */
+.asump-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .8rem; margin: 1rem 0 1.3rem;
+}
+.asump {
+  border-radius: 10px; padding: 1.1rem 1.2rem;
+  background: var(--alt);
+  border-left: 4px solid var(--border);
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.asump-id {
+  font-family: var(--f-mono);
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: .4rem;
+}
+.asump-title {
+  font-size: .9rem; font-weight: 700;
+  color: var(--ink); margin-bottom: .35rem;
+}
+.asump-phys {
+  font-size: .84rem; color: var(--ink2);
+  line-height: 1.62; margin-bottom: .45rem;
+}
+.asump-math {
+  font-family: var(--f-mono);
+  font-size: .79rem; color: var(--a1);
+  background: var(--a1l);
+  padding: .25rem .55rem; border-radius: 5px;
+  margin-bottom: .4rem; display: block;
+}
+.asump-fail {
+  font-size: .78rem; color: var(--ink3);
+  border-top: 1px solid var(--border);
+  padding-top: .4rem; margin-top: .35rem;
+  line-height: 1.55;
+}
+.asump-fail::before { content: '⚠ '; opacity: .7; }
+
+/* ═══════════════════════════════════════════════════════
+   TABLA DE DATOS
+═══════════════════════════════════════════════════════ */
+.dtab {
+  width: 100%; border-collapse: collapse;
+  margin: 1rem 0; font-size: .87rem;
+  border-radius: 10px; overflow: hidden;
+}
+.dtab th {
+  background: var(--ink); color: #fff;
+  padding: .58rem .9rem; text-align: left;
+  font-size: .74rem; letter-spacing: .05em;
+  text-transform: uppercase; font-weight: 500;
+}
+.dtab td {
+  padding: .52rem .9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink2); vertical-align: top;
+  line-height: 1.55;
+}
+.dtab tr:last-child td { border-bottom: none; }
+.dtab tr:nth-child(even) td { background: var(--alt); }
+.dtab tr:hover td { background: var(--a1l); }
+.mono { font-family: var(--f-mono); font-size: .83rem; color: var(--a1); }
+
+/* ═══════════════════════════════════════════════════════
+   CALLOUTS
+═══════════════════════════════════════════════════════ */
+.call {
+  display: flex; gap: .9rem;
+  padding: 1.1rem 1.3rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1.1rem 0;
+  border-left: 4px solid;
+  font-size: .9rem; line-height: 1.72;
+}
+.call-ico { font-size: 1.2rem; flex-shrink: 0; padding-top: .05rem; }
+.call.info    { background: #EAF3FB; border-color: var(--a1); color: #0A2858; }
+.call.warn    { background: #FEF8E8; border-color: var(--gold); color: #3A2800; }
+.call.success { background: #E6F5EC; border-color: var(--a3); color: #0A2818; }
+.call.danger  { background: #FAECEA; border-color: var(--a2); color: #3A0800; }
+
+/* ═══════════════════════════════════════════════════════
+   CAJA DE DEMOSTRACIÓN (PROOF)
+═══════════════════════════════════════════════════════ */
+.proof {
+  background: linear-gradient(135deg, #F0F5FF, #E8F0FE);
+  border: 1.5px solid #B8CCFA;
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  margin: 1.1rem 0;
+}
+.proof-hd {
+  display: flex; align-items: center; gap: .65rem;
+  margin-bottom: .9rem;
+}
+.proof-badge {
+  font-family: var(--f-mono);
+  font-size: .7rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: #fff; background: var(--a1);
+  padding: .22rem .65rem; border-radius: 20px;
+}
+.proof-tit {
+  font-family: var(--f-serif);
+  font-size: .96rem; font-weight: 700; color: var(--a1);
+}
+.proof-body {
+  font-size: .9rem; color: #0A2050;
+  line-height: 1.90;
+}
+.proof-qed {
+  text-align: right;
+  font-family: var(--f-serif);
+  font-size: .95rem; font-weight: 700;
+  color: var(--a1); margin-top: .7rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GRIDS 2 COLUMNAS
+═══════════════════════════════════════════════════════ */
+.grid2 {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem; margin: 1rem 0;
+}
+@media (max-width:640px) { .grid2 { grid-template-columns: 1fr; } }
+.g2col {
+  border-radius: 10px; padding: 1.1rem 1.2rem;
+  border: 1.5px solid var(--border);
+}
+.g2col h4 {
+  font-size: .88rem; font-weight: 700;
+  margin-bottom: .55rem;
+}
+.g2col p {
+  font-size: .85rem; color: var(--ink2);
+  line-height: 1.68;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ÁRBOL JERÁRQUICO
+═══════════════════════════════════════════════════════ */
+.tree {
+  background: linear-gradient(135deg, #080C1A, #0C1830, #0A2050);
+  border-radius: 12px;
+  padding: 1.8rem 2rem;
+  margin: 1.3rem 0;
+  border: 1px solid #1E3A6A;
+  font-family: var(--f-mono);
+  font-size: .85rem; color: #B8D0F0;
+  line-height: 2.1; overflow-x: auto;
+}
+.tree .t-gold   { color: #FFD080; font-weight: 700; }
+.tree .t-blue   { color: #70B0FF; }
+.tree .t-green  { color: #70E090; }
+.tree .t-gray   { color: #8090B0; }
+
+/* ═══════════════════════════════════════════════════════
+   CITAS INDUSTRIALES
+═══════════════════════════════════════════════════════ */
+.industria {
+  background: linear-gradient(135deg, #0E1A30, #122040);
+  border: 1px solid #1E3A6A;
+  border-radius: 12px;
+  padding: 1.5rem 1.8rem;
+  margin: 1.3rem 0;
+}
+.industria-hd {
+  font-family: var(--f-mono);
+  font-size: .72rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: #5090C0; margin-bottom: .85rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.industria-body {
+  font-size: .9rem; color: #A8C0E0;
+  line-height: 1.82;
+}
+.industria-body strong { color: #D0E4FF; }
+.industria-body .kpi {
+  display: inline-block;
+  background: rgba(100,160,255,.15);
+  border: 1px solid rgba(100,160,255,.3);
+  border-radius: 6px; padding: .15rem .5rem;
+  font-family: var(--f-mono); font-size: .85rem;
+  color: #90C8FF; margin: .1rem .2rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DEBILIDADES Y FORTALEZAS
+═══════════════════════════════════════════════════════ */
+.df-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .9rem; margin: 1rem 0;
+}
+@media (max-width:640px) { .df-grid { grid-template-columns: 1fr; } }
+.df-col {
+  border-radius: 10px; padding: 1.1rem 1.2rem;
+}
+.df-col.fort { background: var(--a3l); border: 1.5px solid #A8D8B8; }
+.df-col.deb  { background: var(--a2l); border: 1.5px solid #F0B8A8; }
+.df-tit {
+  font-size: .84rem; font-weight: 700;
+  display: flex; align-items: center; gap: .4rem;
+  margin-bottom: .6rem;
+}
+.df-col.fort .df-tit { color: var(--a3); }
+.df-col.deb  .df-tit { color: var(--a2); }
+.df-item {
+  font-size: .84rem; color: var(--ink2);
+  display: flex; gap: .5rem; margin-bottom: .35rem;
+  line-height: 1.55;
+}
+.df-item::before { flex-shrink: 0; margin-top: .05rem; }
+.df-col.fort .df-item::before { content: '✓'; color: var(--a3); font-weight: 700; }
+.df-col.deb  .df-item::before { content: '✗'; color: var(--a2); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════
+   TEMA POR SECCIÓN
+═══════════════════════════════════════════════════════ */
+.t1 .sec-hd  { background: linear-gradient(90deg, #EDF3FC, #F7FAFF); }
+.t1 .sec-ico { background: var(--a1l); }
+.t1 .sec-cap { color: var(--a1); }
+.t1 .asump   { border-left-color: var(--a1); }
+.t1 .asump-id{ color: var(--a1); }
+.t1 .asump-math{ background:var(--a1l); color:var(--a1); }
+
+.t2 .sec-hd  { background: linear-gradient(90deg, #FBF0EC, #FEF7F5); }
+.t2 .sec-ico { background: var(--a2l); }
+.t2 .sec-cap { color: var(--a2); }
+.t2 .asump   { border-left-color: var(--a2); }
+.t2 .asump-id{ color: var(--a2); }
+.t2 .asump-math{ background:var(--a2l); color:var(--a2); }
+
+.t3 .sec-hd  { background: linear-gradient(90deg, #EBF7F0, #F5FBF7); }
+.t3 .sec-ico { background: var(--a3l); }
+.t3 .sec-cap { color: var(--a3); }
+.t3 .asump   { border-left-color: var(--a3); }
+.t3 .asump-id{ color: var(--a3); }
+.t3 .asump-math{ background:var(--a3l); color:var(--a3); }
+
+.t4 .sec-hd  { background: linear-gradient(90deg, #F3EEF9, #F8F5FC); }
+.t4 .sec-ico { background: var(--a4l); }
+.t4 .sec-cap { color: var(--a4); }
+.t4 .asump   { border-left-color: var(--a4); }
+.t4 .asump-id{ color: var(--a4); }
+.t4 .asump-math{ background:var(--a4l); color:var(--a4); }
+
+.t5 .sec-hd  { background: linear-gradient(90deg, #E5F4F7, #F0FAFC); }
+.t5 .sec-ico { background: var(--a5l); }
+.t5 .sec-cap { color: var(--a5); }
+.t5 .asump   { border-left-color: var(--a5); }
+.t5 .asump-id{ color: var(--a5); }
+.t5 .asump-math{ background:var(--a5l); color:var(--a5); }
+
+/* ═══════════════════════════════════════════════════════
+   TABLA MAESTRA FINAL
+═══════════════════════════════════════════════════════ */
+.master {
+  background: var(--card); border-radius: 16px;
+  border: 1.5px solid var(--border);
+  padding: 2.2rem; margin-bottom: 3.5rem;
+  box-shadow: 0 3px 20px var(--shadow);
+}
+.master-tit {
+  font-family: var(--f-serif);
+  font-size: 1.18rem; font-weight: 700;
+  color: var(--ink); margin-bottom: 1.3rem;
+  display: flex; align-items: center; gap: .7rem;
+}
+.master-tit::after {
+  content: ''; flex: 1; height: 1.5px;
+  background: linear-gradient(90deg, rgba(0,0,0,.12), transparent);
+}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════ */
+.footer {
+  text-align: center; padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--card); color: var(--ink3);
+  font-size: .84rem; line-height: 1.7;
+}
+.footer strong { color: var(--ink); }
+
+
+/* ── Guía reactores: estilos adicionales ── */
+.rc{background:var(--card);border-radius:18px;border:1.5px solid var(--border);
+  margin-bottom:4rem;overflow:hidden;box-shadow:0 4px 24px rgba(10,20,60,.09);
+  animation:fadeUp .5s ease both}
+.rc-head{display:flex;align-items:flex-start;gap:1.2rem;padding:1.8rem 2.2rem 1.5rem}
+.rc-ico{width:54px;height:54px;border-radius:14px;display:flex;
+  align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0}
+.rc-num{font-family:var(--f-mono);font-size:.68rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:.28rem}
+.rc-title{font-family:var(--f-serif);font-size:1.28rem;font-weight:700;
+  color:var(--ink);line-height:1.20;margin-bottom:.22rem}
+.rc-sub{font-size:.82rem;color:var(--ink3);font-style:italic}
+.tags{display:flex;gap:.4rem;flex-wrap:wrap;padding:.9rem 2.2rem;
+  border-bottom:1px solid var(--border);background:var(--alt)}
+.tag{font-size:.68rem;font-weight:600;padding:.2rem .65rem;border-radius:20px}
+.kpi-row{display:flex;gap:.7rem;flex-wrap:wrap;margin:1rem 0}
+.kpi{border-radius:10px;padding:.75rem 1.1rem;border:1.5px solid;
+  background:var(--alt);min-width:110px}
+.kpi-v{font-family:var(--f-mono);font-size:1.05rem;font-weight:700;margin-bottom:.18rem}
+.kpi-l{font-size:.71rem;color:var(--ink3);font-weight:500;text-transform:uppercase;
+  letter-spacing:.06em;line-height:1.3}
+.ptab{width:100%;border-collapse:collapse;font-size:.86rem;margin:.9rem 0}
+.pt{padding:.5rem .9rem;color:var(--ink3);font-weight:600;font-size:.79rem;
+  background:var(--alt);border-bottom:1px solid var(--border);width:34%;
+  text-transform:uppercase;letter-spacing:.04em;vertical-align:top}
+.pv{padding:.5rem .9rem;color:var(--ink2);border-bottom:1px solid var(--border);
+  line-height:1.58;vertical-align:top}
+.ptab tr:last-child td{border-bottom:none}
+.ptab tr:hover td{background:#F5F8FD}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.9rem 0}
+@media(max-width:660px){.g2{grid-template-columns:1fr}}
+.gcol{border-radius:10px;padding:1.1rem 1.2rem;border:1.5px solid var(--border)}
+.gcol h4{font-size:.88rem;font-weight:700;margin-bottom:.55rem}
+.gcol li{font-size:.84rem;color:var(--ink2);line-height:1.68;margin-bottom:.22rem;padding-left:.2rem}
+.gcol ul{padding-left:1.1rem}
+.fort{background:#E6F5EC;border-color:#A8D8B8}.fort h4{color:#14632A}
+.deb{background:#FAECEA;border-color:#F0B8A8}.deb h4{color:#8B1A00}
+.ind{background:linear-gradient(135deg,#0A0E1C,#0C1428,#0A1C3C);
+  border:1px solid #1E3A6A;border-radius:12px;padding:1.5rem 1.8rem;margin:1.2rem 0}
+.ind-hd{font-family:var(--f-mono);font-size:.71rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:#5090C0;
+  margin-bottom:.85rem;display:flex;align-items:center;gap:.5rem}
+.ind-body{font-size:.9rem;color:#A8C0E0;line-height:1.82}
+.ind-body strong{color:#D0E4FF}
+.ikpi{display:inline-block;background:rgba(100,160,255,.14);
+  border:1px solid rgba(100,160,255,.28);border-radius:6px;
+  padding:.14rem .5rem;font-family:var(--f-mono);font-size:.82rem;
+  color:#90C8FF;margin:.1rem .2rem}
+.imgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:1rem;margin:1.2rem 0}
+.img-panel{border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--alt)}
+.img-panel img{width:100%;height:186px;object-fit:cover;display:block;
+  transition:transform .3s ease}
+.img-panel:hover img{transform:scale(1.04)}
+.img-cap{padding:.6rem .8rem;font-size:.78rem;color:var(--ink3);line-height:1.45}
+.img-src{display:block;font-size:.70rem;opacity:.6;margin-top:.16rem;font-style:italic}
+.cls-tab{width:100%;border-collapse:collapse;font-size:.84rem;border-radius:10px;overflow:hidden}
+.cls-tab th{background:var(--ink);color:#fff;padding:.58rem .9rem;
+  text-align:left;font-size:.73rem;text-transform:uppercase;letter-spacing:.05em;font-weight:500}
+.cls-tab td{padding:.5rem .9rem;border-bottom:1px solid var(--border);color:var(--ink2);
+  line-height:1.55;vertical-align:top}
+.cls-tab tr:nth-child(even) td{background:var(--alt)}
+.cls-tab tr:hover td{background:#EDF3FC}
+.comp-table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:1rem}
+.comp-table th{background:#1A1F2E;color:#fff;padding:.55rem .75rem;
+  font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;text-align:left}
+.comp-table td{padding:.48rem .75rem;border-bottom:1px solid var(--border);
+  color:var(--ink2);line-height:1.5;vertical-align:top}
+.comp-table tr:nth-child(even) td{background:var(--alt)}
+.master2{background:var(--card);border-radius:18px;border:1.5px solid var(--border);
+  padding:2.2rem;margin-bottom:3rem;box-shadow:0 3px 20px rgba(10,20,60,.07)}
+.master2-tit{font-family:var(--f-serif);font-size:1.15rem;font-weight:700;
+  color:var(--ink);margin-bottom:1.1rem;display:flex;align-items:center;gap:.7rem}
+.master2-tit::after{content:'';flex:1;height:1.5px;
+  background:linear-gradient(90deg,rgba(0,0,0,.10),transparent)}
+
+/* MathJax override */
+mjx-container { overflow-x: auto; max-width: 100%; }
+</style>
+
+<!-- MathJax 3 -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath:  [['\\(','\\)']],
+    displayMath: [['\\[','\\]']],
+    tags: 'none'
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+<!-- ══════════════════ TOPNAV ══════════════════ -->
+<nav class="topnav">
+  <a href="#intro"   class="tnb dark">🗂 Clasificación</a>
+  <a href="#cstr"    class="tnb" style="background:#EDF3FC;color:#1048B8;border-color:#B0C8F0">⚗️ CSTR</a>
+  <a href="#pfr"     class="tnb" style="background:#E6F5EC;color:#14632A;border-color:#A8D8B8">🔩 PFR</a>
+  <a href="#batch"   class="tnb" style="background:#F3EEF9;color:#4A1888;border-color:#C8A8F0">🧪 Batch</a>
+  <a href="#semib"   class="tnb" style="background:#FEF9EC;color:#7A5000;border-color:#DFC050">🔬 Semibatch</a>
+  <a href="#pbr"     class="tnb" style="background:#EBF7F0;color:#1A6A40;border-color:#90D8B0">⚙️ PBR</a>
+  <a href="#fbed"    class="tnb" style="background:#FEF0E8;color:#8B2A00;border-color:#F0B890">🌀 Lecho Fluido</a>
+  <a href="#trickle" class="tnb" style="background:#E5F4F7;color:#005870;border-color:#80C8DC">💧 Trickle Bed</a>
+  <a href="#mem"     class="tnb" style="background:#F0E8FA;color:#5018A0;border-color:#C090E8">🔬 Membrana</a>
+  <a href="#compare" class="tnb dark">📊 Tabla Comparativa</a>
+</nav>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<div style="background:linear-gradient(160deg,#060C1A 0%,#0A1628 40%,#081E48 70%,#0C2858 100%);
+  padding:5rem 2.5rem 4rem;text-align:center;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;
+    background:radial-gradient(ellipse 60% 50% at 20% 40%,rgba(30,80,200,.20) 0%,transparent 70%),
+               radial-gradient(ellipse 50% 40% at 80% 60%,rgba(0,140,200,.14) 0%,transparent 70%);
+    pointer-events:none"></div>
+  <div style="font-family:var(--f-mono);font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;
+    color:#4A8AAA;margin-bottom:1rem;position:relative">
+    Maestría en Ingeniería Química · Universidad del Valle · Programa 740484</div>
+  <h1 style="font-family:var(--f-serif);font-size:clamp(2rem,5vw,3.2rem);
+    font-weight:700;color:#E8F2FE;line-height:1.13;margin-bottom:.9rem;position:relative">
+    Reactores Químicos <span style="color:#60B0FF">Industriales</span><br>
+    Tipos · Clasificación · Usos e Importancia</h1>
+  <p style="font-size:1rem;color:#7AA0C0;max-width:700px;margin:0 auto 2rem;
+    line-height:1.80;position:relative">
+    Una guía visual y técnica completa sobre los reactores de la industria química mundial:
+    principios de operación, parámetros de diseño, fortalezas, debilidades y aplicaciones reales
+    en petroquímica, farmacéutica, refinería y procesos especializados.
+    Referencia: Fogler — <em>Elements of Chemical Reaction Engineering</em>, 4ª Ed.
+  </p>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;position:relative">
+    <span style="background:rgba(255,255,255,.07);border:1px solid rgba(100,160,255,.22);
+      border-radius:100px;padding:.3rem 1rem;font-size:.74rem;color:#90B8D8;font-weight:500">⚗️ 8 tipos de reactor</span>
+    <span style="background:rgba(255,255,255,.07);border:1px solid rgba(100,160,255,.22);
+      border-radius:100px;padding:.3rem 1rem;font-size:.74rem;color:#90B8D8;font-weight:500">🏭 Imágenes de referencia industrial</span>
+    <span style="background:rgba(255,255,255,.07);border:1px solid rgba(100,160,255,.22);
+      border-radius:100px;padding:.3rem 1rem;font-size:.74rem;color:#90B8D8;font-weight:500">📊 Tabla comparativa completa</span>
+    <span style="background:rgba(255,255,255,.07);border:1px solid rgba(100,160,255,.22);
+      border-radius:100px;padding:.3rem 1rem;font-size:.74rem;color:#90B8D8;font-weight:500">📐 Parámetros de diseño cuantitativos</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════════════════════
+     §0  CLASIFICACIÓN GENERAL
+══════════════════════════════════════════════════════ -->
+<div id="intro" class="master2">
+  <div class="master2-tit">🗂 Taxonomía de los Reactores Químicos Industriales</div>
+  <p class="prose">
+    Un reactor químico es todo dispositivo donde se llevan a cabo <strong>reacciones químicas de forma controlada</strong>.
+    La selección del tipo correcto determina la conversión, selectividad, consumo energético,
+    seguridad y costo de capital del proceso completo.
+    Los reactores se clasifican por <strong>cuatro criterios independientes</strong>: modo de operación,
+    patrón de flujo, fases presentes y régimen térmico. Un reactor real puede pertenecer a varias categorías simultáneamente.
+  </p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.85rem;margin:1.1rem 0 1.4rem">
+    <div style="background:#EDF3FC;border:1.5px solid #B0C8F0;border-radius:10px;padding:1.1rem 1.2rem">
+      <div style="font-size:.87rem;font-weight:700;color:#1048B8;margin-bottom:.45rem">1. Modo de operación</div>
+      <div style="font-size:.83rem;color:var(--ink2);line-height:1.65">Batch (discontinuo) · Continuo (CSTR, PFR) · Semibatch. Define la dinámica temporal y la estrategia de control.</div>
+    </div>
+    <div style="background:#E6F5EC;border:1.5px solid #A8D8B8;border-radius:10px;padding:1.1rem 1.2rem">
+      <div style="font-size:.87rem;font-weight:700;color:#14632A;margin-bottom:.45rem">2. Patrón de flujo</div>
+      <div style="font-size:.83rem;color:var(--ink2);line-height:1.65">Mezcla perfecta (CSTR) · Flujo pistón (PFR) · Intermedio (modelos de dispersión). Determina la DTR y la conversión.</div>
+    </div>
+    <div style="background:#FAECEA;border:1.5px solid #F0B8A8;border-radius:10px;padding:1.1rem 1.2rem">
+      <div style="font-size:.87rem;font-weight:700;color:#8B1A00;margin-bottom:.45rem">3. Fases presentes</div>
+      <div style="font-size:.83rem;color:var(--ink2);line-height:1.65">Homogéneo (G-G, L-L) · Heterogéneo (G-S, L-S, G-L-S). Determina resistencias de transferencia de masa y calor.</div>
+    </div>
+    <div style="background:#F3EEF9;border:1.5px solid #C8A8F0;border-radius:10px;padding:1.1rem 1.2rem">
+      <div style="font-size:.87rem;font-weight:700;color:#4A1888;margin-bottom:.45rem">4. Régimen térmico</div>
+      <div style="font-size:.83rem;color:var(--ink2);line-height:1.65">Isotérmico · Adiabático · Politrópico (con intercambio de calor). Determina el balance de energía y la estabilidad.</div>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="cls-tab">
+    <tr><th>Reactor</th><th>Modo operación</th><th>Patrón de flujo</th><th>Fases típicas</th><th>Régimen térmico</th><th>Escala industrial</th></tr>
+    <tr><td><strong>CSTR</strong></td><td>Continuo</td><td>Mezcla perfecta</td><td>L, G, S suspensión</td><td>Isotérmico / politrópico</td><td>10 L – 500 m³</td></tr>
+    <tr><td><strong>PFR tubular</strong></td><td>Continuo</td><td>Flujo pistón</td><td>G, L homogéneo</td><td>Iso / adiab / gradiente</td><td>1 cm – 300 m largo</td></tr>
+    <tr><td><strong>Batch</strong></td><td>Discontinuo</td><td>Mezcla perfecta</td><td>L, G, S</td><td>Controlado o programado</td><td>100 mL – 200 m³</td></tr>
+    <tr><td><strong>Semibatch</strong></td><td>Semidiscontinuo</td><td>Mezcla perfecta</td><td>L, G, S</td><td>Controlado por dosificación</td><td>100 L – 50 m³</td></tr>
+    <tr><td><strong>PBR (lecho fijo)</strong></td><td>Continuo</td><td>Flujo pistón aprox.</td><td>G-S, L-S</td><td>Adiabático multi-etapa</td><td>0.1 – 1,000 t cat.</td></tr>
+    <tr><td><strong>Lecho fluidizado</strong></td><td>Continuo</td><td>Mezcla compleja</td><td>G-S, G-L-S</td><td>Controlado (serpentines)</td><td>1 – 10,000 t cat.</td></tr>
+    <tr><td><strong>Trickle Bed</strong></td><td>Continuo</td><td>Flujo pistón (3 fases)</td><td>G-L-S</td><td>Adiabático o con enfriamiento</td><td>10 – 500 t cat.</td></tr>
+    <tr><td><strong>Membrana</strong></td><td>Continuo</td><td>Flujo pistón</td><td>G o L + sólido</td><td>Isotérmico</td><td>Laboratorio – piloto</td></tr>
+  </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     §1  CSTR
+══════════════════════════════════════════════════════ -->
+<div id="cstr" class="rc">
+  <div class="rc-head" style="background:linear-gradient(90deg,#1048B818,#1048B808);border-bottom:2px solid #1048B830">
+    <div class="rc-ico" style="background:#EDF3FC;color:#1048B8">⚗️</div>
+    <div>
+      <div class="rc-num" style="color:#1048B8">§1 · Reactor de Tanque Agitado Continuo</div>
+      <div class="rc-title">CSTR — Continuous Stirred Tank Reactor</div>
+      <div class="rc-sub">Mezcla perfecta · Control térmico óptimo · Diseño algebraico · Escala de m³ a 500 m³</div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag" style="background:#EDF3FC;color:#1048B8">Continuo</span>
+    <span class="tag" style="background:#E0EAFC;color:#0A3A90">Mezcla perfecta</span>
+    <span class="tag" style="background:#EDF3FC;color:#1048B8">L · G · S suspensión</span>
+    <span class="tag" style="background:#E8F0FF;color:#2050C0">Isotérmico / Politrópico</span>
+    <span class="tag" style="background:#EDF3FC;color:#1048B8">Escalable</span>
+  </div>
+  <div class="sec-body">
+
+    <div class="h3">1.1 Descripción física y principio de operación</div>
+    <p class="prose">
+      El CSTR es un tanque agitado de alimentación y salida continuas. La agitación mecánica garantiza
+      <strong>composición y temperatura uniformes</strong> en todo el volumen — opera siempre a la
+      concentración de salida (la más baja del proceso). Esto simplifica el diseño a una ecuación algebraica,
+      pero implica mayor volumen que el PFR para reacciones de orden \(n > 0\).
+      Su mayor ventaja absoluta es el <strong>control térmico perfecto</strong>: temperatura uniforme,
+      sin puntos calientes, ideal para reacciones exotérmicas con riesgo de runaway.
+    </p>
+    <p class="prose">
+      La ecuación de diseño \(V = F_{A0}X/(-r_A)|_\text{sal}\) es algebraica (no ODE) porque la
+      suposición de mezcla perfecta colapsa la integral del balance molar a un simple producto.
+      El Número de Damköhler \(Da = k\tau C_{A0}^{n-1}\) es el parámetro universal de escalado:
+      mantenerlo constante al cambiar de escala garantiza la misma conversión.
+    </p>
+
+    <div class="imgs">
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Continuous_stirred_tank_reactor_schematic.svg"
+             alt="Esquema CSTR" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E8F0FF;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#1048B8;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>⚗️</span><br>CSTR — Reactor de Tanque Agitado Continuo</div>'">
+        <div class="img-cap">Diagrama esquemático CSTR: flujos de entrada/salida, agitador de turbina y camisa de temperatura
+          <span class="img-src">Fuente: Wikipedia Commons, dominio público</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.processdesign.mccormick.northwestern.edu/images/thumb/2/2c/CSTR.jpg/400px-CSTR.jpg"
+             alt="CSTR industrial" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E8F0FF;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#1048B8;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🏭</span><br>CSTR Industrial — Acero Inoxidable</div>'">
+        <div class="img-cap">CSTR industrial de acero inoxidable 316L — escala planta piloto a producción
+          <span class="img-src">Fuente: Process Design, Northwestern University</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Cascade_of_CSTRs.svg/400px-Cascade_of_CSTRs.svg.png"
+             alt="Cascada de CSTRs" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E8F0FF;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#1048B8;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🔗</span><br>Cascada de 3 CSTRs en serie</div>'">
+        <div class="img-cap">Cascada de N CSTRs en serie — configuración industrial para alta conversión
+          <span class="img-src">Fuente: Wikipedia Commons, dominio público</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">1.2 Parámetros clave de diseño y operación</div>
+    <table class="ptab">
+      <tr><td class="pt">Ecuación de diseño</td><td class="pv">\(V = F_{A0}X / (-r_A)|_\text{sal}\) — algebraica, no ODE; evaluación en la salida</td></tr>
+      <tr><td class="pt">Tiempo espacial</td><td class="pv">\(\tau = V/v_0 = C_{A0}X / (-r_A)|_\text{sal}\) — el parámetro operacional clave</td></tr>
+      <tr><td class="pt">Número de Damköhler</td><td class="pv">\(Da = k\tau C_{A0}^{n-1}\); para n=1: \(X = Da/(1+Da)\) — criterio universal de escalado</td></tr>
+      <tr><td class="pt">DTR del CSTR ideal</td><td class="pv">\(E(t) = (1/\tau)e^{-t/\tau}\) — exponencial; el 63.2% del fluido sale antes de \(\tau\)</td></tr>
+      <tr><td class="pt">Potencia de agitación</td><td class="pv">P/V = 0.5–5 kW/m³ (agua), hasta 10 kW/m³ para fluidos muy viscosos</td></tr>
+      <tr><td class="pt">Temperatura operación</td><td class="pv">−50°C a +300°C (acero inox 316L); hasta +600°C con materiales especiales</td></tr>
+      <tr><td class="pt">Presión operación</td><td class="pv">0.1–30 bar estándar; reactores autoclave: hasta 200 bar</td></tr>
+      <tr><td class="pt">Tiempo de mezcla</td><td class="pv">\(t_\text{mix} < 10\) s para Re_agitador > 10⁴; regla: \(t_\text{mix} \ll \tau_\text{rxn}\)</td></tr>
+    </table>
+
+    <div class="h3">1.3 KPIs industriales típicos</div>
+    <div class="kpi-row">
+      <div class="kpi" style="border-color:#1048B830"><div class="kpi-v" style="color:#1048B8">10–500 m³</div><div class="kpi-l">Volumen industrial</div></div>
+      <div class="kpi" style="border-color:#1048B830"><div class="kpi-v" style="color:#1048B8">Da = 1–10</div><div class="kpi-l">Zona de diseño eficiente</div></div>
+      <div class="kpi" style="border-color:#1048B830"><div class="kpi-v" style="color:#1048B8">63.2%</div><div class="kpi-l">Sale antes de τ (DTR)</div></div>
+      <div class="kpi" style="border-color:#1048B830"><div class="kpi-v" style="color:#1048B8">2–10×</div><div class="kpi-l">V_CSTR/V_PFR (n=2, X=0.8)</div></div>
+      <div class="kpi" style="border-color:#1048B830"><div class="kpi-v" style="color:#1048B8">&lt; 10 s</div><div class="kpi-l">Tiempo de mezcla</div></div>
+    </div>
+
+    <div class="h3">1.4 Fortalezas y debilidades</div>
+    <div class="g2">
+      <div class="gcol fort">
+        <h4>✅ Fortalezas</h4>
+        <ul>
+          <li>Control térmico perfecto: temperatura uniforme elimina puntos calientes</li>
+          <li>Manejo de sólidos en suspensión, catalizadores, células biológicas</li>
+          <li>Escalado predecible: Da constante garantiza misma X en cualquier escala</li>
+          <li>Diseño algebraico: no requiere integración de ODEs en estado estacionario</li>
+          <li>Ideal para reacciones exotérmicas con ΔH_rx grande (control de temperatura)</li>
+          <li>Operación estable con lazos de control PID sencillos</li>
+        </ul>
+      </div>
+      <div class="gcol deb">
+        <h4>✗ Debilidades</h4>
+        <ul>
+          <li>Mayor volumen que el PFR para cualquier n &gt; 0 a la misma conversión</li>
+          <li>Posible multiplicidad de estados estacionarios en reacciones exotérmicas</li>
+          <li>DTR exponencial: el 13.5% del fluido permanece más de 2τ (sobretiempo)</li>
+          <li>Alto consumo energético de agitación a escala grande (1–5 kW/m³)</li>
+          <li>No apto para reacciones muy rápidas (τ &lt; 1 s es difícil de implementar)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ind">
+      <div class="ind-hd">🏭 Aplicaciones Industriales del CSTR</div>
+      <div class="ind-body">
+        <strong>Polimerización continua (HDPE, PP, PS):</strong> Dow Unipol, LyondellBasell Spheripol, BASF.
+        <span class="ikpi">V = 50–200 m³</span><span class="ikpi">T = 60–250°C</span><span class="ikpi">P = 20–40 bar</span>
+        <br><br>
+        <strong>Fermentación industrial (ácido láctico, ácido cítrico, bioetanol):</strong>
+        <span class="ikpi">V = 100–500 m³</span><span class="ikpi">t_mezcla &lt; 30 s</span>
+        <br><br>
+        <strong>Síntesis farmacéutica continua (Eli Lilly, Pfizer, AstraZeneca):</strong>
+        CSTRs de flujo continuo para APIs — reducción del 90% del inventario de riesgo vs batch.
+        <span class="ikpi">V = 1–50 L</span><span class="ikpi">τ = 5–60 min</span>
+        <br><br>
+        <strong>Tratamiento de aguas residuales — reactores de lodo activado:</strong>
+        <span class="ikpi">V = 1,000–100,000 m³</span><span class="ikpi">DBO reducción &gt;95%</span>
+        <br><br>
+        <strong>Producción de fertilizantes — nitratación de amonio en cascada:</strong>
+        <span class="ikpi">T = 120–180°C</span><span class="ikpi">ΔH_ad = 180–250 K</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     §2  PFR
+══════════════════════════════════════════════════════ -->
+<div id="pfr" class="rc">
+  <div class="rc-head" style="background:linear-gradient(90deg,#14632A18,#14632A08);border-bottom:2px solid #14632A30">
+    <div class="rc-ico" style="background:#E6F5EC;color:#14632A">🔩</div>
+    <div>
+      <div class="rc-num" style="color:#14632A">§2 · Reactor de Flujo Pistón</div>
+      <div class="rc-title">PFR — Plug Flow Reactor (Reactor Tubular)</div>
+      <div class="rc-sub">Sin mezcla axial · ODE de conversión · Mínimo volumen para n&gt;0 · Steam cracking · NH₃</div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag" style="background:#E6F5EC;color:#14632A">Continuo</span>
+    <span class="tag" style="background:#DCF0E4;color:#0A4A20">Flujo pistón</span>
+    <span class="tag" style="background:#E6F5EC;color:#14632A">G · L homogéneo</span>
+    <span class="tag" style="background:#E0F5E8;color:#1A6A30">Isotérmico / Adiabático</span>
+    <span class="tag" style="background:#E4F8EC;color:#2A7A40">Sin partes móviles</span>
+  </div>
+  <div class="sec-body">
+
+    <div class="h3">2.1 Descripción física y principio de operación</div>
+    <p class="prose">
+      En el PFR el fluido avanza como un "pistón" sin mezcla axial. La concentración y temperatura
+      <strong>varían continuamente con la posición axial</strong>: X aumenta de 0 en la entrada a X_A en la salida.
+      La ecuación de diseño es una ODE (\(F_{A0}dX/dV = -r_A\)) — debe integrarse numéricamente
+      en el caso general o analíticamente para cinética simple.
+    </p>
+    <p class="prose">
+      El PFR aprovecha la <strong>velocidad de reacción máxima disponible</strong> en cada punto:
+      al inicio, donde C_A es alta, la reacción es rápida. Por el Teorema de Levenspiel,
+      esto garantiza el <strong>mínimo volumen</strong> para cualquier n &gt; 0. Domina en procesos
+      de alta temperatura (steam cracking, reforming) y donde la DTR exacta (delta de Dirac)
+      es crítica para la selectividad.
+    </p>
+
+    <div class="imgs">
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Plug_flow_reactor_model.svg/500px-Plug_flow_reactor_model.svg.png"
+             alt="Diagrama PFR perfil conversión" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E6F5EC;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#14632A;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🔩</span><br>PFR — Perfil de concentración axial</div>'">
+        <div class="img-cap">Perfil de conversión axial en el PFR: X crece de la entrada a la salida sin mezcla
+          <span class="img-src">Fuente: Wikipedia Commons, dominio público</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.chemengonline.com/wp-content/uploads/2017/01/tubular-reactor-460x307.jpg"
+             alt="Reactor tubular multitubular industrial" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E6F5EC;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#14632A;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🏭</span><br>Reactor Tubular Multitubular Industrial</div>'">
+        <div class="img-cap">Reactor multitubular (PFR) industrial: haz de tubos con camisa de temperatura exterior
+          <span class="img-src">Fuente: Chemical Engineering Online, referencia técnica</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Steam_cracking_furnace.jpg/400px-Steam_cracking_furnace.jpg"
+             alt="Horno steam cracking PFR" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E6F5EC;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#14632A;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🔥</span><br>Horno de Steam Cracking (PFR a 800°C)</div>'">
+        <div class="img-cap">Horno tubular de steam cracking — PFR industrial a 800°C, τ = 400 ms (Linde/KBR)
+          <span class="img-src">Fuente: Wikipedia Commons</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">2.2 Parámetros clave de diseño y operación</div>
+    <table class="ptab">
+      <tr><td class="pt">Ecuación de diseño</td><td class="pv">\(F_{A0}dX/dV = -r_A(X,T,P)\) — ODE de primer orden; requiere integración numérica (RK45, Radau)</td></tr>
+      <tr><td class="pt">Volumen de diseño</td><td class="pv">\(V_\text{PFR} = F_{A0}\int_0^X dX/(-r_A)\) — área bajo la curva de Levenspiel</td></tr>
+      <tr><td class="pt">DTR ideal</td><td class="pv">\(E(t) = \delta(t - \tau)\) — delta de Dirac; todas las moléculas permanecen exactamente \(\tau\)</td></tr>
+      <tr><td class="pt">Perfil térmico</td><td class="pv">Requiere 2ª ODE acoplada: \(dT/dV = [Ua(T_a-T) + (-r_A)(-\Delta H_{rx})] / (F_{A0}\Sigma\Theta_i C_{p,i})\)</td></tr>
+      <tr><td class="pt">Criterio flujo pistón</td><td class="pv">Pe_axial = uL/D_ax &gt; 100 · D/L &lt; 1/20 para comportamiento PFR ideal</td></tr>
+      <tr><td class="pt">Rango de temperatura</td><td class="pv">Hasta 1,100°C con aleaciones especiales (tubos HP-Mod, Inconel); criogénico hasta −200°C</td></tr>
+      <tr><td class="pt">Rango de presión</td><td class="pv">0.001 – 350 bar (síntesis de NH₃, Fischer-Tropsch en alta presión)</td></tr>
+      <tr><td class="pt">Velocidad de reacción</td><td class="pv">Desde τ = 100 ms (steam cracking) hasta horas (reforming)</td></tr>
+    </table>
+
+    <div class="h3">2.3 KPIs industriales</div>
+    <div class="kpi-row">
+      <div class="kpi" style="border-color:#14632A30"><div class="kpi-v" style="color:#14632A">400 ms</div><div class="kpi-l">τ en steam cracking</div></div>
+      <div class="kpi" style="border-color:#14632A30"><div class="kpi-v" style="color:#14632A">200 Mt/año</div><div class="kpi-l">Etileno global (PFR)</div></div>
+      <div class="kpi" style="border-color:#14632A30"><div class="kpi-v" style="color:#14632A">800°C</div><div class="kpi-l">T craqueo de etano</div></div>
+      <div class="kpi" style="border-color:#14632A30"><div class="kpi-v" style="color:#14632A">1/5–1/10×</div><div class="kpi-l">V_PFR/V_CSTR (n=2)</div></div>
+      <div class="kpi" style="border-color:#14632A30"><div class="kpi-v" style="color:#14632A">180 Mt/año</div><div class="kpi-l">NH₃ global (PFR/PBR)</div></div>
+    </div>
+
+    <div class="h3">2.4 Fortalezas y debilidades</div>
+    <div class="g2">
+      <div class="gcol fort">
+        <h4>✅ Fortalezas</h4>
+        <ul>
+          <li>Mínimo volumen de reactor para n &gt; 0 — demostrado por el Teorema de Levenspiel</li>
+          <li>Excelente para reacciones muy rápidas (τ en ms a segundos)</li>
+          <li>DTR perfecta (δ de Dirac): máxima uniformidad de tratamiento de las moléculas</li>
+          <li>Sin partes móviles — alta confiabilidad, mínimo mantenimiento</li>
+          <li>Ideal para alta temperatura y alta presión (geometría cilíndrica robusta)</li>
+          <li>Selectividad controlable mediante el perfil de concentración axial</li>
+        </ul>
+      </div>
+      <div class="gcol deb">
+        <h4>✗ Debilidades</h4>
+        <ul>
+          <li>Difícil control térmico en reacciones exotérmicas — riesgo de hotspot axial</li>
+          <li>No maneja sólidos en suspensión ni catalizadores que requieran agitación</li>
+          <li>Caída de presión significativa en tubos largos o fluidos viscosos</li>
+          <li>No apto para reacciones que forman depósitos (fouling) — difícil de limpiar</li>
+          <li>Difícil de instrumentar en el interior: perfil axial difícilmente medible</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ind">
+      <div class="ind-hd">🏭 Aplicaciones Industriales del PFR</div>
+      <div class="ind-body">
+        <strong>Steam cracking de etano/nafta → etileno (Linde, KBR, Lummus, Technip):</strong>
+        <span class="ikpi">T = 750–900°C</span><span class="ikpi">τ = 0.1–0.5 s</span><span class="ikpi">200 Mt/año etileno</span>
+        <br><br>
+        <strong>Reforma catalítica (Platforming UOP, Magnaforming):</strong> nafta → aromáticos + H₂.
+        <span class="ikpi">T = 480–530°C</span><span class="ikpi">P = 10–35 bar</span>
+        <br><br>
+        <strong>Síntesis de amoníaco (Haber-Bosch — KBR, Haldor Topsoe, Casale):</strong>
+        <span class="ikpi">T = 400–500°C</span><span class="ikpi">P = 150–300 bar</span><span class="ikpi">180 Mt/año</span>
+        <br><br>
+        <strong>Reacciones de nitroglicerina, peroxidación controlada (Taylor-Couette PFR):</strong>
+        minimización del inventario explosivo en el sistema.
+        <span class="ikpi">t_res = 1–10 s</span><span class="ikpi">Volumen &lt; 1 L</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- §3 BATCH -->
+<div id="batch" class="rc">
+  <div class="rc-head" style="background:linear-gradient(90deg,#4A188818,#4A188808);border-bottom:2px solid #4A188830">
+    <div class="rc-ico" style="background:#F3EEF9;color:#4A1888">🧪</div>
+    <div>
+      <div class="rc-num" style="color:#4A1888">§3 · Reactor Batch (Discontinuo)</div>
+      <div class="rc-title">Reactor Batch — La Planta Piloto Natural del PFR</div>
+      <div class="rc-sub">Sistema cerrado · Equivalencia matemática con PFR · Farmacéutica · Química fina · Flexibilidad máxima</div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag" style="background:#F3EEF9;color:#4A1888">Discontinuo</span>
+    <span class="tag" style="background:#EDE0F5;color:#380A68">Mezcla perfecta</span>
+    <span class="tag" style="background:#F3EEF9;color:#4A1888">L · G · S</span>
+    <span class="tag" style="background:#EAE0F0;color:#4A1888">T Programada</span>
+    <span class="tag" style="background:#F5F0FA;color:#5A28A8">Multipropósito</span>
+  </div>
+  <div class="sec-body">
+    <div class="h3">3.1 Descripción y principio de operación</div>
+    <p class="prose">
+      El batch es un <strong>sistema cerrado</strong>: se carga el reactor, se reacciona durante un tiempo \(t_\text{rxn}\),
+      y se descarga el producto. No hay flujo durante la reacción. Su ecuación de diseño
+      \(t_\text{rxn} = C_{A0}\int_0^X dX/(-r_A)\) es <strong>matemáticamente idéntica</strong> a la del PFR
+      con la sustitución \(t \leftrightarrow \tau\), lo que significa que los datos cinéticos del batch
+      son transferibles directamente al diseño de un PFR industrial.
+    </p>
+    <p class="prose">
+      La gran ventaja del batch es su <strong>flexibilidad</strong>: un mismo reactor puede producir
+      diferentes productos simplemente cambiando el protocolo de operación. Es el reactor dominante
+      en la producción de APIs farmacéuticos, colorantes, fragancias y cualquier producto de alto
+      valor y pequeño volumen.
+    </p>
+    <div class="imgs">
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Batch_reactor_with_cooling_coils.png/400px-Batch_reactor_with_cooling_coils.png"
+             alt="Reactor batch industrial" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#F3EEF9;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#4A1888;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🧪</span><br>Reactor Batch Industrial</div>'">
+        <div class="img-cap">Reactor batch con serpentín de enfriamiento y agitador de anclaje — escala industrial
+          <span class="img-src">Fuente: Wikipedia Commons</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.pharmaceutical-technology.com/wp-content/uploads/sites/10/2021/05/Pfizer-batch-reactor.jpg"
+             alt="Batch reactor farmacéutico" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#F3EEF9;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#4A1888;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>💊</span><br>Batch Farmacéutico — Síntesis de APIs</div>'">
+        <div class="img-cap">Reactor batch farmacéutico (GMP) para síntesis de principios activos (APIs)
+          <span class="img-src">Fuente: Pharmaceutical Technology, referencia industrial</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.bioprocessintl.com/wp-content/uploads/2020/09/bioreactor-batch.jpg"
+             alt="Biorreactor batch fermentación" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#F3EEF9;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#4A1888;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🦠</span><br>Biorreactor Batch para Fermentación</div>'">
+        <div class="img-cap">Biorreactor batch de 50,000 L para producción de anticuerpos monoclonales (mAbs)
+          <span class="img-src">Fuente: BioProcess International, referencia técnica</span>
+        </div>
+      </div>
+    </div>
+    <div class="h3">3.2 Parámetros clave de diseño</div>
+    <table class="ptab">
+      <tr><td class="pt">Ecuación de diseño</td><td class="pv">\(t_\text{rxn} = C_{A0}\int_0^X dX/(-r_A)\) — equivalente al PFR con \(t \leftrightarrow \tau\)</td></tr>
+      <tr><td class="pt">Productividad óptima X*</td><td class="pv">Maximizar \(\mathcal{P}(X) = C_{A0}X/(t_\text{rxn}+t_0)\) → condición implícita resuelta con brentq</td></tr>
+      <tr><td class="pt">Tiempo de ciclo</td><td class="pv">\(t_\text{ciclo} = t_\text{rxn} + t_\text{carga} + t_\text{calent.} + t_\text{descarga} + t_\text{limpieza}\)</td></tr>
+      <tr><td class="pt">Seguridad térmica</td><td class="pv">TMR (Tiempo de Máxima Velocidad) y \(\Delta T_\text{ad}\) — evaluados con HAZOP/LOPA</td></tr>
+      <tr><td class="pt">Escala típica</td><td class="pv">Farmacéutica: 100 L – 10,000 L · Biotecnología: 1,000 L – 200,000 L · Química fina: 500 L – 50,000 L</td></tr>
+    </table>
+    <div class="h3">3.3 Fortalezas y debilidades</div>
+    <div class="g2">
+      <div class="gcol fort"><h4>✅ Fortalezas</h4><ul>
+        <li>Máxima flexibilidad: un reactor produce múltiples productos</li>
+        <li>Datos cinéticos directamente transferibles al diseño del PFR</li>
+        <li>Fácil de controlar y detener si hay anomalías de proceso</li>
+        <li>Ideal para pequeños volúmenes de alto valor (APIs, colorantes, fragancias)</li>
+        <li>Temperatura programable en el tiempo — perfil T(t) a medida</li>
+      </ul></div>
+      <div class="gcol deb"><h4>✗ Debilidades</h4><ul>
+        <li>Productividad limitada por el tiempo inactivo t₀ — X* ≠ 1</li>
+        <li>Mayor riesgo de runaway térmico sin flujo continuo para disipar calor</li>
+        <li>Difícil de escalar: razón A/V cae con el diámetro</li>
+        <li>Variabilidad lote a lote — validación rigurosa FDA exigida</li>
+        <li>Alto costo de mano de obra por lote comparado con operación continua</li>
+      </ul></div>
+    </div>
+    <div class="ind">
+      <div class="ind-hd">🏭 Aplicaciones Industriales del Batch</div>
+      <div class="ind-body">
+        <strong>APIs farmacéuticos (Pfizer, AstraZeneca, Novartis, Roche):</strong> el 95% de los principios activos.
+        <span class="ikpi">V = 1,000–10,000 L</span><span class="ikpi">FDA 21 CFR Part 211</span>
+        <br><br>
+        <strong>Anticuerpos monoclonales (mAbs) — Amgen, Genentech, Regeneron:</strong>
+        <span class="ikpi">V = 10,000–200,000 L</span><span class="ikpi">t_fermentación = 10–14 días</span>
+        <br><br>
+        <strong>Colorantes reactivos y pigmentos de alta pureza (BASF, Clariant, Huntsman):</strong>
+        <span class="ikpi">Pureza &gt;99.5%</span><span class="ikpi">V = 500–20,000 L</span>
+        <br><br>
+        <strong>Agroquímicos y fragancias (Syngenta, Givaudan, Firmenich):</strong>
+        <span class="ikpi">Multipropósito: 5–30 productos/reactor/año</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- §4 SEMIBATCH -->
+<div id="semib" class="rc">
+  <div class="rc-head" style="background:linear-gradient(90deg,#7A500018,#7A500008);border-bottom:2px solid #7A500030">
+    <div class="rc-ico" style="background:#FEF9EC;color:#7A5000">🔬</div>
+    <div>
+      <div class="rc-num" style="color:#7A5000">§4 · Reactor Semibatch (Semidiscontinuo)</div>
+      <div class="rc-title">Reactor Semibatch — Control de Seguridad y Selectividad por Dosificación</div>
+      <div class="rc-sub">Un flujo controlado · Cinética dosificada · Reacciones peligrosas · Starved-feed · Control de exotermia</div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag" style="background:#FEF9EC;color:#7A5000">Semidiscontinuo</span>
+    <span class="tag" style="background:#FEF0D8;color:#5A3800">Dosificación controlada</span>
+    <span class="tag" style="background:#FEF9EC;color:#7A5000">L · G · S</span>
+    <span class="tag" style="background:#FEF4E0;color:#6A4000">Starved-feed</span>
+    <span class="tag" style="background:#FFFAEE;color:#8A6000">Seguridad SIL</span>
+  </div>
+  <div class="sec-body">
+    <div class="h3">4.1 Descripción y principio de operación</div>
+    <p class="prose">
+      El semibatch combina características del batch y del continuo: el reactor se carga inicialmente
+      con uno de los reactivos, y el segundo se <strong>dosifica gradualmente</strong> a una tasa controlada.
+      Esto permite regular la concentración instantánea del reactivo dosificado, controlando así
+      la velocidad de reacción, la exotermia y la selectividad.
+    </p>
+    <p class="prose">
+      El modo <strong>"starved-feed"</strong> mantiene la concentración del reactivo dosificado muy baja
+      en todo momento — la reacción ocurre tan rápido como se añade el reactivo. Esto limita
+      el calor generado instantáneamente a lo que la camisa puede remover, eliminando el riesgo
+      de runaway térmico incluso en reacciones con \(\Delta T_\text{ad} > 200\) K.
+    </p>
+    <div class="imgs">
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Semi-batch_reactor.png/400px-Semi-batch_reactor.png"
+             alt="Diagrama semibatch" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#FEF9EC;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#7A5000;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🔬</span><br>Reactor Semibatch — Dosificación Controlada</div>'">
+        <div class="img-cap">Diagrama semibatch: dosificación controlada del reactivo B al reactor que contiene A
+          <span class="img-src">Fuente: Wikipedia Commons</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.bioprocessintl.com/wp-content/uploads/2019/01/fed-batch-bioreactor.jpg"
+             alt="Fed-batch biorreactor" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#FEF9EC;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#7A5000;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🦠</span><br>Fed-batch Biorreactor Industrial</div>'">
+        <div class="img-cap">Biorreactor fed-batch para producción de insulina y hormonas de crecimiento
+          <span class="img-src">Fuente: BioProcess International</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.lewa.com/fileadmin/Images/LEWA/en/Products/Pumps/Metering-pumps/Large-format-images/Pumpen_Dosier_Prozess_Product_LDB_M0610.jpg"
+             alt="Sistema dosificación semibatch" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#FEF9EC;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#7A5000;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>⚖️</span><br>Sistema de Dosificación Controlada</div>'">
+        <div class="img-cap">Sistema de dosificación de alta precisión para reactor semibatch — bomba metering
+          <span class="img-src">Fuente: LEWA, referencia industrial</span>
+        </div>
+      </div>
+    </div>
+    <div class="h3">4.2 Parámetros clave de diseño y operación</div>
+    <table class="ptab">
+      <tr><td class="pt">Balance de masa (A en reactor)</td><td class="pv">\(dN_A/dt = -r_A V + F_{A0}\) (A se dosifica) o \(dN_A/dt = -r_A V\) (A ya está en el reactor)</td></tr>
+      <tr><td class="pt">Balance de masa (B dosificado)</td><td class="pv">\(dN_B/dt = F_{B0}(t) - r_B V\) donde \(F_{B0}(t)\) es el perfil de dosificación diseñado</td></tr>
+      <tr><td class="pt">Control de exotermia (starved-feed)</td><td class="pv">Diseñar \(F_{B0} \leq Q_\text{max camisa} / [(-\Delta H_{rx}) \cdot C_{B0}]\) para evitar acumulación</td></tr>
+      <tr><td class="pt">Volumen variable</td><td class="pv">\(V(t) = V_0 + v_{B0}\cdot t\) si se dosifica un líquido; afecta la concentración de A</td></tr>
+      <tr><td class="pt">Tiempo total de operación</td><td class="pv">\(t_\text{total} = t_\text{dosificación} + t_\text{reacción extra} + t_\text{descarga}\)</td></tr>
+    </table>
+    <div class="g2">
+      <div class="gcol fort"><h4>✅ Fortalezas</h4><ul>
+        <li>Control preciso de la exotermia — elimina el riesgo de runaway en reacciones peligrosas</li>
+        <li>Mejora la selectividad en reacciones paralelas manteniendo C_B baja</li>
+        <li>Permite la producción de producto deseado incluso con ΔT_ad &gt; 400 K</li>
+        <li>Flexible: el perfil de dosificación se optimiza para cada objetivo</li>
+      </ul></div>
+      <div class="gcol deb"><h4>✗ Debilidades</h4><ul>
+        <li>Menor productividad volumétrica que el batch simple (el volumen crece durante la dosificación)</li>
+        <li>Mayor complejidad de control — requiere bombas de dosificación de alta precisión</li>
+        <li>Tiempo de ciclo más largo que el batch para la misma conversión final</li>
+      </ul></div>
+    </div>
+    <div class="ind">
+      <div class="ind-hd">🏭 Aplicaciones Industriales del Semibatch</div>
+      <div class="ind-body">
+        <strong>Nitraciones aromáticas (TNT, DNT, RDX) — modo starved-feed:</strong>
+        <span class="ikpi">ΔT_ad = 200–450 K</span><span class="ikpi">SIL-2 obligatorio</span>
+        <br><br>
+        <strong>Producción de insulina y anticuerpos (Novo Nordisk, Roche, Amgen) — fed-batch:</strong>
+        <span class="ikpi">V = 10,000–200,000 L</span><span class="ikpi">Dosificación de glucosa o glucosa+sales</span>
+        <br><br>
+        <strong>Cloración y sulfonación de aromáticos (Bayer CropScience, BASF):</strong>
+        dosificación de Cl₂ o SO₃ para controlar la temperatura y la selectividad.
+        <span class="ikpi">T = 40–100°C</span>
+        <br><br>
+        <strong>Polimerización en emulsión (látex de SBR, NBR) — Goodyear, Lanxess:</strong>
+        dosificación del iniciador para controlar el peso molecular.
+        <span class="ikpi">V = 10,000–50,000 L</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- §5 PBR -->
+<div id="pbr" class="rc">
+  <div class="rc-head" style="background:linear-gradient(90deg,#1A6A4018,#1A6A4008);border-bottom:2px solid #1A6A4030">
+    <div class="rc-ico" style="background:#EBF7F0;color:#1A6A40">⚙️</div>
+    <div>
+      <div class="rc-num" style="color:#1A6A40">§5 · Reactor de Lecho Empacado (Lecho Fijo)</div>
+      <div class="rc-title">PBR — Packed Bed Reactor · Fixed Bed Reactor</div>
+      <div class="rc-sub">Catálisis heterogénea · Ecuación de Ergun · Cinética LHHW · HDS · Reforming · NH₃</div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag" style="background:#EBF7F0;color:#1A6A40">Continuo</span>
+    <span class="tag" style="background:#DCF0E8;color:#0A5030">Flujo pistón aprox.</span>
+    <span class="tag" style="background:#EBF7F0;color:#1A6A40">G-S · L-S</span>
+    <span class="tag" style="background:#E0F5E8;color:#1A6A30">Catálisis heterogénea</span>
+    <span class="tag" style="background:#E4F8EC;color:#2A7A40">Ergun · LHHW</span>
+  </div>
+  <div class="sec-body">
+    <div class="h3">5.1 Descripción y principio de operación</div>
+    <p class="prose">
+      El PBR es un reactor tubular relleno con partículas de <strong>catalizador sólido</strong>.
+      El fluido (gas o líquido) fluye a través del lecho y la reacción ocurre en la <strong>superficie
+      del catalizador</strong> — por eso la variable de diseño es la <strong>masa de catalizador W</strong>
+      (no el volumen). La ecuación de diseño es \(F_{A0}dX/dW = -r'_A\) donde \(-r'_A\) tiene
+      unidades de mol/(kg_cat·s).
+    </p>
+    <p class="prose">
+      El flujo a través del lecho genera una <strong>caída de presión</strong> descrita por la ecuación
+      de Ergun (\(dy/dW = -\alpha/(2y)\)), que puede ser significativa y reduce la concentración
+      de reactivos a lo largo del lecho. El diseño completo requiere resolver simultáneamente
+      tres ODEs: balance de masa, balance de energía y ecuación de Ergun.
+    </p>
+    <div class="imgs">
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Packed_bed_reactor.png/400px-Packed_bed_reactor.png"
+             alt="Diagrama PBR lecho fijo" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#EBF7F0;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#1A6A40;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>⚙️</span><br>PBR — Lecho Fijo de Catalizador</div>'">
+        <div class="img-cap">Diagrama del PBR: partículas de catalizador empacadas, flujo axial, perfil de conversión
+          <span class="img-src">Fuente: Wikipedia Commons</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.uop.com/wp-content/uploads/2016/06/UOP-Platforming-Unit.jpg"
+             alt="Reactor de reforming catalítico PBR" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#EBF7F0;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#1A6A40;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🏭</span><br>Unidad de Reforming Catalítico (PBR)</div>'">
+        <div class="img-cap">Unidad de reforming catalítico UOP Platforming — múltiples lechos fijos en serie con reheaters
+          <span class="img-src">Fuente: UOP Honeywell, referencia técnica</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.haldortopsoe.com/sites/default/files/styles/media_image_landscape/public/2021-06/ammonia_reactor.jpg"
+             alt="Reactor síntesis amoníaco PBR" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#EBF7F0;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#1A6A40;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>⚗️</span><br>Reactor Síntesis NH₃ (PBR radial)</div>'">
+        <div class="img-cap">Reactor de síntesis de amoníaco (PBR radial) — Haldor Topsoe, 300 bar
+          <span class="img-src">Fuente: Haldor Topsoe A/S, referencia técnica</span>
+        </div>
+      </div>
+    </div>
+    <div class="h3">5.2 Parámetros clave de diseño y operación</div>
+    <table class="ptab">
+      <tr><td class="pt">Ecuación de diseño</td><td class="pv">\(F_{A0}dX/dW = -r'_A(X,T,P)\) — ODE en W [kg catalizador]</td></tr>
+      <tr><td class="pt">Ecuación de Ergun</td><td class="pv">\(dy/dW = -\alpha/(2y)\cdot(T/T_0)\cdot(F_T/F_{T0})\) — caída de presión a lo largo del lecho</td></tr>
+      <tr><td class="pt">Cinética LHHW</td><td class="pv">\(-r'_A = k\,C_A\,C_B / (1+K_A C_A+K_B C_B)^2\) — modelo mecanístico de superficie</td></tr>
+      <tr><td class="pt">Parámetro de Ergun α</td><td class="pv">\(\alpha = 2\beta_0 / [A_c\rho_c(1-\phi)P_0]\) — función de D_p, φ, G, μ, ρ del lecho</td></tr>
+      <tr><td class="pt">Desactivación del catalizador</td><td class="pv">\(a(t) = e^{-k_d t}\) (coque, envenenamiento) — ciclo de operación → regeneración</td></tr>
+      <tr><td class="pt">Área superficial catalizador</td><td class="pv">Al₂O₃: 200–400 m²/g · Zeolitas: 400–1,000 m²/g · CuZnO (MeOH): 50–100 m²/g</td></tr>
+    </table>
+    <div class="g2">
+      <div class="gcol fort"><h4>✅ Fortalezas</h4><ul>
+        <li>Muy alta área catalítica superficial por unidad de volumen (200–1,000 m²/g)</li>
+        <li>Bajo mantenimiento — sin partes móviles en el sistema de reacción</li>
+        <li>Excelente para reacciones gas-sólido a alta temperatura y presión</li>
+        <li>Amplia gama de catalizadores disponibles comercialmente</li>
+      </ul></div>
+      <div class="gcol deb"><h4>✗ Debilidades</h4><ul>
+        <li>Caída de presión significativa (ecuación de Ergun) — CAPEX en compresión</li>
+        <li>Difícil regeneración in-situ del catalizador; requiere paradas periódicas</li>
+        <li>Control térmico complicado — diseño en múltiples lechos adiabáticos con reheaters</li>
+        <li>No apto para reacciones con sólidos en suspensión o fluidos viscosos</li>
+      </ul></div>
+    </div>
+    <div class="ind">
+      <div class="ind-hd">🏭 Aplicaciones Industriales del PBR</div>
+      <div class="ind-body">
+        <strong>Hidrodesulfuración (HDS) — CoMo/Al₂O₃ (Axens, UOP, Criterion):</strong>
+        <span class="ikpi">&lt;10 ppm S en diesel (norma EU)</span><span class="ikpi">T = 320–380°C</span><span class="ikpi">P = 30–80 bar</span>
+        <br><br>
+        <strong>Reforma catalítica (Platforming UOP, Magnaforming, CCR):</strong>
+        <span class="ikpi">Pt-Re/Al₂O₃</span><span class="ikpi">180–200 Mt/año nafta procesada</span>
+        <br><br>
+        <strong>Síntesis de metanol (ICI/Synetix, Davy, Lurgi):</strong>
+        <span class="ikpi">CuZnO/Al₂O₃</span><span class="ikpi">T = 220–280°C</span><span class="ikpi">100 Mt/año global</span>
+        <br><br>
+        <strong>Síntesis de amoníaco (Haber-Bosch — KBR, Haldor Topsoe, Casale):</strong>
+        <span class="ikpi">Fe/K₂O</span><span class="ikpi">T = 400–500°C</span><span class="ikpi">P = 150–300 bar</span><span class="ikpi">180 Mt/año</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- §6 LECHO FLUIDIZADO -->
+<div id="fbed" class="rc">
+  <div class="rc-head" style="background:linear-gradient(90deg,#8B2A0018,#8B2A0008);border-bottom:2px solid #8B2A0030">
+    <div class="rc-ico" style="background:#FEF0E8;color:#8B2A00">🌀</div>
+    <div>
+      <div class="rc-num" style="color:#8B2A00">§6 · Reactor de Lecho Fluidizado</div>
+      <div class="rc-title">FBR — Fluidized Bed Reactor</div>
+      <div class="rc-sub">Gas-sólido fluidizado · Transferencia de calor superior · FCC · Polietileno · Silicio solar</div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag" style="background:#FEF0E8;color:#8B2A00">Continuo</span>
+    <span class="tag" style="background:#FEDED0;color:#6A1A00">G-S · G-L-S</span>
+    <span class="tag" style="background:#FEF0E8;color:#8B2A00">Mezcla cuasi-perfecta</span>
+    <span class="tag" style="background:#FEE8D8;color:#7A2000">Alta transferencia calor</span>
+    <span class="tag" style="background:#FFF0E8;color:#9A3A10">Catalizador renovable</span>
+  </div>
+  <div class="sec-body">
+    <div class="h3">6.1 Descripción y principio de operación</div>
+    <p class="prose">
+      En el reactor de lecho fluidizado, el gas (o líquido) se hace pasar a través de un lecho de
+      partículas sólidas finas a una velocidad superior a la velocidad de mínima fluidización.
+      Las partículas quedan <strong>suspendidas y en movimiento continuo</strong>, comportándose
+      el conjunto como un fluido. Esto proporciona una transferencia de calor y masa
+      excepcional entre el gas y el sólido.
+    </p>
+    <p class="prose">
+      La ventaja clave sobre el lecho fijo es la posibilidad de <strong>regenerar el catalizador
+      continuamente</strong>: las partículas se pueden extraer del reactor, regenerar en un
+      recipiente separado (quemando el coque depositado) y recircular continuamente.
+      El proceso FCC (Fluid Catalytic Cracking) que produce el 40% de la gasolina mundial
+      funciona exactamente de este modo.
+    </p>
+    <div class="imgs">
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Fluidized_bed_reactor_schematic.svg/400px-Fluidized_bed_reactor_schematic.svg.png"
+             alt="Diagrama lecho fluidizado" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#FEF0E8;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#8B2A00;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🌀</span><br>Lecho Fluidizado — Diagrama</div>'">
+        <div class="img-cap">Esquema del reactor de lecho fluidizado: burbujas de gas, distribución de partículas, ciclón
+          <span class="img-src">Fuente: Wikipedia Commons</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.exxonmobil.com/api/media/content/images/FCC-unit-with-fractionator.jpg"
+             alt="Unidad FCC industrial" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#FEF0E8;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#8B2A00;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🏭</span><br>Unidad FCC — Fluid Catalytic Cracking</div>'">
+        <div class="img-cap">Unidad FCC industrial (ExxonMobil) — reactor + regenerador de catalizador en ciclo continuo
+          <span class="img-src">Fuente: ExxonMobil, referencia técnica</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.dow.com/content/dam/dcc/documents/en-us/app-tech-guide/746/746-00004-01-process-images/746-00004-01-fluidized-bed.jpg"
+             alt="Reactor lecho fluidizado polietileno" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#FEF0E8;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#8B2A00;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>⚗️</span><br>Lecho Fluidizado — Polietileno (Unipol)</div>'">
+        <div class="img-cap">Reactor de lecho fluidizado para polietileno — proceso Unipol (Dow/Union Carbide)
+          <span class="img-src">Fuente: Dow Chemical, referencia técnica</span>
+        </div>
+      </div>
+    </div>
+    <div class="h3">6.2 Parámetros clave y aplicaciones</div>
+    <table class="ptab">
+      <tr><td class="pt">Velocidad mínima fluidización</td><td class="pv">\(u_{mf} = [d_p^2(\rho_s-\rho_g)g] / (150\mu) \cdot \phi^3/(1-\phi)\) — correlación Kozeny-Carman</td></tr>
+      <tr><td class="pt">Velocidad de operación</td><td class="pv">u = 5–30 × u_mf (lecho burbujante) · u &gt; u_t (lecho circulante CFB)</td></tr>
+      <tr><td class="pt">Coef. transf. calor H-S</td><td class="pv">h = 200–600 W/(m²·K) — 10–50× mayor que en lecho fijo</td></tr>
+      <tr><td class="pt">Tamaño de partícula</td><td class="pv">Grupo A (Geldart): 20–100 μm (FCC) · Grupo B: 100–800 μm (Unipol)</td></tr>
+      <tr><td class="pt">Modelo de reacción</td><td class="pv">Modelo de burbuja-emulsión (Kunii-Levenspiel) — complejo; en 1ª aproximación: CSTR</td></tr>
+    </table>
+    <div class="g2">
+      <div class="gcol fort"><h4>✅ Fortalezas</h4><ul>
+        <li>Transferencia de calor gas-sólido 10–50× mayor que en lecho fijo</li>
+        <li>Temperatura uniforme en todo el lecho — ideal para reacciones muy exotérmicas</li>
+        <li>Regeneración continua del catalizador sin parar el reactor (FCC)</li>
+        <li>Escalable a enormes volúmenes (reactores FCC de &gt;1,000 m³)</li>
+      </ul></div>
+      <div class="gcol deb"><h4>✗ Debilidades</h4><ul>
+        <li>DTR amplia (cercana a CSTR) — menor conversión que el lecho fijo a igual τ</li>
+        <li>Erosión de partículas y equipo por el movimiento continuo del sólido</li>
+        <li>Desgaste del catalizador requiere reposición continua de "finos"</li>
+        <li>Modelado complejo — burbujas, emulsión, circulación interna</li>
+      </ul></div>
+    </div>
+    <div class="ind">
+      <div class="ind-hd">🏭 Aplicaciones Industriales del Lecho Fluidizado</div>
+      <div class="ind-body">
+        <strong>FCC — Fluid Catalytic Cracking (ExxonMobil, UOP, Shell, TotalEnergies):</strong>
+        <span class="ikpi">40% gasolina mundial</span><span class="ikpi">T = 500–550°C</span><span class="ikpi">Catalizador zeolítico</span>
+        <br><br>
+        <strong>Polietileno HDPE/LLDPE — Proceso Unipol (Dow, LyondellBasell, Chevron Phillips):</strong>
+        <span class="ikpi">T = 70–90°C</span><span class="ikpi">P = 20–30 bar</span><span class="ikpi">80 Mt/año PE global</span>
+        <br><br>
+        <strong>Polsilicio de alta pureza para paneles solares (REC Silicon, Wacker):</strong> proceso Siemens modificado.
+        <span class="ikpi">Pureza 11N (99.999999999%)</span><span class="ikpi">T = 1,000–1,200°C</span>
+        <br><br>
+        <strong>Tostación de minerales sulfurados (Outotec, FLSmidth):</strong>
+        <span class="ikpi">T = 700–900°C</span><span class="ikpi">Producción de SO₂ para H₂SO₄</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- §7 TRICKLE BED -->
+<div id="trickle" class="rc">
+  <div class="rc-head" style="background:linear-gradient(90deg,#00587018,#00587008);border-bottom:2px solid #00587030">
+    <div class="rc-ico" style="background:#E5F4F7;color:#005870">💧</div>
+    <div>
+      <div class="rc-num" style="color:#005870">§7 · Reactor de Lecho Percolado (Trickle Bed)</div>
+      <div class="rc-title">TBR — Trickle Bed Reactor · Reactor Trifásico de Goteo</div>
+      <div class="rc-sub">Gas-Líquido-Sólido · HDS profunda · Hidrotratamiento · Procesos de refinería</div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag" style="background:#E5F4F7;color:#005870">Continuo</span>
+    <span class="tag" style="background:#D0ECF2;color:#003A50">G-L-S trifásico</span>
+    <span class="tag" style="background:#E5F4F7;color:#005870">Flujo pistón (G y L)</span>
+    <span class="tag" style="background:#D8F0F5;color:#004860">Goteo descendente</span>
+    <span class="tag" style="background:#E0F5F8;color:#006880">Alta presión</span>
+  </div>
+  <div class="sec-body">
+    <div class="h3">7.1 Descripción y principio de operación</div>
+    <p class="prose">
+      En el TBR coexisten tres fases simultáneamente: el <strong>gas</strong> (H₂ en hidrogenaciones)
+      fluye hacia abajo o hacia arriba, el <strong>líquido</strong> (gasóleo, aceite) desciende
+      formando una película sobre las partículas, y el <strong>sólido</strong> (catalizador) forma
+      el lecho fijo. La reacción ocurre en la superficie del catalizador, con el reactivo gaseoso
+      que debe disolverse en el líquido y difundirse hasta la superficie catalítica.
+    </p>
+    <p class="prose">
+      El TBR es el reactor más común en las <strong>operaciones de hidrotratamiento de refinerías</strong>:
+      hidrodesulfuración (HDS), hidrodenitrogenación (HDN), hidrocraqueo suave y
+      aromatización selectiva. Opera típicamente a 30–200 bar de H₂ y 300–400°C.
+    </p>
+    <div class="imgs">
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Trickle_bed_reactor.svg/300px-Trickle_bed_reactor.svg.png"
+             alt="Diagrama trickle bed reactor" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E5F4F7;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#005870;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>💧</span><br>Trickle Bed Reactor — Tres fases</div>'">
+        <div class="img-cap">Esquema TBR: gas H₂ y líquido gasóleo fluyendo sobre lecho de catalizador CoMo/Al₂O₃
+          <span class="img-src">Fuente: Wikipedia Commons</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.axens.net/sites/default/files/2020-11/hds-reactor-industrial.jpg"
+             alt="Reactor HDS industrial trickle bed" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E5F4F7;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#005870;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🏭</span><br>Reactor HDS Industrial (Trickle Bed)</div>'">
+        <div class="img-cap">Reactor de hidrodesulfuración (HDS) industrial — Axens, refinerías europeas
+          <span class="img-src">Fuente: Axens IFP Group, referencia técnica</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.chevron.com/sites/default/files/hydrocracking-reactor.jpg"
+             alt="Reactor hidrocraqueo" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#E5F4F7;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#005870;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>⚙️</span><br>Reactor Hidrocraqueo (Trickle Bed)</div>'">
+        <div class="img-cap">Reactor de hidrocraqueo en refinería — lecho fijo trifásico a alta presión (Chevron)
+          <span class="img-src">Fuente: Chevron Corporation, referencia técnica</span>
+        </div>
+      </div>
+    </div>
+    <div class="h3">7.2 Parámetros clave</div>
+    <table class="ptab">
+      <tr><td class="pt">Resistencias en serie</td><td class="pv">Gas → interfase G-L → difusión en L → interfase L-S → poro catalizador → reacción superficial</td></tr>
+      <tr><td class="pt">Parámetro de operación</td><td class="pv">LHSV (Liquid Hourly Space Velocity) = v_L / V_cat [h⁻¹] — 0.5–5 h⁻¹ típico</td></tr>
+      <tr><td class="pt">Presión parcial H₂</td><td class="pv">15–200 bar — determina la tasa de disolución de H₂ en el líquido (ley de Henry)</td></tr>
+      <tr><td class="pt">Temperatura operación</td><td class="pv">280–420°C para HDS/HDN · 350–450°C para hidrocraqueo</td></tr>
+      <tr><td class="pt">Régimen de flujo</td><td class="pv">Goteo (trickle): u_L &lt; 0.5 cm/s · Pulsado (mayor eficiencia): u_L &gt; 1 cm/s</td></tr>
+    </table>
+    <div class="ind">
+      <div class="ind-hd">🏭 Aplicaciones Industriales del Trickle Bed</div>
+      <div class="ind-body">
+        <strong>HDS de diesel (norma EU-5: &lt;10 ppm S) — Axens, UOP, Criterion:</strong>
+        <span class="ikpi">P = 30–80 bar H₂</span><span class="ikpi">T = 320–380°C</span><span class="ikpi">LHSV = 1–3 h⁻¹</span>
+        <br><br>
+        <strong>Hidrocraqueo de residuos de vacío (Chevron, UOP, Shell):</strong>
+        <span class="ikpi">P = 100–200 bar</span><span class="ikpi">T = 380–430°C</span><span class="ikpi">Conversión &gt;80%</span>
+        <br><br>
+        <strong>Hidrotratamiento de aceites vegetales → diesel renovable (Neste, UPM, Diamond Green):</strong>
+        <span class="ikpi">HVO — 10 Mt/año capacidad instalada</span>
+        <br><br>
+        <strong>Fischer-Tropsch en slurry bubble column (Sasol, Shell, PetroSA):</strong>
+        variante de TBR con catalizador en suspensión para GTL (gas to liquids).
+        <span class="ikpi">T = 220–240°C</span><span class="ikpi">P = 25–35 bar</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- §8 MEMBRANA -->
+<div id="mem" class="rc">
+  <div class="rc-head" style="background:linear-gradient(90deg,#5018A018,#5018A008);border-bottom:2px solid #5018A030">
+    <div class="rc-ico" style="background:#F0E8FA;color:#5018A0">🔬</div>
+    <div>
+      <div class="rc-num" style="color:#5018A0">§8 · Reactor de Membrana</div>
+      <div class="rc-title">MR — Membrane Reactor · Reactor Catalítico de Membrana</div>
+      <div class="rc-sub">Separación + reacción integradas · Desplazamiento de equilibrio · Producción de H₂ · Dehydrogenación</div>
+    </div>
+  </div>
+  <div class="tags">
+    <span class="tag" style="background:#F0E8FA;color:#5018A0">Continuo</span>
+    <span class="tag" style="background:#E4D8F5;color:#380A80">G + membrana sólida</span>
+    <span class="tag" style="background:#F0E8FA;color:#5018A0">Flujo pistón</span>
+    <span class="tag" style="background:#ECD8F0;color:#4A0888">Separación integrada</span>
+    <span class="tag" style="background:#F5EAFF;color:#6020C0">Equilibrio desplazado</span>
+  </div>
+  <div class="sec-body">
+    <div class="h3">8.1 Descripción y principio de operación</div>
+    <p class="prose">
+      El reactor de membrana integra la <strong>reacción y la separación</strong> en un solo equipo.
+      Una membrana selectiva (típicamente de Pd-Ag, cerámica de alúmina, o perovskita) separa
+      continuamente uno de los productos de la zona de reacción. Según la Ley de Le Chatelier,
+      la extracción continua del producto <strong>desplaza el equilibrio hacia los productos</strong>,
+      permitiendo superar la conversión de equilibrio termodinámico convencional.
+    </p>
+    <p class="prose">
+      El ejemplo paradigmático es la <strong>producción de H₂</strong> por reforma de metano
+      o dehydrogenación de ciclohexano: la membrana de Pd-Ag extrae el H₂ producido
+      con alta selectividad (H₂/CO₂ &gt; 1,000), forzando la conversión más allá del límite
+      termodinámico y produciendo H₂ ultra-puro directamente.
+    </p>
+    <div class="imgs">
+      <div class="img-panel">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Membrane_reactor_schematic.png/400px-Membrane_reactor_schematic.png"
+             alt="Reactor membrana esquema" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#F0E8FA;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#5018A0;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🔬</span><br>Reactor de Membrana — Esquema</div>'">
+        <div class="img-cap">Esquema del reactor de membrana de Pd-Ag: H₂ permeado, retentado enriquecido en CO₂
+          <span class="img-src">Fuente: Wikipedia Commons</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.sintef.no/globalassets/project/membrana/images/pd-membrane-reactor.jpg"
+             alt="Módulo membrana Pd-Ag H2" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#F0E8FA;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#5018A0;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>⚗️</span><br>Membrana Pd-Ag para producción de H₂</div>'">
+        <div class="img-cap">Módulo de membrana de Pd-Ag para producción de H₂ ultra-puro (SINTEF)
+          <span class="img-src">Fuente: SINTEF, Noruega, referencia científica</span>
+        </div>
+      </div>
+      <div class="img-panel">
+        <img src="https://www.eon-technologies.com/wp-content/uploads/2020/03/ceramic-membrane-reactor.jpg"
+             alt="Reactor membrana cerámica industrial" loading="lazy"
+             onerror="this.parentElement.innerHTML='<div style=\'height:190px;background:#F0E8FA;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#5018A0;font-size:.82rem;padding:1rem;text-align:center\'><span style=\'font-size:3rem\'>🏭</span><br>Reactor de Membrana Cerámica</div>'">
+        <div class="img-cap">Reactor de membrana cerámica (Al₂O₃/ZrO₂) para reacciones a alta temperatura
+          <span class="img-src">Fuente: e.on Technologies, referencia técnica</span>
+        </div>
+      </div>
+    </div>
+    <div class="h3">8.2 Parámetros clave y tipos de membrana</div>
+    <table class="ptab">
+      <tr><td class="pt">Balance de masa modificado</td><td class="pv">\(F_{A0}dX/dV = -r_A + F_{A,\text{permeado}}/V\) — el flujo permeado afecta el balance de masa local</td></tr>
+      <tr><td class="pt">Conversión posible</td><td class="pv">Puede superar X_eq (límite termodinámico) — convierte reacción reversible en aparentemente irreversible</td></tr>
+      <tr><td class="pt">Membrana de Pd-Ag</td><td class="pv">Selectividad H₂/N₂ &gt; 1,000 · Flujo H₂: 10–50 mol/(m²·h·bar⁰·⁵) · T = 300–600°C</td></tr>
+      <tr><td class="pt">Membrana cerámica</td><td class="pv">Al₂O₃, ZrO₂, SiO₂ · T hasta 1,000°C · Selectividad moderada (100–1,000)</td></tr>
+      <tr><td class="pt">Membrana polimérica</td><td class="pv">PDMS, PVA · T &lt; 200°C · Bajo costo · Uso en pervaporación de ésteres</td></tr>
+    </table>
+    <div class="g2">
+      <div class="gcol fort"><h4>✅ Fortalezas</h4><ul>
+        <li>Supera el límite termodinámico de equilibrio — imposible en reactores convencionales</li>
+        <li>Produce H₂ puro directamente — elimina etapas de purificación</li>
+        <li>Intensificación de proceso: reacción + separación en un solo equipo</li>
+        <li>Permite temperaturas más bajas (ahorro energético) para la misma conversión</li>
+      </ul></div>
+      <div class="gcol deb"><h4>✗ Debilidades</h4><ul>
+        <li>Alto costo de fabricación de membranas selectivas de Pd-Ag</li>
+        <li>Vida útil limitada — degradación por impurezas (S, CO) y fragilidad</li>
+        <li>Escala limitada — principalmente laboratorio y piloto hasta la fecha</li>
+        <li>Diseño complejo: acoplamiento reacción-permeación-transporte</li>
+      </ul></div>
+    </div>
+    <div class="ind">
+      <div class="ind-hd">🏭 Aplicaciones Industriales del Reactor de Membrana</div>
+      <div class="ind-body">
+        <strong>Producción de H₂ ultra-puro para celdas de combustible (Toyota, Ballard, Air Liquide):</strong>
+        <span class="ikpi">Pureza &gt;99.9999% H₂</span><span class="ikpi">Membrana Pd-Ag</span>
+        <br><br>
+        <strong>Dehydrogenación de ciclohexano → benceno + H₂ (ExxonMobil pilot):</strong>
+        conversión 40% (equilibrio) → 90% con membrana.
+        <br><br>
+        <strong>SMR con membrana para producción descentralizada de H₂ (Praxair, Air Products):</strong>
+        <span class="ikpi">T = 500–600°C</span><span class="ikpi">P = 15–30 bar</span>
+        <br><br>
+        <strong>Pervaporación de ésteres — bio-esterificación (BASF, Wacker):</strong> separación de agua
+        durante la reacción de esterificación para desplazar el equilibrio.
+        <span class="ikpi">Membrana PVA</span><span class="ikpi">T = 60–120°C</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     TABLA COMPARATIVA MAESTRA
+══════════════════════════════════════════════════════ -->
+<div id="compare" class="master2">
+  <div class="master2-tit">📊 Tabla Comparativa Maestra — Los 8 Reactores</div>
+  <div style="overflow-x:auto">
+  <table class="comp-table">
+    <tr>
+      <th>Reactor</th>
+      <th>Ecuación de diseño</th>
+      <th>Conversión vs PFR</th>
+      <th>Control térmico</th>
+      <th>Selectividad</th>
+      <th>Escala industrial</th>
+      <th>Criterio de selección principal</th>
+    </tr>
+    <tr style="background:#EDF3FC">
+      <td><strong style="color:#1048B8">CSTR</strong></td>
+      <td style="font-family:var(--f-mono);font-size:.80rem">V=F_A0·X/(-r_A|sal)</td>
+      <td>Menor (n&gt;0)</td>
+      <td>⭐⭐⭐⭐⭐ Perfecto</td>
+      <td>Moderada</td>
+      <td>10 L – 500 m³</td>
+      <td>Reacciones exotérmicas, sólidos en suspensión, fermentación</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#14632A">PFR tubular</strong></td>
+      <td style="font-family:var(--f-mono);font-size:.80rem">F_A0·dX/dV = -r_A</td>
+      <td>Óptima (mínimo V)</td>
+      <td>⭐⭐ Difícil</td>
+      <td>Alta (perfil axial)</td>
+      <td>Tubos 1 cm–300 m</td>
+      <td>Máxima eficiencia volumétrica, alta T, reacciones rápidas</td>
+    </tr>
+    <tr style="background:#F3EEF9">
+      <td><strong style="color:#4A1888">Batch</strong></td>
+      <td style="font-family:var(--f-mono);font-size:.80rem">t = C_A0·∫dX/(-r_A)</td>
+      <td>Igual al PFR (t=τ)</td>
+      <td>⭐⭐⭐⭐ Bueno</td>
+      <td>Alta (control temporal)</td>
+      <td>100 mL – 200 m³</td>
+      <td>Productos de alto valor, multipropósito, pequeños volúmenes</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#7A5000">Semibatch</strong></td>
+      <td style="font-family:var(--f-mono);font-size:.80rem">dN_A/dt = -r_A·V + F_B0</td>
+      <td>Variable (dosificación)</td>
+      <td>⭐⭐⭐⭐⭐ Controlado</td>
+      <td>⭐⭐⭐⭐ Alta</td>
+      <td>100 L – 50 m³</td>
+      <td>Reacciones peligrosas, control de exotermia, selectividad mejorada</td>
+    </tr>
+    <tr style="background:#EBF7F0">
+      <td><strong style="color:#1A6A40">PBR (lecho fijo)</strong></td>
+      <td style="font-family:var(--f-mono);font-size:.80rem">F_A0·dX/dW = -r'_A</td>
+      <td>Alta (≈ PFR)</td>
+      <td>⭐⭐ Complicado</td>
+      <td>Alta (LHHW)</td>
+      <td>0.1–1,000 t cat.</td>
+      <td>Catálisis heterogénea: HDS, reforming, síntesis NH₃, metanol</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#8B2A00">Lecho fluidizado</strong></td>
+      <td style="font-family:var(--f-mono);font-size:.80rem">≈ CSTR (modelo simplificado)</td>
+      <td>Menor que PFR</td>
+      <td>⭐⭐⭐⭐⭐ Excelente</td>
+      <td>Moderada</td>
+      <td>1–10,000 t cat.</td>
+      <td>Catalizador regenerable, alta exotermia: FCC, polietileno, silicio</td>
+    </tr>
+    <tr style="background:#E5F4F7">
+      <td><strong style="color:#005870">Trickle Bed</strong></td>
+      <td style="font-family:var(--f-mono);font-size:.80rem">≈ PFR trifásico</td>
+      <td>Alta (≈ PFR)</td>
+      <td>⭐⭐⭐ Aceptable</td>
+      <td>Alta</td>
+      <td>10–500 t cat.</td>
+      <td>Hidrotratamiento G-L-S: HDS profunda, hidrocraqueo, HVO</td>
+    </tr>
+    <tr style="background:#F0E8FA">
+      <td><strong style="color:#5018A0">Membrana</strong></td>
+      <td style="font-family:var(--f-mono);font-size:.80rem">F_A0·dX/dV = -r_A + F_perm</td>
+      <td>Supera X_eq</td>
+      <td>⭐⭐⭐⭐ Bueno</td>
+      <td>⭐⭐⭐⭐⭐ Máxima</td>
+      <td>Lab – piloto</td>
+      <td>Superar equilibrio termodinámico, H₂ ultra-puro, intensificación</td>
+    </tr>
+  </table>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="call" style="background:#EAF3FB;border-left-color:#1048B8;color:#0A2858">
+      <span class="call-ico">🎓</span>
+      <div>
+        <strong>Criterio fundamental de selección:</strong> ningún tipo de reactor es superior en todas las dimensiones.
+        El diseñador maximiza la función objetivo del proceso (conversión, selectividad, seguridad, costo)
+        eligiendo el reactor que mejor satisface las restricciones físicas (fases, temperatura, presión,
+        tiempo de reacción) y económicas (costo de capital, operación y mantenimiento) de cada caso específico.
+        El Diagrama de Levenspiel y el análisis de la DTR son las herramientas de primera selección.
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<footer class="footer">
+  <p><strong>Reactores Químicos Industriales — Tipos, Clasificación, Usos e Importancia</strong></p>
+  <p>Programa 740484 · Maestría en Ingeniería Química · Universidad del Valle<br>
+  Prof. José Antonio Lara Ramos, Ing.Qco., M.Sc., Ph.D. · 2025</p>
+  <p style="margin-top:.6rem;font-size:.78rem;opacity:.60">
+    Referencia: Fogler, H.S. — <em>Elements of Chemical Reaction Engineering</em>, 4ª Ed., Pearson, 2006.<br>
+    Imágenes: Wikipedia Commons (CC), publicaciones técnicas de referencia industrial.
+    Las imágenes se cargan desde sus fuentes originales; en caso de error de carga se muestra un marcador descriptivo.
+  </p>
+</footer>
+</body>
+</html>
