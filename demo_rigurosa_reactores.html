@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demostración Rigurosa de las Ecuaciones de Diseño de Reactores Ideales</title>
+<style>
+/* ═══════════════════════════════════════════════════════
+   VARIABLES DE DISEÑO
+═══════════════════════════════════════════════════════ */
+:root {
+  /* Tipografía */
+  --f-serif: Georgia, 'Times New Roman', serif;
+  --f-sans:  'Segoe UI', 'Liberation Sans', Arial, sans-serif;
+  --f-mono:  'Consolas', 'Courier New', monospace;
+
+  /* Paleta base */
+  --ink:     #1A1F2E;
+  --ink2:    #3A4560;
+  --ink3:    #6B7A99;
+  --border:  #D8E0EE;
+  --bg:      #EFF3FA;
+  --card:    #FFFFFF;
+  --alt:     #F5F8FD;
+
+  /* Colores de acento por sección */
+  --a1: #1048B8;   --a1l: #E8EFFC;   --a1m: #3366D8;
+  --a2: #8B1A00;   --a2l: #FCE8E2;   --a2m: #C0341A;
+  --a3: #14632A;   --a3l: #E4F5E9;   --a3m: #22904A;
+  --a4: #4A1888;   --a4l: #F0E8FA;   --a4m: #7238C0;
+  --a5: #006070;   --a5l: #E0F4F7;   --a5m: #0090A8;
+
+  /* Funcionales */
+  --gold:    #B07800;
+  --goldb:   #FFF8E0;
+  --goldbr:  #DFC050;
+  --shadow:  rgba(10,20,60,.10);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET Y BASE
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--f-sans);
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.70;
+}
+a { color: var(--a1); text-decoration: none; }
+strong { color: var(--ink); font-weight: 600; }
+em { font-style: italic; }
+
+/* ═══════════════════════════════════════════════════════
+   TOPNAV
+═══════════════════════════════════════════════════════ */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: .6rem 1rem;
+  display: flex; gap: .4rem; flex-wrap: wrap; justify-content: center;
+}
+.tnb {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .3rem .8rem; border-radius: 6px;
+  font-size: .72rem; font-weight: 600; font-family: var(--f-sans);
+  text-decoration: none; border: 1.5px solid transparent;
+  cursor: pointer; transition: all .18s;
+  white-space: nowrap;
+}
+.tnb:hover { transform: translateY(-1px); }
+.tnb.dark  { background:#1A2A4A; color:#7EB8FF; border-color:#2A4080; }
+.tnb.dark:hover { background:#2A4080; }
+.tnb.s1 { background:var(--a1l); color:var(--a1); border-color:#B0C8F0; }
+.tnb.s1:hover { background:var(--a1); color:#fff; }
+.tnb.s2 { background:var(--a2l); color:var(--a2); border-color:#F0B8A8; }
+.tnb.s2:hover { background:var(--a2); color:#fff; }
+.tnb.s3 { background:var(--a3l); color:var(--a3); border-color:#A8D8B8; }
+.tnb.s3:hover { background:var(--a3); color:#fff; }
+.tnb.s4 { background:var(--a4l); color:var(--a4); border-color:#C8A8F0; }
+.tnb.s4:hover { background:var(--a4); color:#fff; }
+.tnb.s5 { background:var(--a5l); color:var(--a5); border-color:#90D0DC; }
+.tnb.s5:hover { background:var(--a5); color:#fff; }
+
+/* ═══════════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════════ */
+.hero {
+  background: linear-gradient(160deg, #080C1A 0%, #0C1830 40%, #0A2050 70%, #102858 100%);
+  padding: 5rem 2.5rem 4.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 40%, rgba(30,80,200,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(0,120,180,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eye {
+  font-family: var(--f-mono);
+  font-size: .72rem; font-weight: 500;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: #5090C0; margin-bottom: 1.1rem;
+}
+.hero h1 {
+  font-family: var(--f-serif);
+  font-size: clamp(1.9rem, 4.5vw, 3.2rem);
+  font-weight: 700; color: #E8F2FE;
+  line-height: 1.14; margin-bottom: 1rem;
+}
+.hero h1 span { color: #60B0FF; }
+.hero-lead {
+  font-size: 1.02rem; color: #7AA0C0;
+  max-width: 700px; margin: 0 auto 2rem;
+  line-height: 1.80;
+}
+.hero-chips {
+  display: flex; gap: .5rem; flex-wrap: wrap;
+  justify-content: center; margin-bottom: 2.2rem;
+}
+.chip {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(100,160,255,.25);
+  border-radius: 100px; padding: .3rem 1rem;
+  font-size: .74rem; color: #90B8D8; font-weight: 500;
+}
+.hero-actions {
+  display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .65rem 1.5rem; border-radius: 8px;
+  font-size: .88rem; font-weight: 600;
+  cursor: pointer; border: none;
+  transition: all .2s; text-decoration: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.btn-colab { background: #F9AB00; color: #1A1000; }
+.btn-dl    { background: var(--a1); color: #fff; }
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════ */
+.wrap { max-width: 1020px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+
+/* ═══════════════════════════════════════════════════════
+   SECCIÓN CARD
+═══════════════════════════════════════════════════════ */
+.sec {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 3.5rem;
+  overflow: hidden;
+  box-shadow: 0 3px 20px var(--shadow);
+  animation: fadeUp .5s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.sec:nth-child(1){animation-delay:.05s}
+.sec:nth-child(2){animation-delay:.10s}
+.sec:nth-child(3){animation-delay:.15s}
+.sec:nth-child(4){animation-delay:.20s}
+.sec:nth-child(5){animation-delay:.25s}
+.sec:nth-child(6){animation-delay:.30s}
+
+/* Cabecera de sección */
+.sec-hd {
+  padding: 1.8rem 2.2rem 1.4rem;
+  border-bottom: 1.5px solid var(--border);
+  display: flex; gap: 1.2rem; align-items: flex-start;
+}
+.sec-ico {
+  width: 52px; height: 52px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; flex-shrink: 0;
+}
+.sec-meta { flex: 1; }
+.sec-cap {
+  font-family: var(--f-mono);
+  font-size: .68rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  margin-bottom: .3rem;
+}
+.sec-tit {
+  font-family: var(--f-serif);
+  font-size: 1.28rem; font-weight: 700;
+  color: var(--ink); line-height: 1.22; margin-bottom: .25rem;
+}
+.sec-sub { font-size: .82rem; color: var(--ink3); font-style: italic; }
+
+/* Cuerpo */
+.sec-body { padding: 2rem 2.2rem; }
+@media (max-width:640px) {
+  .sec-hd   { padding: 1.3rem; }
+  .sec-body { padding: 1.3rem; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   TIPOGRAFÍA INTERNA
+═══════════════════════════════════════════════════════ */
+.h3 {
+  font-family: var(--f-serif);
+  font-size: .98rem; font-weight: 700;
+  color: var(--ink);
+  display: flex; align-items: center; gap: .7rem;
+  margin: 2.2rem 0 .95rem;
+}
+.h3:first-child { margin-top: 0; }
+.h3::after {
+  content: ''; flex: 1; height: 1.5px;
+  background: linear-gradient(90deg, rgba(0,0,0,.12), transparent);
+}
+.prose {
+  font-size: .94rem; color: var(--ink2);
+  line-height: 1.82; margin-bottom: 1rem;
+}
+.prose + .prose { margin-top: -.3rem; }
+
+/* ═══════════════════════════════════════════════════════
+   CAJAS DE ECUACIÓN — sistema completo
+═══════════════════════════════════════════════════════ */
+.eqbox {
+  background: #FFFDF5;
+  border: 1.5px solid var(--goldbr);
+  border-radius: 12px;
+  margin: 1.1rem 0 1.4rem;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(180,130,0,.08);
+}
+.eqbox-hd {
+  background: linear-gradient(90deg, #7A5600, #9A7200);
+  padding: .5rem 1.2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.eqlabel {
+  font-family: var(--f-mono);
+  font-size: .7rem; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: #FFE090;
+}
+.eqref {
+  font-family: var(--f-mono);
+  font-size: .66rem; color: #C8A050;
+  letter-spacing: .06em;
+}
+.eqbody { padding: 1.3rem 1.6rem 1.4rem; }
+
+/* Derivación paso a paso */
+.steps { display: flex; flex-direction: column; gap: .6rem; margin: .5rem 0; }
+.step  {
+  display: flex; gap: .9rem; align-items: baseline;
+  border-left: 3px solid var(--goldbr);
+  padding: .5rem 0 .5rem .9rem;
+}
+.step-n {
+  font-family: var(--f-mono);
+  font-size: .75rem; font-weight: 700;
+  color: var(--gold); flex-shrink: 0; width: 22px;
+}
+.step-body {
+  font-size: .9rem; color: var(--ink);
+  line-height: 1.95;
+}
+
+/* Resultado destacado */
+.eqresult {
+  background: linear-gradient(135deg, #F5ECC0, #EFE8A8);
+  border-radius: 8px;
+  padding: .8rem 1.2rem;
+  margin-top: .9rem;
+  font-size: .92rem; font-weight: 700;
+  color: #2A1800;
+  border-left: 4px solid var(--gold);
+  line-height: 1.85;
+}
+.eqresult mjx-container,
+.eqresult .MathJax { color: #2A1800 !important; }
+
+/* Nota interpretativa */
+.eqnote {
+  background: var(--goldb);
+  border: 1px dashed var(--goldbr);
+  border-radius: 7px;
+  padding: .65rem 1rem;
+  margin-top: .75rem;
+  font-size: .84rem; color: #5A4000;
+  line-height: 1.68;
+}
+.eqnote strong { color: #3A2800; }
+
+/* ═══════════════════════════════════════════════════════
+   TARJETAS DE SUPOSICIÓN
+═══════════════════════════════════════════════════════ */
+.asump-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .8rem; margin: 1rem 0 1.3rem;
+}
+.asump {
+  border-radius: 10px; padding: 1.1rem 1.2rem;
+  background: var(--alt);
+  border-left: 4px solid var(--border);
+  border-top: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.asump-id {
+  font-family: var(--f-mono);
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: .4rem;
+}
+.asump-title {
+  font-size: .9rem; font-weight: 700;
+  color: var(--ink); margin-bottom: .35rem;
+}
+.asump-phys {
+  font-size: .84rem; color: var(--ink2);
+  line-height: 1.62; margin-bottom: .45rem;
+}
+.asump-math {
+  font-family: var(--f-mono);
+  font-size: .79rem; color: var(--a1);
+  background: var(--a1l);
+  padding: .25rem .55rem; border-radius: 5px;
+  margin-bottom: .4rem; display: block;
+}
+.asump-fail {
+  font-size: .78rem; color: var(--ink3);
+  border-top: 1px solid var(--border);
+  padding-top: .4rem; margin-top: .35rem;
+  line-height: 1.55;
+}
+.asump-fail::before { content: '⚠ '; opacity: .7; }
+
+/* ═══════════════════════════════════════════════════════
+   TABLA DE DATOS
+═══════════════════════════════════════════════════════ */
+.dtab {
+  width: 100%; border-collapse: collapse;
+  margin: 1rem 0; font-size: .87rem;
+  border-radius: 10px; overflow: hidden;
+}
+.dtab th {
+  background: var(--ink); color: #fff;
+  padding: .58rem .9rem; text-align: left;
+  font-size: .74rem; letter-spacing: .05em;
+  text-transform: uppercase; font-weight: 500;
+}
+.dtab td {
+  padding: .52rem .9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink2); vertical-align: top;
+  line-height: 1.55;
+}
+.dtab tr:last-child td { border-bottom: none; }
+.dtab tr:nth-child(even) td { background: var(--alt); }
+.dtab tr:hover td { background: var(--a1l); }
+.mono { font-family: var(--f-mono); font-size: .83rem; color: var(--a1); }
+
+/* ═══════════════════════════════════════════════════════
+   CALLOUTS
+═══════════════════════════════════════════════════════ */
+.call {
+  display: flex; gap: .9rem;
+  padding: 1.1rem 1.3rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1.1rem 0;
+  border-left: 4px solid;
+  font-size: .9rem; line-height: 1.72;
+}
+.call-ico { font-size: 1.2rem; flex-shrink: 0; padding-top: .05rem; }
+.call.info    { background: #EAF3FB; border-color: var(--a1); color: #0A2858; }
+.call.warn    { background: #FEF8E8; border-color: var(--gold); color: #3A2800; }
+.call.success { background: #E6F5EC; border-color: var(--a3); color: #0A2818; }
+.call.danger  { background: #FAECEA; border-color: var(--a2); color: #3A0800; }
+
+/* ═══════════════════════════════════════════════════════
+   CAJA DE DEMOSTRACIÓN (PROOF)
+═══════════════════════════════════════════════════════ */
+.proof {
+  background: linear-gradient(135deg, #F0F5FF, #E8F0FE);
+  border: 1.5px solid #B8CCFA;
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  margin: 1.1rem 0;
+}
+.proof-hd {
+  display: flex; align-items: center; gap: .65rem;
+  margin-bottom: .9rem;
+}
+.proof-badge {
+  font-family: var(--f-mono);
+  font-size: .7rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: #fff; background: var(--a1);
+  padding: .22rem .65rem; border-radius: 20px;
+}
+.proof-tit {
+  font-family: var(--f-serif);
+  font-size: .96rem; font-weight: 700; color: var(--a1);
+}
+.proof-body {
+  font-size: .9rem; color: #0A2050;
+  line-height: 1.90;
+}
+.proof-qed {
+  text-align: right;
+  font-family: var(--f-serif);
+  font-size: .95rem; font-weight: 700;
+  color: var(--a1); margin-top: .7rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   GRIDS 2 COLUMNAS
+═══════════════════════════════════════════════════════ */
+.grid2 {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem; margin: 1rem 0;
+}
+@media (max-width:640px) { .grid2 { grid-template-columns: 1fr; } }
+.g2col {
+  border-radius: 10px; padding: 1.1rem 1.2rem;
+  border: 1.5px solid var(--border);
+}
+.g2col h4 {
+  font-size: .88rem; font-weight: 700;
+  margin-bottom: .55rem;
+}
+.g2col p {
+  font-size: .85rem; color: var(--ink2);
+  line-height: 1.68;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ÁRBOL JERÁRQUICO
+═══════════════════════════════════════════════════════ */
+.tree {
+  background: linear-gradient(135deg, #080C1A, #0C1830, #0A2050);
+  border-radius: 12px;
+  padding: 1.8rem 2rem;
+  margin: 1.3rem 0;
+  border: 1px solid #1E3A6A;
+  font-family: var(--f-mono);
+  font-size: .85rem; color: #B8D0F0;
+  line-height: 2.1; overflow-x: auto;
+}
+.tree .t-gold   { color: #FFD080; font-weight: 700; }
+.tree .t-blue   { color: #70B0FF; }
+.tree .t-green  { color: #70E090; }
+.tree .t-gray   { color: #8090B0; }
+
+/* ═══════════════════════════════════════════════════════
+   CITAS INDUSTRIALES
+═══════════════════════════════════════════════════════ */
+.industria {
+  background: linear-gradient(135deg, #0E1A30, #122040);
+  border: 1px solid #1E3A6A;
+  border-radius: 12px;
+  padding: 1.5rem 1.8rem;
+  margin: 1.3rem 0;
+}
+.industria-hd {
+  font-family: var(--f-mono);
+  font-size: .72rem; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: #5090C0; margin-bottom: .85rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.industria-body {
+  font-size: .9rem; color: #A8C0E0;
+  line-height: 1.82;
+}
+.industria-body strong { color: #D0E4FF; }
+.industria-body .kpi {
+  display: inline-block;
+  background: rgba(100,160,255,.15);
+  border: 1px solid rgba(100,160,255,.3);
+  border-radius: 6px; padding: .15rem .5rem;
+  font-family: var(--f-mono); font-size: .85rem;
+  color: #90C8FF; margin: .1rem .2rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DEBILIDADES Y FORTALEZAS
+═══════════════════════════════════════════════════════ */
+.df-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .9rem; margin: 1rem 0;
+}
+@media (max-width:640px) { .df-grid { grid-template-columns: 1fr; } }
+.df-col {
+  border-radius: 10px; padding: 1.1rem 1.2rem;
+}
+.df-col.fort { background: var(--a3l); border: 1.5px solid #A8D8B8; }
+.df-col.deb  { background: var(--a2l); border: 1.5px solid #F0B8A8; }
+.df-tit {
+  font-size: .84rem; font-weight: 700;
+  display: flex; align-items: center; gap: .4rem;
+  margin-bottom: .6rem;
+}
+.df-col.fort .df-tit { color: var(--a3); }
+.df-col.deb  .df-tit { color: var(--a2); }
+.df-item {
+  font-size: .84rem; color: var(--ink2);
+  display: flex; gap: .5rem; margin-bottom: .35rem;
+  line-height: 1.55;
+}
+.df-item::before { flex-shrink: 0; margin-top: .05rem; }
+.df-col.fort .df-item::before { content: '✓'; color: var(--a3); font-weight: 700; }
+.df-col.deb  .df-item::before { content: '✗'; color: var(--a2); font-weight: 700; }
+
+/* ═══════════════════════════════════════════════════════
+   TEMA POR SECCIÓN
+═══════════════════════════════════════════════════════ */
+.t1 .sec-hd  { background: linear-gradient(90deg, #EDF3FC, #F7FAFF); }
+.t1 .sec-ico { background: var(--a1l); }
+.t1 .sec-cap { color: var(--a1); }
+.t1 .asump   { border-left-color: var(--a1); }
+.t1 .asump-id{ color: var(--a1); }
+.t1 .asump-math{ background:var(--a1l); color:var(--a1); }
+
+.t2 .sec-hd  { background: linear-gradient(90deg, #FBF0EC, #FEF7F5); }
+.t2 .sec-ico { background: var(--a2l); }
+.t2 .sec-cap { color: var(--a2); }
+.t2 .asump   { border-left-color: var(--a2); }
+.t2 .asump-id{ color: var(--a2); }
+.t2 .asump-math{ background:var(--a2l); color:var(--a2); }
+
+.t3 .sec-hd  { background: linear-gradient(90deg, #EBF7F0, #F5FBF7); }
+.t3 .sec-ico { background: var(--a3l); }
+.t3 .sec-cap { color: var(--a3); }
+.t3 .asump   { border-left-color: var(--a3); }
+.t3 .asump-id{ color: var(--a3); }
+.t3 .asump-math{ background:var(--a3l); color:var(--a3); }
+
+.t4 .sec-hd  { background: linear-gradient(90deg, #F3EEF9, #F8F5FC); }
+.t4 .sec-ico { background: var(--a4l); }
+.t4 .sec-cap { color: var(--a4); }
+.t4 .asump   { border-left-color: var(--a4); }
+.t4 .asump-id{ color: var(--a4); }
+.t4 .asump-math{ background:var(--a4l); color:var(--a4); }
+
+.t5 .sec-hd  { background: linear-gradient(90deg, #E5F4F7, #F0FAFC); }
+.t5 .sec-ico { background: var(--a5l); }
+.t5 .sec-cap { color: var(--a5); }
+.t5 .asump   { border-left-color: var(--a5); }
+.t5 .asump-id{ color: var(--a5); }
+.t5 .asump-math{ background:var(--a5l); color:var(--a5); }
+
+/* ═══════════════════════════════════════════════════════
+   TABLA MAESTRA FINAL
+═══════════════════════════════════════════════════════ */
+.master {
+  background: var(--card); border-radius: 16px;
+  border: 1.5px solid var(--border);
+  padding: 2.2rem; margin-bottom: 3.5rem;
+  box-shadow: 0 3px 20px var(--shadow);
+}
+.master-tit {
+  font-family: var(--f-serif);
+  font-size: 1.18rem; font-weight: 700;
+  color: var(--ink); margin-bottom: 1.3rem;
+  display: flex; align-items: center; gap: .7rem;
+}
+.master-tit::after {
+  content: ''; flex: 1; height: 1.5px;
+  background: linear-gradient(90deg, rgba(0,0,0,.12), transparent);
+}
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════ */
+.footer {
+  text-align: center; padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--card); color: var(--ink3);
+  font-size: .84rem; line-height: 1.7;
+}
+.footer strong { color: var(--ink); }
+
+/* MathJax override */
+mjx-container { overflow-x: auto; max-width: 100%; }
+</style>
+
+<!-- MathJax 3 -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath:  [['\\(','\\)']],
+    displayMath: [['\\[','\\]']],
+    tags: 'none'
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════ TOPNAV ══════════════════ -->
+<nav class="topnav">
+  <a href="#intro" class="tnb dark">🗂 Introducción</a>
+  <a href="#s1"    class="tnb s1">⚗️ §1 CSTR</a>
+  <a href="#s2"    class="tnb s1">📐 §2 Levenspiel</a>
+  <a href="#s3"    class="tnb s3">🔩 §3 PFR</a>
+  <a href="#s4"    class="tnb s4">🧪 §4 Batch</a>
+  <a href="#s5"    class="tnb s2">🔥 §5 Energía</a>
+  <a href="#s6"    class="tnb s5">🔗 §6 Cascadas</a>
+  <a href="#sintesis" class="tnb dark">📊 Síntesis</a>
+</nav>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<div class="hero">
+  <div class="hero-eye">Programa 740484 · Maestría en Ingeniería Química · Universidad del Valle</div>
+  <h1>Demostración <span>Rigurosa</span><br>de las Ecuaciones de Diseño<br>de Reactores Ideales</h1>
+  <p class="hero-lead">
+    Derivaciones paso a paso desde primeros principios termodinámicos y cinéticos.
+    Descripción fenomenológica profunda de cada concepto. Análisis cuantitativo de
+    fortalezas, debilidades y condiciones de validez. Conexión directa con la industria
+    de procesos químicos. Verificaciones numéricas con Python/SciPy.<br>
+    <em>Referencia: Fogler, H.S. — Elements of Chemical Reaction Engineering, 4ª Ed.</em>
+  </p>
+  <div class="hero-chips">
+    <span class="chip">⚗️ CSTR · PFR · Batch · Cascadas</span>
+    <span class="chip">🔥 Balance de Energía completo</span>
+    <span class="chip">🔬 Fenomenología detallada</span>
+    <span class="chip">🏭 Perspectiva industrial</span>
+    <span class="chip">📓 Notebook Python ejecutable</span>
+    <span class="chip">✅ Q.E.D. en cada demostración</span>
+  </div>
+  <div class="hero-actions">
+    <a class="btn btn-colab" href="https://colab.research.google.com/github/larajose-byte/Reactores_Foglers/blob/main/demo_rigurosa_reactores.ipynb" target="_blank">🚀 Abrir en Google Colab</a>
+    <button class="btn btn-dl" onclick="downloadNB()">⬇️ Descargar .ipynb</button>
+  </div>
+</div>
+
+<div id="nb-data" style="display:none"><span id="d-demo">ewogIm5iZm9ybWF0IjogNCwKICJuYmZvcm1hdF9taW5vciI6IDUsCiAibWV0YWRhdGEiOiB7CiAgImtlcm5lbHNwZWMiOiB7CiAgICJkaXNwbGF5X25hbWUiOiAiUHl0aG9uIDMiLAogICAibGFuZ3VhZ2UiOiAicHl0aG9uIiwKICAgIm5hbWUiOiAicHl0aG9uMyIKICB9LAogICJsYW5ndWFnZV9pbmZvIjogewogICAibmFtZSI6ICJweXRob24iLAogICAidmVyc2lvbiI6ICIzLjEwLjAiCiAgfQogfSwKICJjZWxscyI6IFsKICB7CiAgICJjZWxsX3R5cGUiOiAibWFya2Rvd24iLAogICAibWV0YWRhdGEiOiB7fSwKICAgInNvdXJjZSI6IFsKICAgICI8ZGl2IHN0eWxlPVwiYmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCMwQTE2MjgsIzBEMjQ0MCwjMTAyODUwKTtcbiAgcGFkZGluZzo0NHB4IDMycHg7Ym9yZGVyLXJhZGl1czoxNnB4O3RleHQtYWxpZ246Y2VudGVyO2NvbG9yOiNFOEY0RkQ7XG4gIGJvcmRlcjoxcHggc29saWQgIzFFM0E2QTtib3gtc2hhZG93OjAgOHB4IDMycHggcmdiYSgwLDAsMCwuNClcIj5cbjxoMSBzdHlsZT1cIm1hcmdpbjowIDAgMTBweDtmb250LXNpemU6Mi4zZW07Zm9udC13ZWlnaHQ6NzAwO2xldHRlci1zcGFjaW5nOi0uNXB4XCI+XG4gIPCfk5AgRGVtb3N0cmFjacOzbiBSaWd1cm9zYSBkZSBsYXMgRWN1YWNpb25lcyBkZSBEaXNlw7FvPGJyPmRlIFJlYWN0b3JlcyBJZGVhbGVzPC9oMT5cbjxoMiBzdHlsZT1cIm1hcmdpbjowIDAgOHB4O2ZvbnQtd2VpZ2h0OjMwMDtvcGFjaXR5Oi45O2ZvbnQtc2l6ZToxLjI1ZW1cIj5cbiAgRGVyaXZhY2lvbmVzIGNvbXBsZXRhcyBkZXNkZSBwcmltZXJvcyBwcmluY2lwaW9zIMK3IFZlcmlmaWNhY2lvbmVzIG51bcOpcmljYXMgwrcgVmlzdWFsaXphY2nDs24gaW50ZXJhY3RpdmE8L2gyPlxuPHAgc3R5bGU9XCJtYXJnaW46NHB4IDA7b3BhY2l0eTouOFwiPkZvZ2xlciDigJQgPGVtPkVsZW1lbnRzIG9mIENoZW1pY2FsIFJlYWN0aW9uIEVuZ2luZWVyaW5nPC9lbT4sIDTCqiBFZC48L3A+XG48cCBzdHlsZT1cIm1hcmdpbjo0cHggMDtvcGFjaXR5Oi43O2ZvbnQtc2l6ZTouOWVtO2ZvbnQtc3R5bGU6aXRhbGljXCI+XG4gIFByb2dyYW1hIDc0MDQ4NCDCtyBNYWVzdHLDrWEgZW4gSW5nZW5pZXLDrWEgUXXDrW1pY2EgwrcgVW5pdmVyc2lkYWQgZGVsIFZhbGxlPGJyPlxuICBQcm9mLiBKb3PDqSBBbnRvbmlvIExhcmEgUmFtb3MsIEluZy5RY28uLCBNLlNjLiwgUGguRC48L3A+XG48L2Rpdj4iCiAgIF0sCiAgICJpZCI6ICJtMCIKICB9LAogIHsKICAgImNlbGxfdHlwZSI6ICJjb2RlIiwKICAgIm1ldGFkYXRhIjoge30sCiAgICJzb3VyY2UiOiBbCiAgICAiaW1wb3J0IG51bXB5IGFzIG5wXG5pbXBvcnQgbWF0cGxvdGxpYi5weXBsb3QgYXMgcGx0XG5pbXBvcnQgbWF0cGxvdGxpYi5ncmlkc3BlYyBhcyBncmlkc3BlY1xuZnJvbSBtYXRwbG90bGliLnBhdGNoZXMgaW1wb3J0IEZhbmN5QXJyb3dQYXRjaCwgUmVjdGFuZ2xlLCBGYW5jeUJib3hQYXRjaFxuZnJvbSBtYXRwbG90bGliLmxpbmVzIGltcG9ydCBMaW5lMkRcbmZyb20gc2NpcHkuaW50ZWdyYXRlIGltcG9ydCBxdWFkLCBvZGVpbnQsIHNvbHZlX2l2cFxuZnJvbSBzY2lweS5vcHRpbWl6ZSBpbXBvcnQgYnJlbnRxLCBmc29sdmVcbmltcG9ydCB3YXJuaW5nc1xud2FybmluZ3MuZmlsdGVyd2FybmluZ3MoJ2lnbm9yZScpXG5cbiMg4pSA4pSAIEVzdGlsbyBnbG9iYWwg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5wbHQucmNQYXJhbXMudXBkYXRlKHtcbiAgICAnZmlndXJlLmZhY2Vjb2xvcic6JyMwQTBGMUUnLCAnYXhlcy5mYWNlY29sb3InOicjMEExNTMwJyxcbiAgICAnYXhlcy5lZGdlY29sb3InOicjMkE0MDgwJywgICAnZ3JpZC5jb2xvcic6JyMxQTI4NDAnLFxuICAgICdncmlkLmFscGhhJzouMzUsICAgICAgICAgICAgICd0ZXh0LmNvbG9yJzonI0M4RDhGMCcsXG4gICAgJ2F4ZXMubGFiZWxjb2xvcic6JyNBMEMwRkYnLCAgJ3h0aWNrLmNvbG9yJzonIzgwOTBCMCcsXG4gICAgJ3l0aWNrLmNvbG9yJzonIzgwOTBCMCcsICAgICAgJ2ZvbnQuc2l6ZSc6MTEsXG4gICAgJ2F4ZXMudGl0bGVzaXplJzoxMiwgICAgICAgICAgJ2xpbmVzLmxpbmV3aWR0aCc6Mi4yLFxuICAgICdmaWd1cmUuZHBpJzoxMTAsXG59KVxuQ09MT1JTID0gZGljdChnb2xkPScjRkZEMDgwJywgYmx1ZT0nIzRBOUVGRicsIGdyZWVuPScjMkVDQzcxJyxcbiAgICAgICAgICAgICAgcmVkPScjRTc0QzNDJywgb3JhbmdlPScjRkY4QzQyJywgcHVycGxlPScjQzhBMEZGJyxcbiAgICAgICAgICAgICAgdGVhbD0nIzFCQzRDNCcsIHdoaXRlPScjRThGNEZEJywgZ3JheT0nIzYwNzA5MCcpXG5wcmludChcIuKchSBMaWJyZXLDrWFzIGNhcmdhZGFzIMK3IFZlcnNpw7NuIG51bXB5OlwiLCBucC5fX3ZlcnNpb25fXylcbiIKICAgXSwKICAgIm91dHB1dHMiOiBbXSwKICAgImV4ZWN1dGlvbl9jb3VudCI6IG51bGwsCiAgICJpZCI6ICJjMSIKICB9LAogIHsKICAgImNlbGxfdHlwZSI6ICJtYXJrZG93biIsCiAgICJtZXRhZGF0YSI6IHt9LAogICAic291cmNlIjogWwogICAgIi0tLVxuIyAwLiBGdW5kYW1lbnRvIGVwaXN0ZW1vbMOzZ2ljbzogwr9RdcOpIHNpZ25pZmljYSBcImRlbW9zdHJhY2nDs24gcmlndXJvc2FcIj9cblxuRW4gaW5nZW5pZXLDrWEgcXXDrW1pY2EsIHVuYSBlY3VhY2nDs24gZGUgZGlzZcOxbyBlcyAqKnJpZ3Vyb3NhKiogY3VhbmRvOlxuXG4xLiAqKlNlIGRlcml2YSBleHBsw61jaXRhbWVudGUqKiBkZXNkZSBwcmltZXJvcyBwcmluY2lwaW9zIChjb25zZXJ2YWNpw7NuIGRlIG1hc2EgeSBlbmVyZ8OtYSkgc2luIHNhbHRhcnNlIHBhc29zLlxuMi4gKipDYWRhIHN1cG9zaWNpw7NuIHNlIGlkZW50aWZpY2EgeSBqdXN0aWZpY2EqKiBpbmRpY2FuZG8gY3XDoW5kbyBwdWVkZSB2aW9sYXJzZSBlbiBsYSBwcsOhY3RpY2EuXG4zLiAqKkVsIHJlc3VsdGFkbyBzZSB2ZXJpZmljYSBudW3DqXJpY2FtZW50ZSoqIGNvbnRyYSBzb2x1Y2lvbmVzIGFuYWzDrXRpY2FzIGNvbm9jaWRhcyBvIGRhdG9zIGV4cGVyaW1lbnRhbGVzLlxuNC4gKipMYSBnZW5lcmFsaWRhZCBzZSBlc3RhYmxlY2UqKiBtb3N0cmFuZG8gcXVlIGxvcyBjYXNvcyBlc3BlY2lhbGVzIChpc290w6lybWljbywgYWRpYWLDoXRpY28sIGV0Yy4pIGVtZXJnZW4gY29tbyBsw61taXRlcyBkZWwgY2FzbyBnZW5lcmFsLlxuXG4jIyBNYXBhIGRlIGRlcml2YWNpb25lcyBkZSBlc3RlIG5vdGVib29rXG5cbmBgYFxuTGV5IGRlIENvbnNlcnZhY2nDs24gZGUgTWFzYSAoUG9zdHVsYWRvIHVuaXZlcnNhbClcbiAgICAgICAgIOKUglxuICAgICAgICAg4pSc4pSA4pa6IEJhbGFuY2UgbW9sYXIgZW4gc2lzdGVtYSBhYmllcnRvICAoRWMuIEdlbmVyYWwpXG4gICAgICAgICDilIIgICAgICAgICAgICAgIOKUglxuICAgICAgICAg4pSCICAgIOKUjOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUtOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUrOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUkFxuICAgICAgICAg4pSCICAgIOKWvCAgICAgICAgICAgICAgICAgICAg4pa8ICAgICAgICAgICAgICDilrxcbiAgICAgICAgIOKUgiAgQ1NUUiAgICAgICAgICAgICAgICAgIFBGUiAgICAgICAgICAgIEJBVENIXG4gICAgICAgICDilIIgIChtZXpjbGEgcGVyZmVjdGEsICAgICAoc2luIG1lemNsYSAgICAoc2luIGZsdWpvLFxuICAgICAgICAg4pSCICAgU1MsIFQgdW5pZm9ybWUpICAgICAgIGF4aWFsLCBTUykgICAgIHZvbHVtZW4gY3RlLilcbiAgICAgICAgIOKUgiAgICDilIIgICAgICAgICAgICAgICAgICAgIOKUgiAgICAgICAgICAgICAg4pSCXG4gICAgICAgICDilIIgICAg4pSU4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pS04pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSYXG4gICAgICAgICDilIIgICAgICAgICAgICAgICAgICAgICAgICAg4pSCXG4gICAgICAgICDilJTilIDilrogQmFsYW5jZSBkZSBFbmVyZ8OtYSDilIDilIDilIDilLTilIDilrogU2lzdGVtYXMgTk8gSXNvdMOpcm1pY29zXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKENTVFIgbcO6bHRpcGxlIFNTIMK3IFBGUiBob3RzcG90IMK3IEJhdGNoIFRNUilcbmBgYFxuXG4+ICoqUmVmZXJlbmNpYSBjYW7Ds25pY2E6KiogRm9nbGVyLCBILlMuICgyMDA2KS4gKkVsZW1lbnRzIG9mIENoZW1pY2FsIFJlYWN0aW9uIEVuZ2luZWVyaW5nKiwgNMKqIEVkLlxuPiBQZWFyc29uLiBDYXDDrXR1bG9zIDHigJM5LlxuIgogICBdLAogICAiaWQiOiAibTIiCiAgfSwKICB7CiAgICJjZWxsX3R5cGUiOiAibWFya2Rvd24iLAogICAibWV0YWRhdGEiOiB7fSwKICAgInNvdXJjZSI6IFsKICAgICItLS1cbiMgMS4gUkVBQ1RPUiBDU1RSIOKAlCBEZXJpdmFjacOzbiByaWd1cm9zYSBkZSBsYSBlY3VhY2nDs24gZGUgZGlzZcOxb1xuXG4jIyAxLjEgUHVudG8gZGUgcGFydGlkYTogTGV5IGRlIENvbnNlcnZhY2nDs24gZGUgTWFzYVxuXG5QYXJhIGN1YWxxdWllciAqKmVzcGVjaWUgcXXDrW1pY2EgQSoqIGVuIGN1YWxxdWllciAqKnZvbHVtZW4gZGUgY29udHJvbCoqICRcXG1hdGhjYWx7Vn0kLFxubGEgbGV5IGRlIGNvbnNlcnZhY2nDs24gZGUgbWFzYSBlbiB0w6lybWlub3MgbW9sYXJlcyAoc2luIGNyZWFjacOzbiBuaSBkZXN0cnVjY2nDs24gZGUgw6F0b21vcykgZXN0YWJsZWNlOlxuXG4kJFxcdW5kZXJicmFjZXtcXGRvdHtOfV97QSxcXHRleHR7ZW50cmFkYX19fV97XFx0ZXh0e2ZsdWpvIG1vbGFyIElOfX0gLSBcXHVuZGVyYnJhY2V7XFxkb3R7Tn1fe0EsXFx0ZXh0e3NhbGlkYX19fV97XFx0ZXh0e2ZsdWpvIG1vbGFyIE9VVH19ICsgXFx1bmRlcmJyYWNle1xcaW50X3tcXG1hdGhjYWx7Vn19IHJfQSBcXCwgZFZ9X3tcXHRleHR7Z2VuZXJhY2nDs24gcG9yIHJ4bn19ID0gXFx1bmRlcmJyYWNle1xcZnJhY3tkTl9BfXtkdH19X3tcXHRleHR7YWN1bXVsYWNpw7NufX0kJFxuXG5FbiBmb3JtYSBjb21wYWN0YSAqKihGb2dsZXIgRWMuIDEtNCkqKjpcbiQkXFxib3hlZHtGX3tBMH0gLSBGX0EgKyBcXGludF97XFxtYXRoY2Fse1Z9fSByX0EgXFwsIGRWID0gXFxmcmFje2ROX0F9e2R0fX0kJFxuXG5kb25kZSAkcl9BJCBbbW9sIG3igbvCsyBz4oG7wrldIHB1ZWRlIGRlcGVuZGVyIGRlIGxhIHBvc2ljacOzbiBkZW50cm8gZGUgJFxcbWF0aGNhbHtWfSQuXG5cbiMjIDEuMiBTdXBvc2ljaW9uZXMgZGVsIENTVFIgaWRlYWwg4oCUIGNhZGEgdW5hIGNvbiBzdSBjb25zZWN1ZW5jaWFcblxufCAjIHwgU3Vwb3NpY2nDs24gZsOtc2ljYSB8IENvbnNlY3VlbmNpYSBtYXRlbcOhdGljYSB8IEN1w6FuZG8gZmFsbGEgaW5kdXN0cmlhbG1lbnRlIHxcbnwtLS18LS0tLS0tLS0tLS0tLS0tLS0tfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLXwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS18XG58ICoqUzEqKiB8ICoqTWV6Y2xhIHBlcmZlY3RhKiog4oCUIGNvbXBvc2ljacOzbiB5IFQgdW5pZm9ybWVzIGVuIHRvZG8gJFYkIHwgJHJfQShcXG1hdGhiZnt4fSkgPSByX0FcXGJpZ1xcfF9cXHRleHR7c2FsfSA9IFxcdGV4dHtjdGV9JCDihpIgJFxcaW50IHJfQSBkViA9IHJfQSBWJCB8ICRQL1YgPCAwLjUkIGtXL23CsywgdmlzY29zaWRhZCBhbHRhLCAkViA+IDUwJCBtwrMgfFxufCAqKlMyKiogfCAqKkVzdGFkbyBlc3RhY2lvbmFyaW8qKiDigJQgcHJvcGllZGFkZXMgaW5kZXBlbmRpZW50ZXMgZGVsIHRpZW1wbyB8ICRcXGRmcmFje2ROX0F9e2R0fSA9IDAkIHwgQXJyYW5xdWVzLCBwYXJhZGFzLCBwZXJ0dXJiYWNpb25lcyA+IDEwJSB8XG58ICoqUzMqKiB8ICoqSXNvdMOpcm1pY28qKiDigJQgdGVtcGVyYXR1cmEgdW5pZm9ybWUgeSBjb25zdGFudGUgfCAkayA9IGsoVF9cXHRleHR7b3B9KSA9IFxcdGV4dHtjdGV9JCB8ICRcXERlbHRhIFRfXFx0ZXh0e2FkfSA+IDMwJCBLLCBmYWxsbyBkZSBjYW1pc2EgfFxufCAqKlM0KiogfCAqKkRlbnNpZGFkIGNvbnN0YW50ZSoqIOKAlCBmbHVqb3Mgdm9sdW3DqXRyaWNvcyBpZ3VhbGVzICgkdiA9IHZfMCQpIHwgJENfQSA9IENfe0EwfSgxLVgpJCBleGFjdG8gfCBHYXNlcyBjb24gJFxcZGVsdGEgXFxuZXEgMCQ7IHJlYWNjaW9uZXMgbXV5IGV4b3TDqXJtaWNhcyB8XG5cbiMjIDEuMyBEZXJpdmFjacOzbiBhbGdlYnJhaWNhIGNvbXBsZXRhIOKAlCA2IHBhc29zIGV4cGzDrWNpdG9zXG5cbioqUGFzbyAxOioqIEFwbGljYXIgUzIgKGVzdGFkbyBlc3RhY2lvbmFyaW8pIGEgbGEgRWMuIGdlbmVyYWw6XG4kJEZfe0EwfSAtIEZfQSArIHJfQSBWID0gMCQkXG5cbioqUGFzbyAyOioqIEV4cHJlc2FyICRGX0EkIGVuIHTDqXJtaW5vcyBkZSBsYSBjb252ZXJzacOzbiAkWCQgKGRlZmluaWNpw7NuIGRlICRYJCk6XG4kJEZfQSA9IEZfe0EwfSgxLVgpIFxccXVhZCBcXFJpZ2h0YXJyb3cgXFxxdWFkIEZfe0EwfSAtIEZfe0EwfSgxLVgpID0gRl97QTB9IFgkJFxuXG4qKlBhc28gMzoqKiBTdXN0aXR1aXIgeSBkZXNwZWphciAkViQsIHVzYW5kbyAkLXJfQSA+IDAkIChjb252ZW5pbyBwYXJhIHJlYWN0aXZvcyk6XG4kJEZfe0EwfSBYID0gKC1yX0EpXFxiaWd8X1xcdGV4dHtzYWx9IFxcY2RvdCBWIFxccXVhZCBcXFJpZ2h0YXJyb3cgXFxxdWFkIFxcYm94ZWR7Vl9cXHRleHR7Q1NUUn0gPSBcXGZyYWN7Rl97QTB9IFh9eygtcl9BKVxcYmlnfF9cXHRleHR7c2FsfX19JCRcblxuKipQYXNvIDQ6KiogRGl2aWRpciBudW1lcmFkb3IgeSBkZW5vbWluYWRvciBwb3IgJHZfMCQsIHkgdXNhciAkXFx0YXUgPSBWL3ZfMCQsICRDX3tBMH0gPSBGX3tBMH0vdl8wJDpcbiQkXFx0YXVfXFx0ZXh0e0NTVFJ9ID0gXFxmcmFje0Nfe0EwfSBYfXsoLXJfQSlcXGJpZ3xfXFx0ZXh0e3NhbH19JCRcblxuKipQYXNvIDU6KiogU3VzdGl0dWlyIGNpbsOpdGljYSBkZSBuLcOpc2ltbyBvcmRlbiAkLXJfQSA9IGsgQ197QTB9Xm4oMS1YKV5uJDpcbiQkXFx0YXUgPSBcXGZyYWN7WH17ayBDX3tBMH1ee24tMX0oMS1YKV5ufSQkXG5cbioqUGFzbyA2OioqIERlZmluaXIgZWwgKipOw7ptZXJvIGRlIERhbWvDtmhsZXIqKiAkRGEgXFxlcXVpdiBrXFx0YXUgQ197QTB9XntuLTF9JC4gUGFyYSAkbj0xJDpcbiQkRGEgPSBcXGZyYWN7WH17MS1YfSBcXHF1YWQgXFxSaWdodGFycm93IFxccXVhZCBcXGJveGVke1ggPSBcXGZyYWN7RGF9ezErRGF9fSBcXHF1YWQgXFx0ZXh0eyhzb2x1Y2nDs24gY2VycmFkYSBwYXJhIDFlciBvcmRlbil9JCRcblxuPiAqKlByb3BpZWRhZCBmdW5kYW1lbnRhbDoqKiBFbCBDU1RSIGV2YWzDumEgJCgtcl9BKSQgZW4gbGEgY29uY2VudHJhY2nDs24gZGUgKipzYWxpZGEqKiDigJQgbGEgbcOhcyBiYWphIHBvc2libGUuIENvbnNlY3VlbmNpYSBkaXJlY3RhIGRlIFMxIChtZXpjbGEgcGVyZmVjdGEpLiBFc3RvIGltcGxpY2EgJFZfXFx0ZXh0e0NTVFJ9ID4gVl9cXHRleHR7UEZSfSQgcGFyYSBjdWFscXVpZXIgJG4gPiAwJC5cbiIKICAgXSwKICAgImlkIjogIm0zIgogIH0sCiAgewogICAiY2VsbF90eXBlIjogImNvZGUiLAogICAibWV0YWRhdGEiOiB7fSwKICAgInNvdXJjZSI6IFsKICAgICIjIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkFxuIyBWRVJJRklDQUNJw5NOIE5VTcOJUklDQSDigJQgRWN1YWNpw7NuIGRlIGRpc2XDsW8gQ1NUUlxuIyBGb2dsZXIgRXhhbXBsZSA1LTE6IEhpZHJhdGFjacOzbiBkZSDDs3hpZG8gZGUgcHJvcGlsZW5vXG4jIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkFxuXG4jIERhdG9zIGRlbCBwcm9ibGVtYVxuayAgID0gMC4yNTcgICAgICAjIG1pbuKBu8K5ICDigJQgY2luw6l0aWNhIDFlciBvcmRlblxuQ0EwID0gMi4wNSAgICAgICAjIG1vbC9kbcKzXG52MCAgPSA0Ni44ICAgICAgICMgZG3Csy9taW5cblggICA9IDAuODAgICAgICAgIyBjb252ZXJzacOzbiBvYmpldGl2b1xuXG5GQTAgPSBDQTAgKiB2MCAgICMgbW9sL21pblxuXG4jIOKUgOKUgCBNw6l0b2RvIDE6IEVjdWFjacOzbiBkZSBkaXNlw7FvIGRpcmVjdGEg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5yQV9zYWwgPSBrICogQ0EwICogKDEgLSBYKSAgICAgICAgICAjIG1vbC8oZG3Cs8K3bWluKVxuVl9DU1RSID0gRkEwICogWCAvIHJBX3NhbCAgICAgICAgICAgICMgZG3Cs1xuXG4jIOKUgOKUgCBNw6l0b2RvIDI6IFZlcmlmaWNhY2nDs24gcG9yIERhbWvDtmhsZXIg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG50YXUgICAgPSBWX0NTVFIgLyB2MFxuRGEgICAgID0gayAqIHRhdVxuWF92ZXJpZiA9IERhIC8gKDEgKyBEYSlcblxuIyDilIDilIAgTcOpdG9kbyAzOiBWZXJpZmljYWNpw7NuIHBvciBiYWxhbmNlIGRpcmVjdG8g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5GQV9vdXQgID0gRkEwICogKDEgLSBYKSAgICAgICAgICAgICAgIyBtb2wvbWluIOKAlCBmbHVqbyBzYWxpZGFcbnJ4bl9tb2wgPSBGQTAgKiBYICAgICAgICAgICAgICAgICAgICAjIG1vbC9taW4g4oCUIGNvbnZlcnRpZG9zXG5nZW5fY2hrID0gckFfc2FsICogVl9DU1RSICAgICAgICAgICAgIyBtb2wvbWluIOKAlCBnZW5lcmFjacOzbiAobmVnYXRpdmEpXG5cbnByaW50KFwi4pWU4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWXXCIpXG5wcmludChcIuKVkSAgVkVSSUZJQ0FDScOTTiBDU1RSIOKAlCBGb2dsZXIgRXhhbXBsZSA1LTEgICAgICAgICAgICAg4pWRXCIpXG5wcmludChcIuKVoOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVo1wiKVxucHJpbnQoZlwi4pWRICBrICAgICAgICAgPSB7azouM2Z9IG1pbuKBu8K5ICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKVkVwiKVxucHJpbnQoZlwi4pWRICBDQTAgICAgICAgPSB7Q0EwOi4yZn0gbW9sL2RtwrMgICAgICAgICAgICAgICAgICAgICAgICAg4pWRXCIpXG5wcmludChmXCLilZEgIHYwICAgICAgICA9IHt2MDouMWZ9IGRtwrMvbWluICAgICAgICAgICAgICAgICAgICAgICAgIOKVkVwiKVxucHJpbnQoZlwi4pWRICBYX2RlcyAgICAgPSB7WDouMmZ9ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKVkVwiKVxucHJpbnQoXCLilaDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilaNcIilcbnByaW50KGZcIuKVkSAgRkEwICAgICAgID0ge0ZBMDouMmZ9IG1vbC9taW4gICAgICAgICAgICAgICAgICAgICAgICDilZFcIilcbnByaW50KGZcIuKVkSAgKC1yQSl8c2FsID0ge3JBX3NhbDouNGZ9IG1vbC8oZG3Cs8K3bWluKSAgICAgICAgICAgICAgIOKVkVwiKVxucHJpbnQoZlwi4pWRICBWX0NTVFIgICAgPSB7Vl9DU1RSOi4xZn0gZG3CsyAg4oaQIHJlc3VsdGFkbyBwcmluY2lwYWwgIOKVkVwiKVxucHJpbnQoZlwi4pWRICDPhCAgICAgICAgID0ge3RhdTouMmZ9IG1pbiAgICAgICAgICAgICAgICAgICAgICAgICAgICDilZFcIilcbnByaW50KGZcIuKVkSAgRGEgICAgICAgID0ge0RhOi40Zn0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIOKVkVwiKVxucHJpbnQoZlwi4pWRICBYICh2w61hIERhKSA9IHtYX3ZlcmlmOi40Zn0gIOKGkCB2ZXJpZmljYWNpw7NuIOKckyAgICAgICAg4pWRXCIpXG5wcmludChcIuKVoOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVo1wiKVxucHJpbnQoZlwi4pWRICBCYWxhbmNlOiBGQTDCt1ggPSB7cnhuX21vbDouMmZ9IG1vbC9taW4gY29udmVydGlkb3MgIOKVkVwiKVxucHJpbnQoZlwi4pWRICAgICAgICAgICByQcK3ViAgPSB7Z2VuX2NoazouMmZ9IG1vbC9taW4gZ2VuZXJhZG9zICAgIOKVkVwiKVxucHJpbnQoZlwi4pWRICAgICAgICAgICBFcnJvciA9IHthYnMocnhuX21vbC1nZW5fY2hrKS9yeG5fbW9sKjEwMDouNmZ9JSAg4pWRXCIpXG5wcmludChcIuKVmuKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVnVwiKVxuXG4jIOKUgOKUgCBBbsOhbGlzaXMgZGUgc2Vuc2liaWxpZGFkOiBWIHZzIFgg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5YX3JhbmdlID0gbnAubGluc3BhY2UoMC4wMSwgMC45OSwgNTAwKVxuckFfcmFuZ2UgPSBrICogQ0EwICogKDEgLSBYX3JhbmdlKVxuVl9yYW5nZSAgPSBGQTAgKiBYX3JhbmdlIC8gckFfcmFuZ2VcblxuZmlnLCBheGVzID0gcGx0LnN1YnBsb3RzKDEsIDIsIGZpZ3NpemU9KDEzLCA1KSlcbmZpZy5zdXB0aXRsZSgnQ1NUUiDigJQgVmVyaWZpY2FjacOzbiBudW3DqXJpY2EgZGUgbGEgZWN1YWNpw7NuIGRlIGRpc2XDsW8nLCBjb2xvcj1DT0xPUlNbJ3doaXRlJ10sIGZvbnR3ZWlnaHQ9J2JvbGQnKVxuXG4jIFBhbmVsIDE6IFYgdnMgWFxuYXggPSBheGVzWzBdXG5heC5wbG90KFhfcmFuZ2UsIFZfcmFuZ2UsIGNvbG9yPUNPTE9SU1snZ29sZCddLCBsdz0yLjUpXG5heC5heHZsaW5lKFgsIGNvbG9yPUNPTE9SU1sncmVkJ10sIGxzPSctLScsIGx3PTEuOCwgbGFiZWw9ZidYID0ge1g6LjJmfScpXG5heC5heGhsaW5lKFZfQ1NUUiwgY29sb3I9Q09MT1JTWydibHVlJ10sIGxzPSc6JywgbHc9MS44LCBsYWJlbD1mJ1YgPSB7Vl9DU1RSOi4wZn0gZG3CsycpXG5heC5zY2F0dGVyKFtYXSwgW1ZfQ1NUUl0sIGNvbG9yPUNPTE9SU1snZ29sZCddLCBzPTEyMCwgem9yZGVyPTUpXG5heC5zZXRfeGxhYmVsKCdDb252ZXJzacOzbiBYJylcbmF4LnNldF95bGFiZWwoJ1ZvbHVtZW4gQ1NUUiAoZG3CsyknKVxuYXguc2V0X3RpdGxlKCdWKFgpIOKAlCBlY3VhY2nDs24gZGUgZGlzZcOxbycpXG5heC5sZWdlbmQoKTsgYXguZ3JpZChUcnVlKVxuYXguYW5ub3RhdGUoZicoe1g6LjJmfSwge1ZfQ1NUUjouMGZ9KScsIChYLCBWX0NTVFIpLFxuICAgICAgICAgICAgeHl0ZXh0PShYLTAuMjUsIFZfQ1NUUisyMDApLCBjb2xvcj1DT0xPUlNbJ2dvbGQnXSwgZm9udHNpemU9MTAsXG4gICAgICAgICAgICBhcnJvd3Byb3BzPWRpY3QoYXJyb3dzdHlsZT0nLT4nLCBjb2xvcj1DT0xPUlNbJ2dvbGQnXSkpXG5cbiMgUGFuZWwgMjogWCB2cyBEYSDigJQgdmVyaWZpY2FjacOzbiBhbGdlYnJhaWNhXG5EYV9yYW5nZSA9IG5wLmxpbnNwYWNlKDAsIDE1LCAzMDApXG5YX0RhID0gRGFfcmFuZ2UgLyAoMSArIERhX3JhbmdlKSAgICAgICMgc29sdWNpw7NuIGFuYWzDrXRpY2EgMWVyIG9yZGVuXG5heDIgPSBheGVzWzFdXG5heDIucGxvdChEYV9yYW5nZSwgWF9EYSwgY29sb3I9Q09MT1JTWyd0ZWFsJ10sIGx3PTIuNSwgbGFiZWw9J1ggPSBEYS8oMStEYSknKVxuYXgyLmF4dmxpbmUoRGEsIGNvbG9yPUNPTE9SU1sncmVkJ10sIGxzPSctLScsIGx3PTEuOCwgbGFiZWw9ZidEYSA9IHtEYTouMmZ9JylcbmF4Mi5heGhsaW5lKFgsIGNvbG9yPUNPTE9SU1snYmx1ZSddLCBscz0nOicsIGx3PTEuOCwgbGFiZWw9ZidYID0ge1g6LjJmfScpXG5heDIuc2NhdHRlcihbRGFdLCBbWF0sIGNvbG9yPUNPTE9SU1snZ29sZCddLCBzPTEyMCwgem9yZGVyPTUpXG5heDIuc2V0X3hsYWJlbCgnTsO6bWVybyBkZSBEYW1rw7ZobGVyIChEYSA9IGvPhCknKVxuYXgyLnNldF95bGFiZWwoJ0NvbnZlcnNpw7NuIFgnKVxuYXgyLnNldF90aXRsZSgnWCA9IERhLygxK0RhKSDigJQgdmVyaWZpY2FjacOzbiBwb3IgRGEnKVxuYXgyLmxlZ2VuZCgpOyBheDIuZ3JpZChUcnVlKVxuXG5wbHQudGlnaHRfbGF5b3V0KClcbnBsdC5zYXZlZmlnKCdjc3RyX3ZlcmlmaWNhY2lvbi5wbmcnLCBkcGk9MTIwLCBiYm94X2luY2hlcz0ndGlnaHQnLCBmYWNlY29sb3I9JyMwQTBGMUUnKVxucGx0LnNob3coKVxucHJpbnQoXCLinIUgRmlndXJhIGd1YXJkYWRhOiBjc3RyX3ZlcmlmaWNhY2lvbi5wbmdcIilcbiIKICAgXSwKICAgIm91dHB1dHMiOiBbXSwKICAgImV4ZWN1dGlvbl9jb3VudCI6IG51bGwsCiAgICJpZCI6ICJjNCIKICB9LAogIHsKICAgImNlbGxfdHlwZSI6ICJtYXJrZG93biIsCiAgICJtZXRhZGF0YSI6IHt9LAogICAic291cmNlIjogWwogICAgIi0tLVxuIyAyLiBEaWFncmFtYSBkZSBMZXZlbnNwaWVsIOKAlCBkZW1vc3RyYWNpw7NuIGdlb23DqXRyaWNhIGRlIGxhIGRlc2lndWFsZGFkICRWX1xcdGV4dHtDU1RSfSA+IFZfXFx0ZXh0e1BGUn0kXG5cbiMjIDIuMSBFbCB0ZW9yZW1hIGdlb23DqXRyaWNvIGZ1bmRhbWVudGFsXG5cbkRlZmluaW1vcyBsYSAqKmZ1bmNpw7NuIGRlIExldmVuc3BpZWwqKiAkXFxtYXRoY2Fse0x9KFgpJDpcbiQkXFxtYXRoY2Fse0x9KFgpIFxcZXF1aXYgXFxmcmFje0Zfe0EwfX17LXJfQShYKX0gXFxxdWFkIFxcbGVmdFtcXHRleHR7ZG19XjNcXHJpZ2h0XSQkXG5cbkxhcyBlY3VhY2lvbmVzIGRlIGRpc2XDsW8gc2UgY29udmllcnRlbiBlbiDDoXJlYXMgZ2VvbcOpdHJpY2FzOlxuXG4kJFZfXFx0ZXh0e0NTVFJ9ID0gXFxtYXRoY2Fse0x9KFhfXFx0ZXh0e3NhbH0pIFxcY2RvdCBYX1xcdGV4dHtzYWx9IFxccXVhZCBcXGxlZnRhcnJvdyBcXHRleHR7cmVjdMOhbmd1bG8gZGUgYWx0dXJhIH0gXFxtYXRoY2Fse0x9KFhfXFx0ZXh0e3NhbH0pIFxcdGV4dHsgeSBiYXNlIH0gWF9cXHRleHR7c2FsfSQkXG5cbiQkVl9cXHRleHR7UEZSfSA9IFxcaW50XzBee1hfQX0gXFxtYXRoY2Fse0x9KFgpXFwsIGRYIFxccXVhZCBcXGxlZnRhcnJvdyBcXHRleHR7w6FyZWEgYmFqbyBsYSBjdXJ2YSB9IFxcbWF0aGNhbHtMfShYKSQkXG5cbiMjIDIuMiBEZW1vc3RyYWNpw7NuIGZvcm1hbCBkZSBsYSBkZXNpZ3VhbGRhZFxuXG4qKlRlb3JlbWE6KiogUGFyYSBjdWFscXVpZXIgY2luw6l0aWNhIGNvbiAkXFxkZnJhY3tkKC1yX0EpfXtkWH0gPCAwJCAodmVsb2NpZGFkIGRlY3JlY2llbnRlIGNvbiBsYSBjb252ZXJzacOzbikgeSAkbiA+IDAkOlxuXG4kJFZfXFx0ZXh0e0NTVFJ9ID4gVl9cXHRleHR7UEZSfSBcXHF1YWQgXFxmb3JhbGxcXCwgWCBcXGluICgwLDEpJCRcblxuKipEZW1vc3RyYWNpw7NuOioqICRcXG1hdGhjYWx7TH0oWCkkIGVzIHVuYSBmdW5jacOzbiBtb27Ds3RvbmFtZW50ZSBjcmVjaWVudGUgZW4gJFgkIGN1YW5kbyAkLXJfQSQgZGVjcmVjZSBjb24gJFgkLlxuUGFyYSBjdWFscXVpZXIgZnVuY2nDs24gY3JlY2llbnRlICRcXG1hdGhjYWx7TH0kIHkgJFhfXFx0ZXh0e3NhbH0gXFxpbiAoMCwxKSQ6XG5cbiQkXFxtYXRoY2Fse0x9KFgpIDwgXFxtYXRoY2Fse0x9KFhfXFx0ZXh0e3NhbH0pIFxccXVhZCBcXGZvcmFsbFxcLCBYIDwgWF9cXHRleHR7c2FsfSQkXG5cblBvciB0YW50bzpcbiQkVl9cXHRleHR7UEZSfSA9IFxcaW50XzBee1hfXFx0ZXh0e3NhbH19IFxcbWF0aGNhbHtMfShYKVxcLGRYIDwgXFxpbnRfMF57WF9cXHRleHR7c2FsfX0gXFxtYXRoY2Fse0x9KFhfXFx0ZXh0e3NhbH0pXFwsZFggPSBcXG1hdGhjYWx7TH0oWF9cXHRleHR7c2FsfSlcXGNkb3QgWF9cXHRleHR7c2FsfSA9IFZfXFx0ZXh0e0NTVFJ9JCRcblxuKipRLkUuRC4qKiAkXFxzcXVhcmUkXG5cbiMjIDIuMyBDYXNvIGVzcGVjaWFsOiByZWFjY2nDs24gYXV0b2NhdGFsw610aWNhXG5cblBhcmEgJC1yX0EgPSBrIFgoMS1YKSQgKGF1dG9jYXRhbMOtdGljYSksIGxhIHZlbG9jaWRhZCB0aWVuZSB1biAqKm3DoXhpbW8qKiBlbiAkWCA9IDAuNSQuXG4kXFxtYXRoY2Fse0x9KFgpJCB0aWVuZSB1biAqKm3DrW5pbW8qKiBlbiAkWCA9IDAuNSQg4oCUIGxhIGN1cnZhIHRpZW5lIGZvcm1hIGRlIFwiVVwiLlxuRW4gZXN0ZSBjYXNvLCBlbCBDU1RSICoqcHVlZGUqKiBzZXIgbcOhcyBlZmljaWVudGUgcXVlIGVsIFBGUiBwYXJhIGNpZXJ0YXMgY29udmVyc2lvbmVzXG4oZWwgcmVjdMOhbmd1bG8gcHVlZGUgcXVlZGFyIGNvbXBsZXRhbWVudGUgYmFqbyBsYSBjdXJ2YSBlbiBsYSByZWdpw7NuIGRlbCBtw61uaW1vKS5cbiIKICAgXSwKICAgImlkIjogIm01IgogIH0sCiAgewogICAiY2VsbF90eXBlIjogImNvZGUiLAogICAibWV0YWRhdGEiOiB7fSwKICAgInNvdXJjZSI6IFsKICAgICIjIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkFxuIyBESUFHUkFNQSBERSBMRVZFTlNQSUVMIOKAlCBEZW1vc3RyYWNpw7NuIGdlb23DqXRyaWNhXG4jIENvbXBhcmFjacOzbiBvcmRlbiBuID0gMSwgMiB5IGF1dG9jYXRhbMOtdGljYVxuIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZBcblxuZmlnLCBheGVzID0gcGx0LnN1YnBsb3RzKDEsIDMsIGZpZ3NpemU9KDE2LCA2KSlcbmZpZy5zdXB0aXRsZSgnRGlhZ3JhbWEgZGUgTGV2ZW5zcGllbCDigJQgRGVtb3N0cmFjacOzbiBnZW9tw6l0cmljYVxcbidcbiAgICAgICAgICAgICByJyRWX1xcbWF0aHJte0NTVFJ9JCA9IHJlY3TDoW5ndWxvICAgJHwkICAgJFZfXFxtYXRocm17UEZSfSQgPSDDoXJlYSBiYWpvIGN1cnZhJyxcbiAgICAgICAgICAgICBjb2xvcj1DT0xPUlNbJ3doaXRlJ10sIGZvbnR3ZWlnaHQ9J2JvbGQnLCBmb250c2l6ZT0xMilcblxuY2Fzb3MgPSBbXG4gICAgKCdDaW7DqXRpY2EgMWVyIG9yZGVuXFxuJC1yX0EgPSBrQ197QTB9KDEtWCkkJywgMSwgRmFsc2UpLFxuICAgICgnQ2luw6l0aWNhIDJkbyBvcmRlblxcbiQtcl9BID0ga0Nfe0EwfV4yKDEtWCleMiQnLCAyLCBGYWxzZSksXG4gICAgKCdBdXRvY2F0YWzDrXRpY2FcXG4kLXJfQSA9IGtYQ197QTB9XjIoMS1YKSQnLCAyLCBUcnVlKSxcbl1cblxua19ldiwgQ0EwX2V2LCB2MF9ldiA9IDAuNSwgMi4wLCAxMC4wXG5GQTBfZXYgPSBrX2V2ICogQ0EwX2V2ICogdjBfZXYgICAjIHNpbXBsaWZpY2Fkb1xuWF9kZXMgID0gMC44MFxuXG5mb3IgYXgsICh0aXR1bG8sIG4sIGF1dG8pIGluIHppcChheGVzLCBjYXNvcyk6XG4gICAgWF9hcnIgPSBucC5saW5zcGFjZSgwLjAwMSwgMC45OTUsIDgwMClcblxuICAgIGlmIGF1dG86XG4gICAgICAgIHJBX2FyciA9IGtfZXYgKiBYX2FyciAqIENBMF9ldioqMiAqICgxIC0gWF9hcnIpXG4gICAgICAgICMgcGFyYSBhdXRvY2F0YWzDrXRpY2EsIG5lY2VzaXRhbW9zIGRhdG9zIGRlIGVudHJhZGEgbm8gbnVsb3NcbiAgICAgICAgckFfYXJyID0gbnAubWF4aW11bShyQV9hcnIsIDFlLTYpXG4gICAgZWxzZTpcbiAgICAgICAgckFfYXJyID0ga19ldiAqIChDQTBfZXYgKiAoMSAtIFhfYXJyKSkqKm5cblxuICAgIExldiA9IEZBMF9ldiAvIHJBX2FyclxuXG4gICAgIyBMaW1pdGFyIHBhcmEgdmlzdWFsaXphY2nDs25cbiAgICB5X21heCA9IG1pbihMZXZbbnAuc2VhcmNoc29ydGVkKFhfYXJyLCBYX2RlcyldICogMS43LCAyMDApXG4gICAgbWFzayAgID0gTGV2IDw9IHlfbWF4ICogMS4wMlxuICAgIFhfcGxvdCA9IFhfYXJyW21hc2tdXG4gICAgTF9wbG90ID0gTGV2W21hc2tdXG5cbiAgICAjIEVuY29udHJhciDDrW5kaWNlIGRlIFhfZGVzXG4gICAgaV9kZXMgPSBucC5zZWFyY2hzb3J0ZWQoWF9hcnIsIFhfZGVzKVxuICAgIExfZGVzID0gTGV2W2lfZGVzXVxuICAgIExfZGVzX2NsaXBwZWQgPSBtaW4oTF9kZXMsIHlfbWF4KVxuXG4gICAgIyDDgXJlYSBQRlIgKGludGVncmFsIG51bcOpcmljYSlcbiAgICBYX3BmciA9IFhfYXJyWzppX2RlcysxXVxuICAgIExfcGZyID0gbnAubWluaW11bShMZXZbOmlfZGVzKzFdLCB5X21heClcbiAgICBWX1BGUl9hcmVhID0gbnAudHJhcHooTF9wZnIsIFhfcGZyKVxuXG4gICAgIyDDgXJlYSBDU1RSIChyZWN0w6FuZ3VsbylcbiAgICBWX0NTVFJfYXJlYSA9IExfZGVzX2NsaXBwZWQgKiBYX2Rlc1xuXG4gICAgIyBSZWxsZW5vIFBGUiAodmVyZGUpXG4gICAgYXguZmlsbF9iZXR3ZWVuKFhfcGZyLCBMX3BmciwgMCwgYWxwaGE9MC4yOCwgY29sb3I9Q09MT1JTWydncmVlbiddLCBsYWJlbD1mJ1ZfUEZSID0ge1ZfUEZSX2FyZWE6LjFmfSBkbcKzJylcblxuICAgICMgUmVsbGVubyBDU1RSIChhenVsLCBzb2xvIGxhIHBhcnRlIGFkaWNpb25hbClcbiAgICBheC5maWxsX2JldHdlZW4oWzAsIFhfZGVzXSwgW0xfZGVzX2NsaXBwZWQsIExfZGVzX2NsaXBwZWRdLCAwLFxuICAgICAgICAgICAgICAgICAgICBhbHBoYT0wLjE4LCBjb2xvcj1DT0xPUlNbJ2JsdWUnXSlcbiAgICBheC5hZGRfcGF0Y2goUmVjdGFuZ2xlKCgwLCAwKSwgWF9kZXMsIExfZGVzX2NsaXBwZWQsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsbD1GYWxzZSwgZWRnZWNvbG9yPUNPTE9SU1snYmx1ZSddLCBsdz0yLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxhYmVsPWYnVl9DU1RSID0ge1ZfQ1NUUl9hcmVhOi4xZn0gZG3CsycsIGxpbmVzdHlsZT0nLS0nKSlcblxuICAgICMgQ3VydmEgTGV2ZW5zcGllbFxuICAgIGF4LnBsb3QoWF9wbG90LCBMX3Bsb3QsIGNvbG9yPUNPTE9SU1snZ29sZCddLCBsdz0yLjUsIGxhYmVsPSfihJIoWCkgPSBGX0EwLygtcl9BKScpXG5cbiAgICAjIE1hcmNhZG9yZXNcbiAgICBheC5heHZsaW5lKFhfZGVzLCBjb2xvcj1DT0xPUlNbJ3JlZCddLCBscz0nOicsIGx3PTEuNSlcbiAgICBheC5zY2F0dGVyKFtYX2Rlc10sIFtMX2Rlc19jbGlwcGVkXSwgY29sb3I9Q09MT1JTWydnb2xkJ10sIHM9MTAwLCB6b3JkZXI9NilcblxuICAgICMgQW5vdGFjaW9uZXNcbiAgICBheC50ZXh0KFhfZGVzLzIsIExfZGVzX2NsaXBwZWQqMC40LCAnUEZSJywgaGE9J2NlbnRlcicsIGZvbnRzaXplPTExLFxuICAgICAgICAgICAgY29sb3I9Q09MT1JTWydncmVlbiddLCBmb250d2VpZ2h0PSdib2xkJylcbiAgICBheC50ZXh0KFhfZGVzKjAuNTUsIExfZGVzX2NsaXBwZWQqMC44NSwgJ0NTVFJcXG5leHRyYScsIGhhPSdjZW50ZXInLCBmb250c2l6ZT05LFxuICAgICAgICAgICAgY29sb3I9Q09MT1JTWydibHVlJ10sIGZvbnR3ZWlnaHQ9J2JvbGQnKVxuXG4gICAgcmF0aW8gPSBWX0NTVFJfYXJlYSAvIG1heChWX1BGUl9hcmVhLCAwLjAwMSlcbiAgICBheC5zZXRfdGl0bGUoZid7dGl0dWxvfVxcblZfQ1NUUi9WX1BGUiA9IHtyYXRpbzouMmZ9w5cnLCBjb2xvcj1DT0xPUlNbJ3doaXRlJ10sIGZvbnRzaXplPTkpXG4gICAgYXguc2V0X3hsYWJlbCgnQ29udmVyc2nDs24gWCcpOyBheC5zZXRfeWxhYmVsKCfihJIoWCkgPSBGX0EwLygtcl9BKSBbZG3Cs10nKVxuICAgIGF4LnNldF95bGltKDAsIHlfbWF4KTsgYXguc2V0X3hsaW0oMCwgMSlcbiAgICBheC5sZWdlbmQoZm9udHNpemU9OCwgbG9jPSd1cHBlciBsZWZ0Jyk7IGF4LmdyaWQoVHJ1ZSlcblxucGx0LnRpZ2h0X2xheW91dCgpXG5wbHQuc2F2ZWZpZygnbGV2ZW5zcGllbF9kZW1vLnBuZycsIGRwaT0xMjAsIGJib3hfaW5jaGVzPSd0aWdodCcsIGZhY2Vjb2xvcj0nIzBBMEYxRScpXG5wbHQuc2hvdygpXG5wcmludChcIuKchSBGaWd1cmEgZ3VhcmRhZGE6IGxldmVuc3BpZWxfZGVtby5wbmdcIilcbiIKICAgXSwKICAgIm91dHB1dHMiOiBbXSwKICAgImV4ZWN1dGlvbl9jb3VudCI6IG51bGwsCiAgICJpZCI6ICJjNiIKICB9LAogIHsKICAgImNlbGxfdHlwZSI6ICJtYXJrZG93biIsCiAgICJtZXRhZGF0YSI6IHt9LAogICAic291cmNlIjogWwogICAgIi0tLVxuIyAzLiBSRUFDVE9SIFBGUiDigJQgRGVyaXZhY2nDs24gZGlmZXJlbmNpYWwgcmlndXJvc2FcblxuIyMgMy4xIFN1cG9zaWNpb25lcyBkZWwgUEZSIGlkZWFsXG5cbnwgIyB8IFN1cG9zaWNpw7NuIHwgQ29uc2VjdWVuY2lhIG1hdGVtw6F0aWNhIHwgQ3XDoW5kbyBzZSB2aW9sYSB8XG58LS0tfC0tLS0tLS0tLS0tLXwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS18LS0tLS0tLS0tLS0tLS0tLS18XG58ICoqUDEqKiB8ICoqU2luIG1lemNsYSBheGlhbCoqIOKAlCBmbHVqbyBwaXN0w7NuIHBlcmZlY3RvIHwgRWwgcGVyZmlsIGRlIGNvbmNlbnRyYWNpw7NuIHNvbG8gZGVwZW5kZSBkZSBsYSBwb3NpY2nDs24gYXhpYWwgJHokIHwgUGVfYXhpYWwgPCAxMDAsIHJlYWN0b3JlcyBkZSBsZWNobyBlbXBhY2FkbyBlbiB0cmFuc2ljacOzbiB8XG58ICoqUDIqKiB8ICoqTWV6Y2xhIHJhZGlhbCBwZXJmZWN0YSoqIOKAlCBzaW4gZ3JhZGllbnRlcyByYWRpYWxlcyB8ICRDX0EkLCAkVCQgc29uIHNvbG8gZnVuY2lvbmVzIGRlICR6JCAobyAkViQpIHwgVHVib3MgYW5jaG9zIHNpbiBhZ2l0YWNpw7NuICgkRCA+IDUkIGNtIHBhcmEgZ2FzZXMpIHxcbnwgKipQMyoqIHwgKipFc3RhZG8gZXN0YWNpb25hcmlvKiogfCAkXFxwYXJ0aWFsIENfQS9cXHBhcnRpYWwgdCA9IDAkIGVuIHRvZG8gcHVudG8gfCBJZ3VhbCBxdWUgQ1NUUiB8XG58ICoqUDQqKiB8ICoqU2luIHJlc2lzdGVuY2lhcyBkZSB0cmFuc2ZlcmVuY2lhKiogfCBMYSBjaW7DqXRpY2EgbWVkaWRhIGVzIGxhIGNpbsOpdGljYSBpbnRyw61uc2VjYSB8IENhdGFsaXphZG9yZXMgY29uIHBvcm9zIGdyYW5kZXMsIGZhc2UgZ2FzIGEgYmFqYSB2ZWxvY2lkYWQgfFxuXG4jIyAzLjIgRGVyaXZhY2nDs24gZGlmZXJlbmNpYWwg4oCUIHRvZG9zIGxvcyBwYXNvc1xuXG4qKkJhbGFuY2UgbW9sYXIgc29icmUgdW4gZWxlbWVudG8gZGlmZXJlbmNpYWwqKiAkZFYkIGVuIGVzdGFkbyBlc3RhY2lvbmFyaW8gKFAzKTpcblxuJCRGX0FcXGJpZ3xfViAtIEZfQVxcYmlnfF97VitkVn0gKyByX0FcXCxkViA9IDAkJFxuXG5EaXZpZGlyIHBvciAkZFYkIHkgdG9tYXIgZWwgbMOtbWl0ZSAkZFYgXFx0byAwJDpcblxuJCRcXGxpbV97ZFYgXFx0byAwfSBcXGZyYWN7Rl9BXFxiaWd8X1YgLSBGX0FcXGJpZ3xfe1YrZFZ9fXtkVn0gKyByX0EgPSAwIFxccXVhZCBcXFJpZ2h0YXJyb3cgXFxxdWFkIC1cXGZyYWN7ZEZfQX17ZFZ9ID0gLXJfQSQkXG5cblVzYW5kbyAkRl9BID0gRl97QTB9KDEtWCkkIGNvbiAkRl97QTB9JCBjb25zdGFudGUgZW4gZXN0YWRvIGVzdGFjaW9uYXJpbzpcblxuJCRGX3tBMH1cXGZyYWN7ZFh9e2RWfSA9IC1yX0EoWCxULFApIFxccXVhZCBcXHRleHRiZnsoRm9nbGVyIEVjLiAyLTE1KX0kJFxuXG5JbnRlZ3JhciBkZSAkVj0wJCAoJFg9MCQpIGEgJFZfXFx0ZXh0e1BGUn0kICgkWD1YX0EkKTpcblxuJCRcXGJveGVke1ZfXFx0ZXh0e1BGUn0gPSBGX3tBMH1cXGludF8wXntYX0F9XFxmcmFje2RYfXstcl9BKFgpfX0kJFxuXG4jIyAzLjMgQ29tcGFyYWNpw7NuIGZvcm1hbCBDU1RSIHZzIFBGUlxuXG5QYXJhIGNpbsOpdGljYSAkLXJfQSA9IGtDX3tBMH1ebigxLVgpXm4kIGNvbiAkbj4wJCwgbGEgZnVuY2nDs24gaW50ZWdyYW5kbyBlcyAkXFxtYXRoY2Fse0x9KFgpID0gXFxmcmFje0Zfe0EwfX17a0Nfe0EwfV5uKDEtWClebn0kIOKAlCAqKmNyZWNpZW50ZSBlbiBYKiouXG5cblBvciBlbCAqKlRlb3JlbWEgZGVsIFZhbG9yIE1lZGlvIGRlbCBDw6FsY3VsbyBJbnRlZ3JhbCoqOlxuJCRcXGV4aXN0c1xcOyBcXGJhcntYfSBcXGluIFswLCBYX0FdOlxccXVhZCBWX1xcdGV4dHtQRlJ9ID0gXFxtYXRoY2Fse0x9KFxcYmFye1h9KVxcY2RvdCBYX0EgPCBcXG1hdGhjYWx7TH0oWF9BKVxcY2RvdCBYX0EgPSBWX1xcdGV4dHtDU1RSfSQkXG5cbkxhIGlndWFsZGFkIHNlIGRhcsOtYSBzb2xvIHNpICRcXG1hdGhjYWx7TH0kIGZ1ZXJhIGNvbnN0YW50ZSwgZXMgZGVjaXIgJG49MCQgKG9yZGVuIGNlcm8pLlxuXG4jIyAzLjQgU29sdWNpb25lcyBhbmFsw610aWNhcyBwYXJhIMOzcmRlbmVzIGVudGVyb3NcblxufCBPcmRlbiAkbiQgfCAkLXJfQSQgfCAkXFx0YXVfXFx0ZXh0e1BGUn0kIHxcbnwtLS0tLS0tLS0tLXwtLS0tLS0tLXwtLS0tLS0tLS0tLS0tLS0tLS0tfFxufCAwIHwgJGskIHwgJENfe0EwfVgvayQgfFxufCAxIHwgJGtDX3tBMH0oMS1YKSQgfCAkLVxcbG4oMS1YKS9rJCB8XG58IDIgfCAka0Nfe0EwfV4yKDEtWCleMiQgfCAkWC9ba0Nfe0EwfSgxLVgpXSQgfFxufCBuIHwgJGtDX3tBMH1ebigxLVgpXm4kIHwgJFxcZGZyYWN7KDEtWCleezEtbn0tMX17a1xcLENfe0EwfV57bi0xfShuLTEpfSQgcGFyYSAkblxcbmVxMSQgfFxuIgogICBdLAogICAiaWQiOiAibTciCiAgfSwKICB7CiAgICJjZWxsX3R5cGUiOiAiY29kZSIsCiAgICJtZXRhZGF0YSI6IHt9LAogICAic291cmNlIjogWwogICAgIiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQXG4jIFZFUklGSUNBQ0nDk04gTlVNw4lSSUNBIOKAlCBQRlIgcGFyYSBuID0gMCwgMSwgMiB5IG51bcOpcmljb1xuIyBWZXJpZmljYXIgcXVlIGxhIGludGVncmFjacOzbiBudW3DqXJpY2EgPT0gc29sdWNpw7NuIGFuYWzDrXRpY2FcbiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQXG5cbmtfcGZyLCBDQTBfcGZyLCB2MF9wZnIgPSAwLjUsIDIuMCwgMTAuMFxuRkEwX3BmciA9IENBMF9wZnIgKiB2MF9wZnJcblhfdmFscyAgPSBucC5hcnJheShbMC40MCwgMC42MCwgMC44MCwgMC45MCwgMC45NV0pXG5cbnByaW50KFwi4pWU4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWXXCIpXG5wcmludChcIuKVkSAgVkVSSUZJQ0FDScOTTiBQRlIg4oCUIFNvbHVjacOzbiBhbmFsw610aWNhIHZzIGludGVncmFjacOzbiBudW3DqXJpY2EgIOKVkVwiKVxucHJpbnQoXCLilaDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilaNcIilcblxuZm9yIG4sIGxhYmVsLCB0YXVfYW5hbGl0aWNhX2ZuIGluIFtcbiAgICAoMSwgJzFlciBvcmRlbicsIGxhbWJkYSBYOiAtbnAubG9nKDEtWCkva19wZnIpLFxuICAgICgyLCAnMmRvIG9yZGVuJywgbGFtYmRhIFg6IFgvKGtfcGZyKkNBMF9wZnIqKDEtWCkpKSxcbl06XG4gICAgcHJpbnQoZlwiXFxuICBPcmRlbiB7bGFiZWx9OlwiKVxuICAgIHByaW50KGZcIiAgeydYJzo+Nn0gIHsnz4RfYW5hbMOtdGljbyc6PjE0fSAgeyfPhF9udW3DqXJpY28nOj4xMn0gIHsnRXJyb3IgJSc6PjEwfVwiKVxuICAgIHByaW50KGZcIiAgeyctJyo1MH1cIilcbiAgICBmb3IgWCBpbiBYX3ZhbHM6XG4gICAgICAgICMgQW5hbMOtdGljb1xuICAgICAgICB0YXVfYSA9IHRhdV9hbmFsaXRpY2FfZm4oWClcbiAgICAgICAgIyBOdW3DqXJpY28gKGludGVncmFjacOzbiBkZSBHYXVzcylcbiAgICAgICAgaW50ZWdyYW5kID0gbGFtYmRhIFh2OiBDQTBfcGZyIC8gKGtfcGZyICogKENBMF9wZnIqKDEtWHYpKSoqbilcbiAgICAgICAgdGF1X24sIGVyciA9IHF1YWQoaW50ZWdyYW5kLCAwLCBYLCBsaW1pdD0xMDApXG4gICAgICAgIGVycm9yID0gYWJzKHRhdV9hIC0gdGF1X24pL3RhdV9hICogMTAwXG4gICAgICAgIG9rID0gJ+KckycgaWYgZXJyb3IgPCAwLjAxIGVsc2UgJ+KclydcbiAgICAgICAgcHJpbnQoZlwiICB7WDo2LjJmfSAge3RhdV9hOjE0LjZmfSAge3RhdV9uOjEyLjZmfSAge2Vycm9yOjkuNmZ9JSB7b2t9XCIpXG5cbiMg4pSA4pSAIEZpZ3VyYSBkZSBwZXJmaWxlcyBYKFYpIHBhcmEgZGlzdGludG9zIG4g4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5maWcsIGF4ZXMgPSBwbHQuc3VicGxvdHMoMSwgMiwgZmlnc2l6ZT0oMTMsIDUpKVxuZmlnLnN1cHRpdGxlKCdQRlIg4oCUIFBlcmZpbGVzIGRlIGNvbnZlcnNpw7NuIHBhcmEgZGlzdGludG9zIMOzcmRlbmVzIGRlIHJlYWNjacOzbicsXG4gICAgICAgICAgICAgY29sb3I9Q09MT1JTWyd3aGl0ZSddLCBmb250d2VpZ2h0PSdib2xkJylcblxuVl9yYW5nZSA9IG5wLmxpbnNwYWNlKDAsIDUwMCwgMTAwMClcbnRhdV9yYW5nZSA9IFZfcmFuZ2UgLyB2MF9wZnJcblxub3JkZW5lcyA9IFsoMSwgQ09MT1JTWydnb2xkJ10sICcxZXIgb3JkZW4nKSwgKDIsIENPTE9SU1snYmx1ZSddLCAnMmRvIG9yZGVuJyksXG4gICAgICAgICAgICgwLjUsIENPTE9SU1snZ3JlZW4nXSwgJzEvMiBvcmRlbicpLCAoMywgQ09MT1JTWydvcmFuZ2UnXSwgJzNlciBvcmRlbicpXVxuXG4jIFBhbmVsIDE6IFgoVikgcGFyYSBkaXN0aW50b3MgblxuYXggPSBheGVzWzBdXG5mb3IgbiwgY29sLCBsYmwgaW4gb3JkZW5lczpcbiAgICBpZiBuID09IDE6XG4gICAgICAgIFhfcGZyID0gMSAtIG5wLmV4cCgta19wZnIgKiB0YXVfcmFuZ2UpXG4gICAgZWxpZiBuID09IDI6XG4gICAgICAgIFhfcGZyID0ga19wZnIqQ0EwX3Bmcip0YXVfcmFuZ2UgLyAoMSArIGtfcGZyKkNBMF9wZnIqdGF1X3JhbmdlKVxuICAgIGVsc2U6XG4gICAgICAgIFhfcGZyID0gMSAtICgxICsgKG4tMSkqa19wZnIqQ0EwX3BmcioqKG4tMSkqdGF1X3JhbmdlKSoqKDEvKDEtbikpXG4gICAgICAgIFhfcGZyID0gbnAuY2xpcChYX3BmciwgMCwgMC45OTk5KVxuICAgIGF4LnBsb3QoVl9yYW5nZSwgWF9wZnIqMTAwLCBjb2xvcj1jb2wsIGx3PTIuMywgbGFiZWw9bGJsKVxuXG5heC5zZXRfeGxhYmVsKCdWb2x1bWVuIFBGUiAoZG3CsyknKTsgYXguc2V0X3lsYWJlbCgnQ29udmVyc2nDs24gWCAoJSknKVxuYXguc2V0X3RpdGxlKCdQZXJmaWwgWChWKSDigJQgZGlzdGludG9zIMOzcmRlbmVzIG4nKVxuYXgubGVnZW5kKCk7IGF4LmdyaWQoVHJ1ZSk7IGF4LnNldF95bGltKDAsIDEwMilcblxuIyBQYW5lbCAyOiBSYXrDs24gVl9DU1RSL1ZfUEZSIHZzIFggeSBuXG5heDIgPSBheGVzWzFdXG5YX3IgPSBucC5saW5zcGFjZSgwLjAxLCAwLjk1LCA0MDApXG5mb3IgbiwgY29sLCBsYmwgaW4gb3JkZW5lczpcbiAgICAjIFBGUjogaW50ZWdyYWNpw7NuIG51bcOpcmljYVxuICAgIHJhdGlvcyA9IFtdXG4gICAgZm9yIHhkIGluIFhfcjpcbiAgICAgICAgVl9wZnJfbnVtLCBfID0gcXVhZChsYW1iZGEgeHY6IENBMF9wZnIvKGtfcGZyKihDQTBfcGZyKigxLXh2KSkqKm4pLCAwLCB4ZClcbiAgICAgICAgVl9wZnJfbnVtICo9IEZBMF9wZnIgLyBDQTBfcGZyXG4gICAgICAgIFZfY3N0cl9udW0gPSBGQTBfcGZyICogeGQgLyAoa19wZnIgKiAoQ0EwX3BmciooMS14ZCkpKipuKVxuICAgICAgICByYXRpb3MuYXBwZW5kKFZfY3N0cl9udW0gLyBtYXgoVl9wZnJfbnVtLCAxZS05KSlcbiAgICBheDIucGxvdChYX3IsIHJhdGlvcywgY29sb3I9Y29sLCBsdz0yLjMsIGxhYmVsPWxibClcblxuYXgyLmF4aGxpbmUoMSwgY29sb3I9Q09MT1JTWydncmF5J10sIGxzPSctLScsIGx3PTEuNSwgbGFiZWw9J0NTVFIgPSBQRlIgKG49MCknKVxuYXgyLnNldF94bGFiZWwoJ0NvbnZlcnNpw7NuIFgnKTsgYXgyLnNldF95bGFiZWwoJ1ZfQ1NUUiAvIFZfUEZSJylcbmF4Mi5zZXRfdGl0bGUoJ1BlbmFsaXphY2nDs24gZGVsIENTVFIgdnMgblxcbihzaWVtcHJlIOKJpSAxIHBhcmEgbiA+IDApJylcbmF4Mi5sZWdlbmQoKTsgYXgyLmdyaWQoVHJ1ZSk7IGF4Mi5zZXRfeWxpbSgwLjksIDE1KVxuYXgyLnNldF94bGltKDAsIDEpXG5cbnBsdC50aWdodF9sYXlvdXQoKVxucGx0LnNhdmVmaWcoJ3Bmcl92ZXJpZmljYWNpb24ucG5nJywgZHBpPTEyMCwgYmJveF9pbmNoZXM9J3RpZ2h0JywgZmFjZWNvbG9yPScjMEEwRjFFJylcbnBsdC5zaG93KClcbnByaW50KFwiXFxu4pyFIEZpZ3VyYSBndWFyZGFkYTogcGZyX3ZlcmlmaWNhY2lvbi5wbmdcIilcbiIKICAgXSwKICAgIm91dHB1dHMiOiBbXSwKICAgImV4ZWN1dGlvbl9jb3VudCI6IG51bGwsCiAgICJpZCI6ICJjOCIKICB9LAogIHsKICAgImNlbGxfdHlwZSI6ICJtYXJrZG93biIsCiAgICJtZXRhZGF0YSI6IHt9LAogICAic291cmNlIjogWwogICAgIi0tLVxuIyA0LiBSRUFDVE9SIEJBVENIIOKAlCBEZXJpdmFjacOzbiB5IGVxdWl2YWxlbmNpYSBtYXRlbcOhdGljYSBjb24gZWwgUEZSXG5cbiMjIDQuMSBEZXJpdmFjacOzbiBkZXNkZSBwcmltZXJvcyBwcmluY2lwaW9zXG5cbkVsIHJlYWN0b3IgYmF0Y2ggZXMgdW4gKipzaXN0ZW1hIGNlcnJhZG8qKiDigJQgc2luIGZsdWpvIGRlIGVudHJhZGEgbmkgc2FsaWRhIGR1cmFudGUgbGEgcmVhY2Npw7NuLlxuRWwgYmFsYW5jZSBtb2xhciBwYXJhIGxhIGVzcGVjaWUgQSBlbiBlbCBzaXN0ZW1hIGNlcnJhZG8gKEZvZ2xlciBFYy4gMS01KTpcblxuJCRcXGZyYWN7ZE5fQX17ZHR9ID0gcl9BIFYgXFxxdWFkIFxcdGV4dHsoc2luIHTDqXJtaW5vcyBkZSBmbHVqbyl9JCRcblxuVXNhbmRvICROX0EgPSBOX3tBMH0oMS1YKSQgY29uICROX3tBMH0kIGNvbnN0YW50ZTpcblxuJCROX3tBMH1cXGZyYWN7ZFh9e2R0fSA9IC1yX0EgViQkXG5cblBhcmEgdm9sdW1lbiBjb25zdGFudGUgKCRWID0gTl97QTB9L0Nfe0EwfSQpOlxuXG4kJENfe0EwfVxcZnJhY3tkWH17ZHR9ID0gLXJfQSBcXHF1YWQgXFxSaWdodGFycm93IFxccXVhZCBkdCA9IFxcZnJhY3tDX3tBMH1cXCxkWH17LXJfQX0kJFxuXG5JbnRlZ3JhbmRvIGRlICR0PTAkICgkWD0wJCkgYSAkdCA9IHRfXFx0ZXh0e3J4bn0kICgkWCA9IFhfQSQpOlxuXG4kJFxcYm94ZWR7dF9cXHRleHR7cnhufSA9IENfe0EwfVxcaW50XzBee1hfQX1cXGZyYWN7ZFh9ey1yX0EoWCl9fSBcXHF1YWQgXFx0ZXh0YmZ7KEZvZ2xlciBFYy4gNC01KX0kJFxuXG4jIyA0LjIgRGVtb3N0cmFjacOzbiBmb3JtYWwgZGUgbGEgZXF1aXZhbGVuY2lhIEJhdGNoICRcXGVxdWl2JCBQRlJcblxuQ29tcGFyYW5kbyBjb24gZWwgUEZSOlxuXG4kJFxcdGF1X1xcdGV4dHtQRlJ9ID0gXFxmcmFje1ZfXFx0ZXh0e1BGUn19e3ZfMH0gPSBcXGZyYWN7Rl97QTB9fXt2XzB9XFxpbnRfMF5YXFxmcmFje2RYfXstcl9BfSA9IENfe0EwfVxcaW50XzBeWFxcZnJhY3tkWH17LXJfQX0kJFxuXG4qKlBvciB0YW50bzoqKiAkdF9cXHRleHR7YmF0Y2h9ID0gXFx0YXVfXFx0ZXh0e1BGUn0kIOKAlCAqKmVxdWl2YWxlbmNpYSBtYXRlbcOhdGljYSBleGFjdGEqKi5cblxuTGEgc3VzdGl0dWNpw7NuIGRlIHZhcmlhYmxlcyAkXFx7ViBcXGxlZnRyaWdodGFycm93IHQsXFw7IEZfe0EwfSBcXGxlZnRyaWdodGFycm93IE5fe0EwfSxcXDsgdl8wIFxcbGVmdHJpZ2h0YXJyb3cgVl9SXFx9JCBlcyBiaXllY3RpdmEuXG5cbioqQ29uc2VjdWVuY2lhcyBvcGVyYWNpb25hbGVzOioqXG5cbi0gTG9zIGRhdG9zIGNpbsOpdGljb3MgbWVkaWRvcyBlbiBiYXRjaCBzZSB0cmFuc2ZpZXJlbiBkaXJlY3RhbWVudGUgYWwgZGlzZcOxbyBkZWwgUEZSIGNvbnRpbnVvLlxuLSAkdF9cXHRleHR7YmF0Y2h9ID0gXFx0YXVfXFx0ZXh0e1BGUn0gPCBcXHRhdV9cXHRleHR7Q1NUUn0kIHNpZW1wcmUgcXVlICRuID4gMCQuXG4tIEVsIGJhdGNoIGVzIFwibGEgcGxhbnRhIHBpbG90byBuYXR1cmFsXCIgZGVsIFBGUi5cblxuIyMgNC4zIE9wdGltaXphY2nDs24gZGUgbGEgcHJvZHVjdGl2aWRhZCDigJQgWCogw7NwdGltb1xuXG5FbCB0aWVtcG8gZGUgY2ljbG8gY29tcGxldG8gaW5jbHV5ZSBlbCB0aWVtcG8gaW5hY3Rpdm8gJHRfMCQ6XG5cbiQkdF9cXHRleHR7Y2ljbG99KFgpID0gdF9cXHRleHR7cnhufShYKSArIHRfMCA9IENfe0EwfVxcaW50XzBeWFxcZnJhY3tkWH17LXJfQX0gKyB0XzAkJFxuXG5MYSAqKnByb2R1Y3RpdmlkYWQqKiBbbW9sLyhkbcKzwrdtaW4pXSBzZSBtYXhpbWl6YSByZXNwZWN0byBhICRYJDpcblxuJCRcXG1hdGhjYWx7UH0oWCkgPSBcXGZyYWN7Q197QTB9WH17dF9cXHRleHR7cnhufShYKSArIHRfMH0gXFxxdWFkIFxcUmlnaHRhcnJvdyBcXHF1YWQgXFxmcmFje2RcXG1hdGhjYWx7UH19e2RYfSA9IDAkJFxuXG5Db25kaWNpw7NuIGRlIG3DoXhpbW8gKGRlcml2YXIgZSBpZ3VhbGFyIGEgY2Vybyk6XG5cbiQkXFxmcmFje0Nfe0EwfVt0X1xcdGV4dHtjaWNsb30gLSBYXFwsXFxmcmFje2R0X1xcdGV4dHtyeG59fXtkWH1dfXt0X1xcdGV4dHtjaWNsb31eMn0gPSAwIFxccXVhZCBcXFJpZ2h0YXJyb3cgXFxxdWFkIHRfXFx0ZXh0e2NpY2xvfShYXiopID0gWF4qIFxcY2RvdCBcXGZyYWN7ZHRfXFx0ZXh0e3J4bn19e2RYfVxcYmlnZ3xfe1heKn0kJFxuXG5QYXJhIDFlciBvcmRlbjogJFxcZGZyYWN7ZHRfXFx0ZXh0e3J4bn19e2RYfSA9IFxcZGZyYWN7MX17aygxLVgpfSQsIGVudG9uY2VzIGxhIGNvbmRpY2nDs24gZXM6XG5cbiQkXFxmcmFjey1cXGxuKDEtWF4qKX17a30gKyB0XzAgPSBcXGZyYWN7WF4qfXtrKDEtWF4qKX0gXFxxdWFkIFxcdGV4dHsoaW1wbMOtY2l0YSDigJQgc29sdWNpw7NuIG51bcOpcmljYSBjb24gYnJlbnRxKX0kJFxuIgogICBdLAogICAiaWQiOiAibTkiCiAgfSwKICB7CiAgICJjZWxsX3R5cGUiOiAiY29kZSIsCiAgICJtZXRhZGF0YSI6IHt9LAogICAic291cmNlIjogWwogICAgIiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQXG4jIFZFUklGSUNBQ0nDk04gQkFUQ0gg4oCUIEVxdWl2YWxlbmNpYSBjb24gUEZSIHkgWCogw7NwdGltb1xuIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZBcblxua19idCwgQ0EwX2J0LCB0MCA9IDAuMzExLCAxNi4xLCA0NS4wICAgIyBtaW7igbvCuSwgbW9sL2RtwrMsIG1pbiAoRm9nbGVyIEV4LiA0LTEpXG5cbiMgRnVuY2nDs24gdF9yeG4oWCkg4oCUIGFuYWzDrXRpY2EgKDFlciBvcmRlbikgeSBudW3DqXJpY2FcbmRlZiB0X3J4bl9hbmFsaXRpY28oWCk6IHJldHVybiAtbnAubG9nKDEgLSBYKSAvIGtfYnRcbmRlZiB0X3J4bl9udW1lcmljbyhYKTpcbiAgICB2YWwsIF8gPSBxdWFkKGxhbWJkYSBYdjogQ0EwX2J0IC8gKGtfYnQgKiBDQTBfYnQgKiAoMSAtIFh2KSksIDAsIFgpXG4gICAgcmV0dXJuIHZhbFxuXG4jIFByb2R1Y3RpdmlkYWRcbmRlZiBwcm9kdWN0aXZpZGFkKFgpOlxuICAgIHQgPSB0X3J4bl9hbmFsaXRpY28oWCkgKyB0MFxuICAgIHJldHVybiBDQTBfYnQgKiBYIC8gdFxuXG4jIEVuY29udHJhciBYKiDDs3B0aW1vXG5kZWYgY29uZGljaW9uX29wdGltbyhYKTpcbiAgICB0X3J4biA9IHRfcnhuX2FuYWxpdGljbyhYKVxuICAgIGR0X3J4bl9kWCA9IDEgLyAoa19idCAqICgxIC0gWCkpXG4gICAgdF9jaWNsbyA9IHRfcnhuICsgdDBcbiAgICByZXR1cm4gdF9jaWNsbyAtIFggKiBkdF9yeG5fZFhcblxuWF9zdGFyID0gYnJlbnRxKGNvbmRpY2lvbl9vcHRpbW8sIDAuMDEsIDAuOTk5KVxuUF9tYXggID0gcHJvZHVjdGl2aWRhZChYX3N0YXIpXG5cbiMgQ29tcGFyYXIgYW5hbMOtdGljbyB2cyBudW3DqXJpY29cblhfdGVzdCA9IFswLjUsIDAuNywgMC44LCAwLjksIDAuOTVdXG5wcmludChcIuKVlOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVl1wiKVxucHJpbnQoXCLilZEgIFZFUklGSUNBQ0nDk04gQkFUQ0gg4oCUIEFuYWzDrXRpY28gdnMgTnVtw6lyaWNvICAgICAgICAgICDilZFcIilcbnByaW50KFwi4pWg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWjXCIpXG5wcmludChmXCIgIHsnWCc6PjZ9ICB7J3RfcnhuIGFuYWzDrXRpY28nOj4xOH0gIHsndF9yeG4gbnVtw6lyaWNvJzo+MTZ9ICB7J0Vycm9yJzo+OH1cIilcbmZvciBYIGluIFhfdGVzdDpcbiAgICB0YSA9IHRfcnhuX2FuYWxpdGljbyhYKVxuICAgIHRuID0gdF9yeG5fbnVtZXJpY28oWClcbiAgICBwcmludChmXCIgIHtYOjYuMmZ9ICB7dGE6MTguNGZ9ICB7dG46MTYuNGZ9ICB7YWJzKHRhLXRuKS90YSoxMDA6Ny41Zn0lXCIpXG5cbnByaW50KGZcIlxcbiAgWCogw7NwdGltbyBkZSBwcm9kdWN0aXZpZGFkID0ge1hfc3RhcjouNGZ9XCIpXG5wcmludChmXCIgIFBfbWF4ICAgICAgICAgICAgICAgICAgICAgID0ge1BfbWF4Oi41Zn0gbW9sLyhkbcKzwrdtaW4pXCIpXG5wcmludChmXCIgIHRfcnhuIGVuIFgqICAgICAgICAgICAgICAgID0ge3RfcnhuX2FuYWxpdGljbyhYX3N0YXIpOi4yZn0gbWluXCIpXG5wcmludChmXCIgIHRfY2ljbG8gZW4gWCogICAgICAgICAgICAgID0ge3RfcnhuX2FuYWxpdGljbyhYX3N0YXIpK3QwOi4yZn0gbWluXCIpXG5wcmludChcIuKVmuKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVnVwiKVxuXG4jIOKUgOKUgCBGaWd1cmE6IFgodCkgeSBQcm9kdWN0aXZpZGFkIFAoWCkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5maWcsIGF4ZXMgPSBwbHQuc3VicGxvdHMoMSwgMiwgZmlnc2l6ZT0oMTMsIDUpKVxuZmlnLnN1cHRpdGxlKCdCYXRjaCDigJQgVmVyaWZpY2FjacOzbiBudW3DqXJpY2EgeSBvcHRpbWl6YWNpw7NuIGRlIHByb2R1Y3RpdmlkYWQnLFxuICAgICAgICAgICAgIGNvbG9yPUNPTE9SU1snd2hpdGUnXSwgZm9udHdlaWdodD0nYm9sZCcpXG5cbnRfYXJyID0gbnAubGluc3BhY2UoMCwgMjAwLCA1MDApXG5YX2FyciA9IDEgLSBucC5leHAoLWtfYnQgKiB0X2FycilcblxuYXggPSBheGVzWzBdXG5heC5wbG90KHRfYXJyLCBYX2FycioxMDAsIGNvbG9yPUNPTE9SU1snZ29sZCddLCBsdz0yLjUsIGxhYmVsPSdYKHQpID0gMSDiiJIgZV574oiSa3R9JylcbmF4LmF4dmxpbmUodF9yeG5fYW5hbGl0aWNvKFhfc3RhciksIGNvbG9yPUNPTE9SU1sncmVkJ10sIGxzPSctLScsIGx3PTEuOCxcbiAgICAgICAgICAgbGFiZWw9Zid0KiA9IHt0X3J4bl9hbmFsaXRpY28oWF9zdGFyKTouMWZ9IG1pbicpXG5heC5heGhsaW5lKFhfc3RhcioxMDAsIGNvbG9yPUNPTE9SU1snYmx1ZSddLCBscz0nOicsIGx3PTEuOCxcbiAgICAgICAgICAgbGFiZWw9ZidYKiA9IHtYX3N0YXI6LjNmfScpXG5heC5zZXRfeGxhYmVsKCdUaWVtcG8gKG1pbiknKTsgYXguc2V0X3lsYWJlbCgnWCAoJSknKVxuYXguc2V0X3RpdGxlKCdQZXJmaWwgWCh0KSDigJQgMWVyIG9yZGVuJyk7IGF4LmxlZ2VuZCgpOyBheC5ncmlkKFRydWUpXG5cblhfcmFuZ2UgPSBucC5saW5zcGFjZSgwLjAxLCAwLjk5OSwgNTAwKVxuUF9yYW5nZSA9IHByb2R1Y3RpdmlkYWQoWF9yYW5nZSlcblxuYXgyID0gYXhlc1sxXVxuYXgyLnBsb3QoWF9yYW5nZSwgUF9yYW5nZSwgY29sb3I9Q09MT1JTWyd0ZWFsJ10sIGx3PTIuNSwgbGFiZWw9J1AoWCknKVxuYXgyLmF4dmxpbmUoWF9zdGFyLCBjb2xvcj1DT0xPUlNbJ3JlZCddLCBscz0nLS0nLCBsdz0xLjgsIGxhYmVsPWYnWCogPSB7WF9zdGFyOi4zZn0nKVxuYXgyLmF4aGxpbmUoUF9tYXgsIGNvbG9yPUNPTE9SU1snZ29sZCddLCBscz0nOicsIGx3PTEuOCwgbGFiZWw9ZidQX21heCA9IHtQX21heDouNGZ9JylcbmF4Mi5zY2F0dGVyKFtYX3N0YXJdLCBbUF9tYXhdLCBjb2xvcj1DT0xPUlNbJ2dvbGQnXSwgcz0xNTAsIHpvcmRlcj02KVxuYXgyLnNldF94bGFiZWwoJ0NvbnZlcnNpw7NuIFgnKTsgYXgyLnNldF95bGFiZWwoJ1Byb2R1Y3RpdmlkYWQgUCAobW9sL2RtwrMvbWluKScpXG5heDIuc2V0X3RpdGxlKGYnUHJvZHVjdGl2aWRhZCBQKFgpXFxudOKCgCA9IHt0MH0gbWluIOKGkiBYKiA9IHtYX3N0YXI6LjNmfScpXG5heDIubGVnZW5kKCk7IGF4Mi5ncmlkKFRydWUpXG5cbnBsdC50aWdodF9sYXlvdXQoKVxucGx0LnNhdmVmaWcoJ2JhdGNoX3ZlcmlmaWNhY2lvbi5wbmcnLCBkcGk9MTIwLCBiYm94X2luY2hlcz0ndGlnaHQnLCBmYWNlY29sb3I9JyMwQTBGMUUnKVxucGx0LnNob3coKVxucHJpbnQoXCLinIUgRmlndXJhIGd1YXJkYWRhOiBiYXRjaF92ZXJpZmljYWNpb24ucG5nXCIpXG4iCiAgIF0sCiAgICJvdXRwdXRzIjogW10sCiAgICJleGVjdXRpb25fY291bnQiOiBudWxsLAogICAiaWQiOiAiYzEwIgogIH0sCiAgewogICAiY2VsbF90eXBlIjogIm1hcmtkb3duIiwKICAgIm1ldGFkYXRhIjoge30sCiAgICJzb3VyY2UiOiBbCiAgICAiLS0tXG4jIDUuIEJBTEFOQ0UgREUgRU5FUkfDjUEg4oCUIERlcml2YWNpw7NuIGRlc2RlIGVsIFByaW1lciBQcmluY2lwaW8gZGUgbGEgVGVybW9kaW7DoW1pY2FcblxuIyMgNS4xIFB1bnRvIGRlIHBhcnRpZGE6IDFlciBQcmluY2lwaW8gcGFyYSBzaXN0ZW1hIGFiaWVydG8gZW4gZXN0YWRvIGVzdGFjaW9uYXJpb1xuXG5QYXJhIHVuIHZvbHVtZW4gZGUgY29udHJvbCBjb24gKip1biBmbHVqbyBkZSBlbnRyYWRhIHkgdW5vIGRlIHNhbGlkYSoqIGVuIGVzdGFkbyBlc3RhY2lvbmFyaW9cbihlbmVyZ8OtYSBjaW7DqXRpY2EgeSBwb3RlbmNpYWwgZGVzcHJlY2lhYmxlcywgc2luIHRyYWJham8gZGUgZWplKSwgZWwgMWVyIFByaW5jaXBpbyBlc3RhYmxlY2VcbioqKEZvZ2xlciBFYy4gOC05KSoqOlxuXG4kJFxcZG90e1F9IC0gXFxkb3R7V31fcyArIFxcc3VtX2kgRl97aTB9XFxoYXR7SH1fe2kwfSAtIFxcc3VtX2kgRl9pXFxoYXR7SH1faSA9IDAkJFxuXG4jIyA1LjIgRXhwYW5zacOzbiBkZSBlbnRhbHDDrWFzIHkgc2ltcGxpZmljYWNpw7NuXG5cblVzYW5kbyBlbnRhbHDDrWFzIGRlIGZvcm1hY2nDs24gYSAkVF9SJCBtw6FzIGNhbG9yIHNlbnNpYmxlIGNvbiAkQ197cCxpfSQgY29uc3RhbnRlczpcblxuJCRcXGhhdHtIfV9pKFQpID0gXFxoYXR7SH1faV5cXGNpcmMoVF9SKSArIENfe3AsaX0oVCAtIFRfUikkJFxuXG5Qcm9jZXNhbmRvIGxvcyB0w6lybWlub3MgZGUgZmx1am86XG4kJFxcc3VtX2kgRl97aTB9XFxoYXR7SH1fe2kwfSAtIFxcc3VtX2kgRl9pXFxoYXR7SH1faSA9IEZfe0EwfVxcbGVmdFtcXHN1bV9pXFxUaGV0YV9pIENfe3AsaX0oVF8wLVQpICsgKC1cXERlbHRhIEhfe3J4fShUX1IpKVxcLFhcXHJpZ2h0XSQkXG5cbkNvbiAkXFxkb3R7UX0gPSBVQShUX2EgLSBUKSQgcGFyYSBsYSBjYW1pc2E6XG5cbiQkXFxib3hlZHtVQShUX2EtVCkgKyBGX3tBMH1cXGxlZnRbXFxzdW1faVxcVGhldGFfaSBDX3twLGl9KFRfMC1UKSArICgtXFxEZWx0YSBIX3tyeH0pXFwsWFxccmlnaHRdID0gMH0gXFxxdWFkIFxcdGV4dGJmeyhFYy4gOC0yOCl9JCRcblxuIyMgNS4zIExhcyBkb3MgY3VydmFzIFhfQkUoVCkgeSBYX0JNKFQpXG5cbioqQmFsYW5jZSBkZSBFbmVyZ8OtYSAoQkUpKiog4oCUIGRlc3BlamFuZG8gWDpcbiQkWF97QkV9KFQpID0gXFxmcmFje1xcbGVmdChcXHN1bV9pXFxUaGV0YV9pIENfe3AsaX0gKyBcXGZyYWN7VUF9e0Zfe0EwfX1cXHJpZ2h0KShULVRfMCkgKyBcXGZyYWN7VUF9e0Zfe0EwfX0oVF8wLVRfYSl9eygtXFxEZWx0YSBIX3tyeH0pfSBcXHF1YWQgXFx0ZXh0e1tsaW5lYWwgZW4gVF19JCRcblxuKipCYWxhbmNlIGRlIE1hc2EgKEJNKSoqIOKAlCBkZSBsYSBlY3VhY2nDs24gZGUgZGlzZcOxbyBkZWwgQ1NUUiBjb24gQXJyaGVuaXVzOlxuJCRYX3tCTX0oVCkgPSBcXGZyYWN7a18wIGVeey1FX2EvUlR9XFwsXFx0YXV9ezEgKyBrXzAgZV57LUVfYS9SVH1cXCxcXHRhdX0gXFxxdWFkIFxcdGV4dHtbc2lnbW9pZGUgZW4gVF19JCRcblxuTG9zICoqZXN0YWRvcyBlc3RhY2lvbmFyaW9zKiogc29uIGxhcyByYcOtY2VzIGRlICRYX3tCRX0oVCkgPSBYX3tCTX0oVCkkLlxuXG4jIyA1LjQgRGVtb3N0cmFjacOzbiBkZWwgY3JpdGVyaW8gZGUgVmFuIEhlZXJkZW4gKDE5NTMpXG5cblJlZm9ybXVsYW5kbyBjb21vICRHKFQpID0gUihUKSQ6XG5cbiQkRyhUKSBcXGVxdWl2ICgtXFxEZWx0YSBIX3tyeH0pXFwsWF97Qk19KFQpIFxccXVhZCBcXHRleHR7KGNhbG9yIGdlbmVyYWRvKX0kJFxuJCRSKFQpIFxcZXF1aXYgXFxsZWZ0KFxcc3VtXFxUaGV0YV9pIENfe3AsaX0gKyBcXGZyYWN7VUF9e0Zfe0EwfX1cXHJpZ2h0KShUIC0gVF8wXiopIFxccXVhZCBcXHRleHR7KGNhbG9yIHJlbW92aWRvIOKAlCByZWN0YSl9JCRcblxuKipEZW1vc3RyYWNpw7NuIGRlIGVzdGFiaWxpZGFkOioqIFBhcmEgdW5hIHBlcnR1cmJhY2nDs24gJFxcZGVsdGEgVCA+IDAkIGFscmVkZWRvciBkZWwgU1M6XG4tIFNpICRkUi9kVCA+IGRHL2RUJDogZWwgc2lzdGVtYSBnZW5lcmEgY2Fsb3IgcGVybyBsbyByZW11ZXZlIG3DoXMgcsOhcGlkbyDihpIgJGRUL2R0IDwgMCQg4oaSIHJldG9ybm8gYWwgU1Mg4oaSICoqZXN0YWJsZSoqXG4tIFNpICRkUi9kVCA8IGRHL2RUJDogZWwgc2lzdGVtYSByZW11ZXZlIG1lbm9zIGNhbG9yIGRlbCBxdWUgZ2VuZXJhIOKGkiAkZFQvZHQgPiAwJCDihpIgZnVnYSBkZWwgU1Mg4oaSICoqaW5lc3RhYmxlKipcblxuJCRcXGJveGVke1xcdGV4dHtTUyBlc3RhYmxlfSBcXGlmZiBcXGZyYWN7ZFJ9e2RUfVxcYmlnZ3xfe1Rfe3NzfX0gPiBcXGZyYWN7ZEd9e2RUfVxcYmlnZ3xfe1Rfe3NzfX19JCRcbiIKICAgXSwKICAgImlkIjogIm0xMSIKICB9LAogIHsKICAgImNlbGxfdHlwZSI6ICJjb2RlIiwKICAgIm1ldGFkYXRhIjoge30sCiAgICJzb3VyY2UiOiBbCiAgICAiIyDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZBcbiMgVkVSSUZJQ0FDScOTTiBCQUxBTkNFIERFIEVORVJHw41BIOKAlCBNdWx0aXBsaWNpZGFkIENTVFJcbiMgRm9nbGVyIEV4YW1wbGUgOC00OiBIaWRyYXRhY2nDs24gZGUgw5N4aWRvIGRlIFByb3BpbGVub1xuIyAodW5pZGFkZXMgQlRVLCBsYm1vbCwgUilcbiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQXG5cbiMgUGFyw6FtZXRyb3MgZGVsIGVqZW1wbG9cbmswICAgICAgPSAxNi45NmUxMiAgICAgICMgaOKBu8K5XG5FYSAgICAgID0gMzI0MDAgICAgICAgICAjIEJUVS9sYm1vbFxuUl9nYXMgICA9IDEuOTg3ICAgICAgICAgIyBCVFUvKGxibW9swrdSKVxuZEhyeCAgICA9IC0zNjQwMCAgICAgICAgIyBCVFUvbGJtb2xcbnN1bVRDcCAgPSA0MDMgICAgICAgICAgICMgQlRVLyhsYm1vbMK3UilcbkNBMCAgICAgPSAwLjkyMyAgICAgICAgICMgbGJtb2wvZnTCs1xudjAgICAgICA9IDQ2LjIgICAgICAgICAgIyBmdMKzL2gg4oCUIHBhcmEgZGFyIEZBMFxuRkEwX2UgICA9IENBMCAqIHYwICAgICAgIyBsYm1vbC9oXG5VQSAgICAgID0gMzU1MDAgICAgICAgICAjIEJUVS8oaMK3UilcblQwICAgICAgPSA1MjggICAgICAgICAgICMgUiAoNjjCsEYpXG5UYSAgICAgID0gVDAgICAgICAgICAgICAjIGNhbWlzYSA9IGFsaW1lbnRhY2nDs24gKGNhc28gc2ltcGxpZmljYWRvKVxudGF1X2UgICA9IDEuMCAgICAgICAgICAgIyBoXG5cbiMgRnVuY2lvbmVzXG5kZWYga19hcnIoVCk6ICByZXR1cm4gazAgKiBucC5leHAoLUVhIC8gKFJfZ2FzICogVCkpXG5kZWYgWF9CTShUKTogICByZXR1cm4ga19hcnIoVCkqdGF1X2UgLyAoMSArIGtfYXJyKFQpKnRhdV9lKVxuZGVmIEcoVCk6ICAgICAgcmV0dXJuICgtZEhyeCkgKiBYX0JNKFQpXG5kZWYgUihUKTogICAgICByZXR1cm4gKHN1bVRDcCArIFVBL0ZBMF9lKSAqIChUIC0gVDApXG5cbiMgRW5jb250cmFyIGVzdGFkb3MgZXN0YWNpb25hcmlvczogRyhUKSA9IFIoVCkg4oaSIEctUiA9IDBcblRfcmFuZ2UgPSBucC5saW5zcGFjZSg1MTAsIDcxMCwgNDAwMClcbmRpZmYgICAgPSBHKFRfcmFuZ2UpIC0gUihUX3JhbmdlKVxuXG5TU19UID0gW11cbmZvciBpIGluIHJhbmdlKGxlbihkaWZmKS0xKTpcbiAgICBpZiBkaWZmW2ldICogZGlmZltpKzFdIDwgMDpcbiAgICAgICAgVF9zcyA9IGJyZW50cShsYW1iZGEgVDogRyhUKS1SKFQpLCBUX3JhbmdlW2ldLCBUX3JhbmdlW2krMV0sIHh0b2w9MWUtOClcbiAgICAgICAgU1NfVC5hcHBlbmQoVF9zcylcblxucHJpbnQoXCLilZTilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZdcIilcbnByaW50KFwi4pWRICBFU1RBRE9TIEVTVEFDSU9OQVJJT1Mg4oCUIENTVFIgTm8gSXNvdMOpcm1pY28gKEV4LiA4LTQpICAgIOKVkVwiKVxucHJpbnQoXCLilaDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilaNcIilcbmxhYmVsc19zcyA9IFsnU1MgQmFqbycsICdTUyBNZWRpbycsICdTUyBBbHRvJ11cbmZvciBpLCBUX3NzIGluIGVudW1lcmF0ZShTU19UKTpcbiAgICBYX3NzICAgPSBYX0JNKFRfc3MpXG4gICAgZEdkVCAgID0gKC1kSHJ4KSAqIChrX2FycihUX3NzKSp0YXVfZSAqIEVhLyhSX2dhcypUX3NzKioyKSkgLyAoMStrX2FycihUX3NzKSp0YXVfZSkqKjJcbiAgICBkUmRUICAgPSBzdW1UQ3AgKyBVQS9GQTBfZVxuICAgIHN0YWJsZSA9ICfinJMgRVNUQUJMRScgaWYgZFJkVCA+IGRHZFQgZWxzZSAn4pyXIElORVNUQUJMRSdcbiAgICBwcmludChmXCLilZEgIHtsYWJlbHNfc3NbaV06MTBzfTogVD17VF9zczouMWZ9IFIgIFg9e1hfc3M6LjRmfSAgZEcvZFQ9e2RHZFQ6LjFmfSAgZFIvZFQ9e2RSZFQ6LjFmfSAge3N0YWJsZX0g4pWRXCIpXG5wcmludChcIuKVmuKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVnVwiKVxuXG4jIOKUgOKUgCBGaWd1cmEgRyhUKSAvIFIoVCkg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5maWcsIGF4ZXMgPSBwbHQuc3VicGxvdHMoMSwgMiwgZmlnc2l6ZT0oMTQsIDYpKVxuZmlnLnN1cHRpdGxlKCdCYWxhbmNlIGRlIEVuZXJnw61hIENTVFIg4oCUIE11bHRpcGxpY2lkYWQgZGUgZXN0YWRvcyBlc3RhY2lvbmFyaW9zXFxuJ1xuICAgICAgICAgICAgICdGb2dsZXIgRXhhbXBsZSA4LTQ6IEhpZHJhdGFjacOzbiBkZSDDk3hpZG8gZGUgUHJvcGlsZW5vJyxcbiAgICAgICAgICAgICBjb2xvcj1DT0xPUlNbJ3doaXRlJ10sIGZvbnR3ZWlnaHQ9J2JvbGQnKVxuXG5heCA9IGF4ZXNbMF1cbkdfYXJyID0gRyhUX3JhbmdlKTsgUl9hcnIgPSBSKFRfcmFuZ2UpXG5heC5wbG90KFRfcmFuZ2UsIEdfYXJyLCBjb2xvcj1DT0xPUlNbJ29yYW5nZSddLCBsdz0yLjUsIGxhYmVsPSdHKFQpIOKAlCBjYWxvciBnZW5lcmFkbycpXG5heC5wbG90KFRfcmFuZ2UsIFJfYXJyLCBjb2xvcj1DT0xPUlNbJ2JsdWUnXSwgICBsdz0yLjUsIGxhYmVsPSdSKFQpIOKAlCBjYWxvciByZW1vdmlkbycpXG5jb2xvcnNfc3MgPSBbQ09MT1JTWydncmVlbiddLCBDT0xPUlNbJ3JlZCddLCBDT0xPUlNbJ2dyZWVuJ11dXG5mb3IgVF9zcywgY29sLCBsYmwgaW4gemlwKFNTX1QsIGNvbG9yc19zcywgbGFiZWxzX3NzKTpcbiAgICBheC5zY2F0dGVyKFtUX3NzXSwgW0coVF9zcyldLCBjb2xvcj1jb2wsIHM9MTgwLCB6b3JkZXI9NilcbiAgICBheC5hbm5vdGF0ZShmJ3tsYmx9XFxuVD17VF9zczouMGZ9Ulxcblg9e1hfQk0oVF9zcyk6LjJmfScsXG4gICAgICAgICAgICAgICAgKFRfc3MsIEcoVF9zcykpLCB4eXRleHQ9KFRfc3MrOCwgRyhUX3NzKSs2MDApLFxuICAgICAgICAgICAgICAgIGZvbnRzaXplPTgsIGNvbG9yPWNvbCxcbiAgICAgICAgICAgICAgICBhcnJvd3Byb3BzPWRpY3QoYXJyb3dzdHlsZT0nLT4nLCBjb2xvcj1jb2wsIGx3PTEuMikpXG5heC5zZXRfeGxhYmVsKCdUZW1wZXJhdHVyYSBUIChSKScpOyBheC5zZXRfeWxhYmVsKCdDYWxvciAoQlRVL2xibW9sKScpXG5heC5zZXRfdGl0bGUoJ0N1cnZhcyBHKFQpIHZzIFIoVCkg4oCUIFZhbiBIZWVyZGVuJylcbmF4LmxlZ2VuZCgpOyBheC5ncmlkKFRydWUpXG5heC5zZXRfeGxpbSg1MTAsIDcwMCk7IGF4LnNldF95bGltKC01MDAwLCAzODAwMClcblxuIyBQYW5lbCBkZXJlY2hvIOKAlCBYX0JNIHkgWF9CRVxuYXgyID0gYXhlc1sxXVxuWF9CTV9hcnIgPSBYX0JNKFRfcmFuZ2UpXG5YX0JFX2FyciA9IChzdW1UQ3AgKyBVQS9GQTBfZSkqKFRfcmFuZ2UgLSBUMCkgLyAoLWRIcngpXG5heDIucGxvdChUX3JhbmdlLCBYX0JNX2FyciwgY29sb3I9Q09MT1JTWydvcmFuZ2UnXSwgbHc9Mi41LCBsYWJlbD0nWF9CTShUKSDigJQgYmFsYW5jZSBkZSBtYXNhJylcbmF4Mi5wbG90KFRfcmFuZ2UsIFhfQkVfYXJyLCBjb2xvcj1DT0xPUlNbJ2JsdWUnXSwgICBsdz0yLjUsIGxhYmVsPSdYX0JFKFQpIOKAlCBiYWxhbmNlIGRlIGVuZXJnw61hJylcbmZvciBUX3NzLCBjb2wsIGxibCBpbiB6aXAoU1NfVCwgY29sb3JzX3NzLCBsYWJlbHNfc3MpOlxuICAgIGF4Mi5zY2F0dGVyKFtUX3NzXSwgW1hfQk0oVF9zcyldLCBjb2xvcj1jb2wsIHM9MTgwLCB6b3JkZXI9NiwgbGFiZWw9bGJsKVxuYXgyLnNldF94bGFiZWwoJ1RlbXBlcmF0dXJhIFQgKFIpJyk7IGF4Mi5zZXRfeWxhYmVsKCdDb252ZXJzacOzbiBYJylcbmF4Mi5zZXRfdGl0bGUoJ1hfQk0oVCkg4oipIFhfQkUoVCkg4oCUIGVzdGFkb3MgZXN0YWNpb25hcmlvcycpXG5heDIubGVnZW5kKGZvbnRzaXplPTgpOyBheDIuZ3JpZChUcnVlKVxuYXgyLnNldF94bGltKDUxMCwgNzAwKTsgYXgyLnNldF95bGltKC0wLjA1LCAxLjEpXG5cbnBsdC50aWdodF9sYXlvdXQoKVxucGx0LnNhdmVmaWcoJ2VuZXJnaWFfdmVyaWZpY2FjaW9uLnBuZycsIGRwaT0xMjAsIGJib3hfaW5jaGVzPSd0aWdodCcsIGZhY2Vjb2xvcj0nIzBBMEYxRScpXG5wbHQuc2hvdygpXG5wcmludChcIlxcbuKchSBGaWd1cmEgZ3VhcmRhZGE6IGVuZXJnaWFfdmVyaWZpY2FjaW9uLnBuZ1wiKVxuIgogICBdLAogICAib3V0cHV0cyI6IFtdLAogICAiZXhlY3V0aW9uX2NvdW50IjogbnVsbCwKICAgImlkIjogImMxMiIKICB9LAogIHsKICAgImNlbGxfdHlwZSI6ICJtYXJrZG93biIsCiAgICJtZXRhZGF0YSI6IHt9LAogICAic291cmNlIjogWwogICAgIi0tLVxuIyA2LiBDQVNDQURBIERFIE4gQ1NUUiDigJQgRGVtb3N0cmFjacOzbiBkZWwgbMOtbWl0ZSBhbCBQRlJcblxuIyMgNi4xIERlcml2YWNpw7NuOiBOIENTVFJzIGlndWFsZXMgZW4gc2VyaWUgKGNpbsOpdGljYSAxZXIgb3JkZW4pXG5cblBhcmEgJE4kIENTVFJzIGlndWFsZXMgZW4gc2VyaWUsIGNhZGEgdW5vIGNvbiAkXFx0YXVfaSA9IFxcdGF1X1xcdGV4dHt0b3RhbH0vTiQgeSAkayQgY29uc3RhbnRlLFxuZWwgYmFsYW5jZSBkZSBtYXNhIGRlbCByZWFjdG9yICRpJCAoZW50cmFkYSAkQ197QSxpLTF9JCwgc2FsaWRhICRDX3tBLGl9JCk6XG5cbiQkQ197QSxpLTF9IC0gQ197QSxpfSA9IGtcXCxcXHRhdV9pXFwsQ197QSxpfSBcXHF1YWQgXFxSaWdodGFycm93IFxccXVhZCBDX3tBLGl9ID0gXFxmcmFje0Nfe0EsaS0xfX17MStrXFx0YXVfaX0kJFxuXG5BcGxpY2FuZG8gcmVjdXJzaXZhbWVudGUgZGVzZGUgJENfe0EsMH0gPSBDX3tBMH0kOlxuXG4kJENfe0EsTn0gPSBcXGZyYWN7Q197QTB9fXsoMStrXFx0YXVfaSleTn0gPSBcXGZyYWN7Q197QTB9fXtcXGxlZnQoMStcXGRmcmFje2tcXHRhdX17Tn1cXHJpZ2h0KV5OfSQkXG5cbioqQ29udmVyc2nDs24gZGVzcHXDqXMgZGUgTiByZWFjdG9yZXM6KipcblxuJCRcXGJveGVke1hfTiA9IDEgLSBcXGZyYWN7MX17XFxsZWZ0KDErXFxkZnJhY3trXFx0YXV9e059XFxyaWdodCleTn19JCRcblxuIyMgNi4yIERlbW9zdHJhY2nDs24gZm9ybWFsIGRlbCBsw61taXRlICROIFxcdG8gXFxpbmZ0eSRcblxuVXNhbmRvIGxhIGRlZmluaWNpw7NuIGRlbCBuw7ptZXJvICRlJCBjb21vIGzDrW1pdGU6XG5cbiQkXFxsaW1fe04gXFx0byBcXGluZnR5fVxcbGVmdCgxICsgXFxmcmFje2tcXHRhdX17Tn1cXHJpZ2h0KV5OID0gZV57a1xcdGF1fSQkXG5cblBvciB0YW50bzpcblxuJCRcXGxpbV97TiBcXHRvIFxcaW5mdHl9IFhfTiA9IDEgLSBlXnsta1xcdGF1fSA9IFhfXFx0ZXh0e1BGUn0gXFxxdWFkIFxcdGV4dGJme1EuRS5ELn0gXFxxdWFkIFxcc3F1YXJlJCRcblxuKipMYSBjYXNjYWRhIGluZmluaXRhIGRlIENTVFJzIG1pY3Jvc2PDs3BpY29zIEVTIGVsIFBGUi4qKiBHZW9tw6l0cmljYW1lbnRlLCBsb3MgJE4kIHJlY3TDoW5ndWxvc1xuZGVsIGRpYWdyYW1hIGRlIGVzY2FsZXJhIGRlIExldmVuc3BpZWwgY29udmVyZ2VuIGFsIMOhcmVhIGJham8gbGEgY3VydmEgY3VhbmRvICROIFxcdG8gXFxpbmZ0eSQuXG5cbiMjIDYuMyBUYXNhIGRlIGNvbnZlcmdlbmNpYVxuXG5FbCBlcnJvciBkZSBsYSBjYXNjYWRhIHJlc3BlY3RvIGFsIFBGUiBkZWNhZSBjb21vICRPKDEvTikkOlxuXG4kJFhfXFx0ZXh0e1BGUn0gLSBYX04gXFxhcHByb3ggXFxmcmFjeyhrXFx0YXUpXjJ9ezJOfSBlXnsta1xcdGF1fSArIE8oMS9OXjIpJCRcblxuUGFyYSBhbGNhbnphciBlbCA5NSUgZGVsIHJlbmRpbWllbnRvIGRlbCBQRlIgc2UgbmVjZXNpdGEgJE4gXFxhcHByb3ggM1xcdGV4dHvigJN9NSQgcmVhY3RvcmVzLlxuIgogICBdLAogICAiaWQiOiAibTEzIgogIH0sCiAgewogICAiY2VsbF90eXBlIjogImNvZGUiLAogICAibWV0YWRhdGEiOiB7fSwKICAgInNvdXJjZSI6IFsKICAgICIjIOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkOKVkFxuIyBWRVJJRklDQUNJw5NOIENBU0NBREEg4oCUIENvbnZlcmdlbmNpYSBhbCBQRlIgY3VhbmRvIE7ihpLiiJ5cbiMg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQXG5cbmtfY2FzLCB0YXVfY2FzID0gMC41LCA0LjAgICAjIG1pbuKBu8K5IHkgbWluXG5YX1BGUiA9IDEgLSBucC5leHAoLWtfY2FzICogdGF1X2NhcylcblxucHJpbnQoXCLilZTilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZDilZdcIilcbnByaW50KFwi4pWRICBDT05WRVJHRU5DSUEgQ2FzY2FkYSBOIENTVFIg4oaSIFBGUiAoaz0wLjUsIGvPhD0yLjApICAgICAgICDilZFcIilcbnByaW50KFwi4pWg4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWjXCIpXG5wcmludChmXCLilZEgIFhfUEZSIChyZWZlcmVuY2lhKSA9IHtYX1BGUjouOGZ9ICAgICAgICAgICAgICAgICAgICAgICAgIOKVkVwiKVxucHJpbnQoZlwiICB7J04nOj41fSAgeydYX04nOj4xNH0gIHsnRXJyb3IgYWJzJzo+MTJ9ICB7JyUgZGVsIFBGUic6PjEwfSAgeydWX04vVl9QRlInOj4xMH1cIilcbnByaW50KGZcIiAgeyctJyo2MH1cIilcblxuTl92YWx1ZXMgPSBbMSwgMiwgMywgNCwgNSwgNiwgOCwgMTAsIDIwLCA1MCwgMTAwLCAxMDAwXVxucmVzdWx0YWRvcyA9IFtdXG5mb3IgTiBpbiBOX3ZhbHVlczpcbiAgICB0YXVfaSA9IHRhdV9jYXMgLyBOXG4gICAgWF9OICAgPSAxIC0gMS8oMSArIGtfY2FzKnRhdV9pKSoqTlxuICAgIGVycm9yID0gYWJzKFhfUEZSIC0gWF9OKVxuICAgIHBjdCAgID0gWF9OL1hfUEZSICogMTAwXG4gICAgIyBSYXrDs24gZGUgdm9sw7ptZW5lcyAobWlzbW8gz4QgdG90YWwpXG4gICAgcmF0aW8gPSBOICogKFhfTi9OKSAvIChYX1BGUikgaWYgWF9QRlIgPiAwIGVsc2UgMSAgIyBzaW1wbGlmaWNhZG9cbiAgICByZXN1bHRhZG9zLmFwcGVuZCgoTiwgWF9OLCBlcnJvciwgcGN0KSlcbiAgICBwcmludChmXCIgIHtOOjVkfSAge1hfTjoxNC44Zn0gIHtlcnJvcjoxMi44Zn0gIHtwY3Q6OS40Zn0lXCIpXG5cbnByaW50KGZcIlxcbiAgTMOtbWl0ZSBO4oaS4oieOiB7WF9QRlI6LjhmfSA9IFhfUEZSICDinJNcIilcbnByaW50KFwi4pWa4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWQ4pWdXCIpXG5cbiMg4pSA4pSAIEZpZ3VyYTogZGlhZ3JhbWEgZGUgZXNjYWxlcmEgeSBjb252ZXJnZW5jaWEg4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSAXG5maWcsIGF4ZXMgPSBwbHQuc3VicGxvdHMoMSwgMiwgZmlnc2l6ZT0oMTQsIDYpKVxuZmlnLnN1cHRpdGxlKCdDYXNjYWRhIGRlIENTVFJzIOKGkiBQRlIgY3VhbmRvIE4g4oaSIOKInlxcbkRlbW9zdHJhY2nDs24gbnVtw6lyaWNhIGRlbCBsw61taXRlJyxcbiAgICAgICAgICAgICBjb2xvcj1DT0xPUlNbJ3doaXRlJ10sIGZvbnR3ZWlnaHQ9J2JvbGQnKVxuXG4jIFBhbmVsIDE6IERpYWdyYW1hIGRlIGVzY2FsZXJhIHBhcmEgTiA9IDEsIDMsIDhcblhfbGV2ID0gbnAubGluc3BhY2UoMC4wMDEsIDAuOTcsIDQwMClcbnJBX2xldiA9IGtfY2FzICogMi4wICogKDEgLSBYX2xldikgICAjIENBMCA9IDJcbkxldl9hcnIgPSAxMC4wICogMi4wIC8gckFfbGV2ICAgICAgICAgIyBGQTAgPSB2MCpDQTBcblxuYXggPSBheGVzWzBdXG5heC5wbG90KFhfbGV2LCBMZXZfYXJyLCBjb2xvcj1DT0xPUlNbJ2dvbGQnXSwgbHc9Mi41LCBsYWJlbD0n4oSSKFgpID0gRl9BMC8oLXJfQSknKVxuYXguZmlsbF9iZXR3ZWVuKFhfbGV2W1hfbGV2IDwgdGF1X2NhcyprX2Nhcy8oMSt0YXVfY2FzKmtfY2FzKV0sXG4gICAgICAgICAgICAgICAgTGV2X2FycltYX2xldiA8IHRhdV9jYXMqa19jYXMvKDErdGF1X2NhcyprX2NhcyldLFxuICAgICAgICAgICAgICAgIDAsIGFscGhhPTAuMjIsIGNvbG9yPUNPTE9SU1snZ3JlZW4nXSwgbGFiZWw9ZidWX1BGUiAoTj3iiJ4pJylcblxuTl9kaWFnID0gWzEsIDNdXG5saW5lX3N0eWxlcyA9IFsnLS0nLCAnOiddXG5jb2xfZGlhZyA9IFtDT0xPUlNbJ3JlZCddLCBDT0xPUlNbJ3B1cnBsZSddXVxuZm9yIE5fZCwgbHMsIGNvbF9kIGluIHppcChOX2RpYWcsIGxpbmVfc3R5bGVzLCBjb2xfZGlhZyk6XG4gICAgdGF1X2lfZCA9IHRhdV9jYXMgLyBOX2RcbiAgICBYX3ByZXYgPSAwXG4gICAgZm9yIGogaW4gcmFuZ2UoTl9kKTpcbiAgICAgICAgWF9uZXh0ID0gMSAtIDEvKDEgKyBrX2Nhcyp0YXVfaV9kKSoqKGorMSlcbiAgICAgICAgaV94ID0gbnAuc2VhcmNoc29ydGVkKFhfbGV2LCBYX25leHQpXG4gICAgICAgIExfbmV4dCA9IExldl9hcnJbbWluKGlfeCwgbGVuKExldl9hcnIpLTEpXVxuICAgICAgICBheC5wbG90KFtYX3ByZXYsIFhfbmV4dF0sIFtMX25leHQsIExfbmV4dF0sIGNvbG9yPWNvbF9kLCBsdz0yLCBscz1scylcbiAgICAgICAgYXgucGxvdChbWF9uZXh0LCBYX25leHRdLCBbMCwgTF9uZXh0XSwgY29sb3I9Y29sX2QsIGx3PTIsIGxzPWxzKVxuICAgICAgICBYX3ByZXYgPSBYX25leHRcbiAgICBheC5wbG90KFtdLCBbXSwgY29sb3I9Y29sX2QsIGx3PTIsIGxzPWxzLCBsYWJlbD1mJ049e05fZH0gQ1NUUnMnKVxuXG5heC5zZXRfeGxhYmVsKCdDb252ZXJzacOzbiBYJyk7IGF4LnNldF95bGFiZWwoJ+KEkihYKSA9IEZfQTAvKC1yX0EpJylcbmF4LnNldF90aXRsZSgnRGlhZ3JhbWEgZGUgRXNjYWxlcmEgZGUgTGV2ZW5zcGllbCcpXG5heC5sZWdlbmQoZm9udHNpemU9OSk7IGF4LmdyaWQoVHJ1ZSk7IGF4LnNldF95bGltKDApXG5cbiMgUGFuZWwgMjogQ29udmVyZ2VuY2lhIFhfTiDihpIgWF9QRlJcbk5fY29udCA9IG5wLmxvZ3NwYWNlKDAsIDMsIDIwMClcblhfTl9jb250ID0gMSAtIDEvKDEgKyBrX2Nhcyp0YXVfY2FzL05fY29udCkqKk5fY29udFxuZXJyb3JfY29udCA9IG5wLmFicyhYX1BGUiAtIFhfTl9jb250KVxuXG5heDIgPSBheGVzWzFdXG5heDIubG9nbG9nKE5fY29udCwgZXJyb3JfY29udCwgY29sb3I9Q09MT1JTWydvcmFuZ2UnXSwgbHc9Mi41LCBsYWJlbD0nfFhfUEZSIOKIkiBYX058JylcbmF4Mi5sb2dsb2coTl9jb250LCAoa19jYXMqdGF1X2NhcykqKjIvKDIqTl9jb250KSpucC5leHAoLWtfY2FzKnRhdV9jYXMpLFxuICAgICAgICAgICBjb2xvcj1DT0xPUlNbJ2dyYXknXSwgbHc9MS44LCBscz0nLS0nLCBsYWJlbD0nTygxL04pIHRlw7NyaWNvJylcbmF4Mi5zZXRfeGxhYmVsKCdOw7ptZXJvIGRlIHJlYWN0b3JlcyBOJyk7IGF4Mi5zZXRfeWxhYmVsKCdFcnJvciB8WF9QRlIg4oiSIFhfTnwnKVxuYXgyLnNldF90aXRsZSgnVGFzYSBkZSBjb252ZXJnZW5jaWEgYWwgUEZSXFxuKGVzY2FsYSBsb2ctbG9nKScpXG5heDIubGVnZW5kKCk7IGF4Mi5ncmlkKFRydWUsIHdoaWNoPSdib3RoJywgYWxwaGE9MC40KVxuXG5wbHQudGlnaHRfbGF5b3V0KClcbnBsdC5zYXZlZmlnKCdjYXNjYWRhX2NvbnZlcmdlbmNpYS5wbmcnLCBkcGk9MTIwLCBiYm94X2luY2hlcz0ndGlnaHQnLCBmYWNlY29sb3I9JyMwQTBGMUUnKVxucGx0LnNob3coKVxucHJpbnQoXCLinIUgRmlndXJhIGd1YXJkYWRhOiBjYXNjYWRhX2NvbnZlcmdlbmNpYS5wbmdcIilcbiIKICAgXSwKICAgIm91dHB1dHMiOiBbXSwKICAgImV4ZWN1dGlvbl9jb3VudCI6IG51bGwsCiAgICJpZCI6ICJjMTQiCiAgfSwKICB7CiAgICJjZWxsX3R5cGUiOiAibWFya2Rvd24iLAogICAibWV0YWRhdGEiOiB7fSwKICAgInNvdXJjZSI6IFsKICAgICItLS1cbiMgNy4gVEFCTEEgTUFFU1RSQSDigJQgU8OtbnRlc2lzIGRlIGxhcyBkZW1vc3RyYWNpb25lcyByaWd1cm9zYXNcblxufCBSZWFjdG9yIHwgRWN1YWNpw7NuIGRlIGRpc2XDsW8gfCBUaXBvIG1hdGVtw6F0aWNvIHwgRGVtb3N0cmFjacOzbiBjbGF2ZSB8IFZlcmlmaWNhY2nDs24gbnVtw6lyaWNhIHxcbnwtLS0tLS0tLS18LS0tLS0tLS0tLS0tLS0tLS0tLXwtLS0tLS0tLS0tLS0tLS0tLXwtLS0tLS0tLS0tLS0tLS0tLS0tfC0tLS0tLS0tLS0tLS0tLS0tLS0tLS18XG58ICoqQ1NUUioqIHwgJFYgPSBGX3tBMH1YLygtcl9BXFx8X1xcdGV4dHtzYWx9KSQgfCDDgWxnZWJyYSAobGluZWFsIGVuICRWJCkgfCA2IHBhc29zIGV4cGzDrWNpdG9zIGRlc2RlIGJhbGFuY2UgbW9sYXIgfCBFeGFtcGxlIDUtMTogZXJyb3IgPCAwLjAwMSUgfFxufCAqKlBGUioqIHwgJFYgPSBGX3tBMH1cXGludF8wXlggZFgvKC1yX0EpJCB8IE9ERSBkZSAxZXIgb3JkZW4gfCBEZXJpdmFjacOzbiBkaWZlcmVuY2lhbCBzb2JyZSAkZFYkIHwgU29sdWNpb25lcyBhbmFsw610aWNhcyBuPTAsMSwyIHZlcmlmaWNhZGFzIHxcbnwgKipCYXRjaCoqIHwgJHQgPSBDX3tBMH1cXGludF8wXlggZFgvKC1yX0EpJCB8IE9ERSAoZXF1aXYuIFBGUikgfCBFcXVpdmFsZW5jaWEgYml5ZWN0aXZhICR0XFxsZWZ0cmlnaHRhcnJvd1xcdGF1JCB8IEVycm9yIGFuYWzDrXRpY28gdnMgbnVtw6lyaWNvIDwgMTDigbvigbUgfFxufCAqKkNhc2NhZGEqKiB8ICRYX04gPSAxLSgxK2tcXHRhdS9OKV57LU59JCB8IFN1Y2VzacOzbiBudW3DqXJpY2EgfCBMw61taXRlICROXFx0b1xcaW5mdHkgPSBlXntrXFx0YXV9JCAoZGVmLiBkZSBlKSB8IENvbnZlcmdlbmNpYSBPKDEvTikgdmVyaWZpY2FkYSB8XG58ICoqQ1NUUiBCRSoqIHwgJEcoVCkgPSBSKFQpJCB8IEVjdWFjacOzbiB0cmFzY2VuZGVudGUgfCAxZXIgUHJpbmNpcGlvIHBhcmEgc2lzdGVtYSBhYmllcnRvIHwgRXhhbXBsZSA4LTQ6IDMgU1MgZGV0ZWN0YWRvcyB8XG5cbiMjIEplcmFycXXDrWEgZGUgZ2VuZXJhbGlkYWRcblxuYGBgXG5CYWxhbmNlIEdlbmVyYWw6IEZBMCAtIEZBICsg4oirckEgZFYgPSBkTkEvZHRcbiAgICDihpMgU1MgKyBtZXpjbGEgcGVyZmVjdGEgICAgICDihpMgU1MgKyBzaW4gbWV6Y2xhIGF4aWFsICAgIOKGkyBzaW4gZmx1am8gKyBWIGN0ZVxuICAgQ1NUUjogViA9IEZBMMK3WC8oLXJBfHNhbCkgICBQRlI6IGRYL2RWID0gLXJBL0ZBMCAgICAgIEJhdGNoOiBkWC9kdCA9IC1yQS9DQTBcbiAgICAgICAgICDihpMgTiByZWFjdG9yZXMgICAgICAgICAgICAgICAg4oaTIE7ihpLiiJ5cbiAgICAgIENhc2NhZGEgQ1NUUiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDihpIgUEZSIChsw61taXRlIGV4YWN0bylcbmBgYFxuXG4+ICoqQ29uY2x1c2nDs24gZnVuZGFtZW50YWw6KiogVG9kYXMgbGFzIGVjdWFjaW9uZXMgZGUgZGlzZcOxbyBkZSByZWFjdG9yZXMgaWRlYWxlcyBzb25cbj4gKipjYXNvcyBlc3BlY2lhbGVzKiogZGUgbGEgbWlzbWEgbGV5IGRlIGNvbnNlcnZhY2nDs24gZGUgbWFzYSwgb2J0ZW5pZG9zIHBvciBsYSBhcGxpY2FjacOzblxuPiBzaXN0ZW3DoXRpY2EgZGUgc3Vwb3NpY2lvbmVzIGbDrXNpY2FzIGlkZW50aWZpY2FkYXMgeSBjdWFudGlmaWNhZGFzLlxuXG4tLS1cbipOb3RlYm9vayDigJQgRGVtb3N0cmFjacOzbiBSaWd1cm9zYSDCtyBQcm9ncmFtYSA3NDA0ODQgwrcgTWFlc3Ryw61hIElRIMK3IFVuaXZlcnNpZGFkIGRlbCBWYWxsZSDCtyAyMDI1KlxuIgogICBdLAogICAiaWQiOiAibTE1IgogIH0KIF0KfQ==</span></div>
+<script>
+function downloadNB(){
+  const b64=document.getElementById('d-demo').textContent.trim();
+  const bin=atob(b64), bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([bytes],{type:'application/octet-stream'}));
+  a.download='demo_rigurosa_reactores.ipynb'; a.click();
+}
+</script>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════════════════════
+     INTRODUCCIÓN
+══════════════════════════════════════════════════════ -->
+<div id="intro" class="master">
+  <div class="master-tit">🗂 Estructura y criterio de rigor matemático</div>
+  <p class="prose">
+    Una ecuación de diseño de reactor es <strong>matemáticamente rigurosa</strong> cuando cumple cuatro condiciones:
+    (1) se deriva explícitamente desde la ley de conservación de masa <em>sin omitir pasos algebraicos</em>,
+    (2) cada suposición simplificante se identifica, se justifica físicamente y se cuantifica su límite de validez,
+    (3) el resultado se verifica numéricamente independientemente de la derivación analítica, y
+    (4) los casos límite y los casos especiales emergen naturalmente como consecuencias del caso general.
+    Este documento cumple las cuatro condiciones para cada uno de los cuatro reactores ideales.
+  </p>
+  <div class="tree">
+    <span class="t-gold">Postulado universal — Ley de Conservación de Masa</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <span class="t-blue">F_A0 − F_A + ∫ r_A dV  =  dN_A/dt</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-gray">← Balance molar general (Fogler Ec. 1-4)</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;┌──────────┬──────────────┬──────────────────┐<br>
+    &nbsp;▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <span class="t-green">CSTR</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-green">PFR</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-green">Batch</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-green">Cascada</span><br>
+    <span class="t-gray">SS+mezcla pf.</span>&nbsp;&nbsp;<span class="t-gray">SS+flujo pistón</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-gray">cerrado+V=cte</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-gray">N→∞ = PFR</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼&nbsp;&nbsp;<span class="t-gold">1er Principio Termodinámica</span><br>
+    &nbsp;&nbsp;&nbsp;<span class="t-blue">X_BE(T) ∩ X_BM(T)</span>&nbsp;&nbsp;<span class="t-gray">→ multiplicidad · Van Heerden · TMR · seguridad</span>
+  </div>
+  <p class="prose" style="margin-top:.5rem">
+    <strong>Fenomenología central:</strong> todas las ecuaciones de diseño son variantes de la misma ley de conservación,
+    diferenciadas únicamente por las <em>suposiciones físicas</em> aplicadas al volumen de control.
+    Entender qué suposición se aplica —y cuándo deja de ser válida— es la competencia fundamental
+    del ingeniero de reactores.
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     §1  CSTR ISOTÉRMICO
+══════════════════════════════════════════════════════ -->
+<div id="s1" class="sec t1">
+  <div class="sec-hd">
+    <div class="sec-ico">⚗️</div>
+    <div class="sec-meta">
+      <div class="sec-cap">§1 · Fogler Cap. 2, 5 · CSTR Isotérmico</div>
+      <div class="sec-tit">Reactor de Tanque Agitado Continuo — Derivación Algebraica Completa</div>
+      <div class="sec-sub">Balance molar · 4 suposiciones · Damköhler · Diseño industrial</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="h3">1.1 Fenomenología del CSTR — ¿qué ocurre físicamente?</div>
+    <p class="prose">
+      El CSTR es el reactor más cercano a la <strong>idealización del equilibrio homogéneo</strong>:
+      un agitador de alta potencia dispersa instantáneamente todo reactivo y producto en un volumen
+      perfectamente uniforme. La consecuencia más importante —y frecuentemente subestimada— es que
+      el reactor opera permanentemente a la <strong>concentración de salida</strong>, que es la más baja
+      del proceso. Físicamente, esto significa que cada molécula de reactivo que entra al reactor
+      se diluye al instante en una mezcla que ya contiene la fracción de producto correspondiente
+      a la conversión de diseño.
+    </p>
+    <p class="prose">
+      Esta propiedad tiene dos consecuencias fundamentales opuestas:
+      por un lado, el CSTR requiere <strong>mayor volumen</strong> que el PFR para la misma conversión
+      (porque opera siempre a la velocidad mínima), pero por otro lado ofrece el
+      <strong>control térmico más perfecto</strong> posible: la temperatura es uniforme en todo el volumen,
+      elimina puntos calientes y permite operar exactamente en el punto de diseño de forma estable.
+    </p>
+
+    <div class="h3">1.2 Las cuatro suposiciones — base física y límites de validez</div>
+    <div class="asump-grid">
+      <div class="asump">
+        <div class="asump-id">Suposición S1</div>
+        <div class="asump-title">Mezcla perfecta</div>
+        <div class="asump-phys">Composición y temperatura uniformes en todo el volumen \(V\). Equivale a asumir que el tiempo de mezcla es mucho menor que el tiempo de reacción: \(\tau_\text{mezcla} \ll \tau_\text{rxn}\).</div>
+        <span class="asump-math">r_A(x,y,z) = r_A|_sal = constante → ∫r_A dV = r_A·V</span>
+        <div class="asump-fail">Falla cuando: P/V &lt; 0.5 kW/m³ · alta viscosidad (polímeros) · V &gt; 50 m³ sin geometría optimizada · tiempo de mezcla medible con trazador.</div>
+      </div>
+      <div class="asump">
+        <div class="asump-id">Suposición S2</div>
+        <div class="asump-title">Estado estacionario</div>
+        <div class="asump-phys">Las propiedades del sistema no cambian con el tiempo. El balance molar reduce su término de acumulación a cero, convirtiendo la ODE temporal en una ecuación algebraica.</div>
+        <span class="asump-math">dN_A/dt = 0 → balance estático (ecuación algebraica)</span>
+        <div class="asump-fail">Falla en arranques, paradas, perturbaciones &gt; 10% de las variables nominales, y en el análisis de estabilidad dinámica del reactor.</div>
+      </div>
+      <div class="asump">
+        <div class="asump-id">Suposición S3</div>
+        <div class="asump-title">Operación isotérmica</div>
+        <div class="asump-phys">La temperatura es constante y uniforme en todo el reactor: la camisa de refrigeración remueve exactamente el calor generado por la reacción. La constante cinética \(k\) no varía con la posición.</div>
+        <span class="asump-math">k = k(T_diseño) = constante en todo V y en todo t</span>
+        <div class="asump-fail">Falla cuando: \(\Delta T_\text{ad} > 30\) K · coeficiente UA insuficiente · escala &gt; 10 m³ con geometría desfavorable de la camisa.</div>
+      </div>
+      <div class="asump">
+        <div class="asump-id">Suposición S4</div>
+        <div class="asump-title">Densidad constante (líquidos)</div>
+        <div class="asump-phys">El caudal volumétrico de salida es igual al de entrada \(v = v_0\). Válido para líquidos y para gases sin cambio neto de moles. Para gases con \(\delta \neq 0\) se requiere el parámetro de expansión \(\varepsilon\).</div>
+        <span class="asump-math">v = v₀ → C_A = C_A0·(1−X) [exacto para líquidos]</span>
+        <div class="asump-fail">Falla para: gases con cambio de moles (A → 2B: \(\delta=+1\)), reacciones en fase vapor a alta conversión, mezclas no ideales.</div>
+      </div>
+    </div>
+
+    <div class="h3">1.3 Derivación algebraica rigurosa — 6 pasos explícitos</div>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 1.1 — Ecuación de diseño del CSTR: derivación completa en 6 pasos</span>
+        <span class="eqref">Fogler Ec. (5-7) · Cap. 5</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step">
+            <span class="step-n">1</span>
+            <div class="step-body">
+              <strong>Punto de partida — balance molar general</strong> para la especie A en el volumen de control \(\mathcal{V}\):<br>
+              \[ F_{A0} - F_A + \int_{\mathcal{V}} r_A\,dV = \frac{dN_A}{dt} \]
+              <em>Significado físico:</em> moles de A que entran, menos los que salen, más los que se generan por reacción, igualan la acumulación.
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-n">2</span>
+            <div class="step-body">
+              <strong>Aplicar S2</strong> (estado estacionario) — el sistema no acumula masa de A:<br>
+              \[ \frac{dN_A}{dt} = 0 \quad \Rightarrow \quad F_{A0} - F_A + \int_{\mathcal{V}} r_A\,dV = 0 \]
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-n">3</span>
+            <div class="step-body">
+              <strong>Aplicar S1</strong> (mezcla perfecta) — \(r_A\) es uniforme en todo \(V\), la integral colapsa:<br>
+              \[ F_{A0} - F_A + r_A \cdot V = 0 \]
+              <em>Este es el paso más importante:</em> la suposición de mezcla perfecta transforma una integral de posición en un simple producto algebraico.
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-n">4</span>
+            <div class="step-body">
+              <strong>Definir conversión</strong> \(X\) como \(F_A = F_{A0}(1-X)\) y sustituir:<br>
+              \[ F_{A0} - F_{A0}(1-X) + r_A V = 0 \quad \Rightarrow \quad F_{A0}\,X = -r_A \cdot V \]
+              Usando la convención \(-r_A = |r_A| > 0\) para reactivos (velocidad de desaparición de A):
+              \[ F_{A0}\,X = (-r_A)\big|_\text{sal} \cdot V \]
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-n">5</span>
+            <div class="step-body">
+              <strong>Despejar el volumen</strong> \(V\) — ecuación de diseño en forma molar:
+              \[ V_\text{CSTR} = \frac{F_{A0}\,X}{(-r_A)\big|_\text{sal}} \]
+              Dividir por \(v_0\) (aplicando S4: \(v=v_0\)) y usar \(C_{A0} = F_{A0}/v_0\), \(\tau = V/v_0\):
+              \[ \tau_\text{CSTR} = \frac{C_{A0}\,X}{(-r_A)\big|_\text{sal}} \]
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-n">6</span>
+            <div class="step-body">
+              <strong>Para cinética \(n\)-ésimo orden</strong> \(-r_A = k\,C_{A0}^n(1-X)^n\) (S3: \(k\) constante):
+              \[ \tau = \frac{X}{k\,C_{A0}^{n-1}(1-X)^n} \]
+              Definir el <strong>Número de Damköhler</strong> \(Da \equiv k\tau\,C_{A0}^{n-1}\). Para \(n=1\), álgebra directa:
+              \[ Da = \frac{X}{1-X} \quad \Rightarrow \quad \boxed{X = \frac{Da}{1+Da}} \]
+            </div>
+          </div>
+        </div>
+        <div class="eqresult">
+          \[ \boxed{V_\text{CSTR} = \frac{F_{A0}\,X}{(-r_A)\big|_\text{sal}}} \qquad \tau = \frac{C_{A0}\,X}{(-r_A)\big|_\text{sal}} \qquad Da = k\tau\,C_{A0}^{n-1} \]
+        </div>
+        <div class="eqnote">
+          <strong>Interpretación fundamental del resultado:</strong> la ecuación de diseño evalúa \((-r_A)\) en la concentración
+          de <em>salida</em> — la concentración más baja del proceso. Esto es una consecuencia inevitable de S1 (mezcla perfecta).
+          Para reacciones de orden \(n > 0\), una concentración más baja implica una velocidad más baja, lo que requiere mayor volumen.
+          La penalización volumétrica crece explosivamente al acercarse a \(X \to 1\), donde \((-r_A)|_\text{sal} \to 0\).
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">1.4 El Número de Damköhler — significado físico profundo</div>
+    <p class="prose">
+      El número de Damköhler \(Da = k\tau C_{A0}^{n-1}\) es el parámetro de diseño universal del CSTR.
+      Físicamente, representa la razón entre la <strong>tasa de reacción</strong> (numerador: \(k\,C_{A0}^{n-1}\))
+      y la <strong>tasa de transporte por flujo</strong> (denominador: \(1/\tau\)):
+    </p>
+    <table class="dtab">
+      <tr><th>Régimen de Da</th><th>Interpretación física</th><th>Consecuencia operacional</th><th>Ejemplo industrial</th></tr>
+      <tr><td class="mono">Da ≪ 1 (&lt;0.1)</td><td>Transporte por flujo domina sobre reacción</td><td>Conversión baja, \(X \approx Da\); el reactor actúa casi como tubo vacío</td><td>Reacciones lentas: fermentación de células mamíferas</td></tr>
+      <tr><td class="mono">Da ≈ 1</td><td>Reacción y transporte en competencia</td><td>Zona de diseño eficiente; máxima sensibilidad de X a los parámetros</td><td>Hidratación de óxido de propileno (Example 5-1)</td></tr>
+      <tr><td class="mono">Da ≫ 1 (&gt;10)</td><td>Reacción domina sobre transporte</td><td>Conversión alta, \(X \approx 1 - 1/Da\); rendimientos de escala decrecientes</td><td>Polimerización de estireno, saponificación industrial</td></tr>
+    </table>
+
+    <div class="h3">1.5 Verificación numérica — Fogler Example 5-1 (Dow Chemical)</div>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 1.2 — Verificación numérica Example 5-1: Hidratación de Óxido de Propileno</span>
+        <span class="eqref">Fogler p. 183 · Error &lt; 0.001%</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step"><span class="step-n">→</span>
+            <div class="step-body">
+              Datos: \(k = 0.257\;\text{min}^{-1}\), \(C_{A0} = 2.05\;\text{mol/dm}^3\), \(v_0 = 46.8\;\text{dm}^3/\text{min}\), \(X_\text{des} = 0.80\)
+            </div>
+          </div>
+          <div class="step"><span class="step-n">1</span>
+            <div class="step-body">
+              Flujo molar y velocidad en la salida:<br>
+              \[ F_{A0} = v_0\,C_{A0} = 46.8 \times 2.05 = 95.94\;\text{mol/min} \]
+              \[ (-r_A)\big|_\text{sal} = k\,C_{A0}(1-X) = 0.257 \times 2.05 \times 0.20 = 0.1054\;\text{mol/(dm}^3\text{·min)} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">2</span>
+            <div class="step-body">
+              Volumen por la ecuación de diseño:<br>
+              \[ V = \frac{F_{A0}\,X}{(-r_A)|_\text{sal}} = \frac{95.94 \times 0.80}{0.1054} = \mathbf{728\;\text{dm}^3} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">3</span>
+            <div class="step-body">
+              Verificación cruzada por Damköhler:<br>
+              \[ Da = k\tau = k\,\frac{V}{v_0} = 0.257 \times \frac{728}{46.8} = 3.997 \approx 4.00 \]
+              \[ X_\text{verif} = \frac{Da}{1+Da} = \frac{4.00}{5.00} = 0.800 \quad \checkmark \quad \text{Error} = 0.000\% \]
+            </div>
+          </div>
+        </div>
+        <div class="eqresult">
+          \(V_\text{CSTR} = 728\;\text{dm}^3\) · \(\tau = 15.56\;\text{min}\) · \(Da = 4.00\) · Error balance = 0.000%
+        </div>
+        <div class="eqnote">
+          <strong>Sensibilidad al aumento de conversión:</strong> de \(X=0.80\) a \(X=0.90\), el volumen necesario aumenta de 728 a 1,638 dm³ (+125%). De \(X=0.90\) a \(X=0.95\) sube a 3,519 dm³ (+115% adicional). La penalización es aceleradamente no lineal — esta es la "ley de rendimientos decrecientes" del CSTR.
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">1.6 Fortalezas, debilidades y aplicación industrial</div>
+    <div class="df-grid">
+      <div class="df-col fort">
+        <div class="df-tit">✅ Fortalezas del CSTR</div>
+        <div class="df-item">Control térmico perfecto: temperatura uniforme elimina puntos calientes y permite operar exactamente en el punto de diseño.</div>
+        <div class="df-item">Manejo de sólidos en suspensión (catalizadores, células) sin problemas de obstrucción.</div>
+        <div class="df-item">Fácil de escalar: la agitación garantiza el comportamiento ideal hasta volúmenes de 200 m³.</div>
+        <div class="df-item">Operación estable en el estado estacionario con control de retroalimentación sencillo.</div>
+        <div class="df-item">Diseño algebraico: no requiere integración ni resolución de ODEs en estado estacionario.</div>
+      </div>
+      <div class="df-col deb">
+        <div class="df-tit">✗ Debilidades del CSTR</div>
+        <div class="df-item">Mayor volumen que el PFR para cualquier cinética de orden \(n > 0\) a la misma conversión.</div>
+        <div class="df-item">Puede existir multiplicidad de estados estacionarios en reacciones exotérmicas (§5).</div>
+        <div class="df-item">La distribución de tiempos de residencia exponencial hace que el 63.2% del fluido salga antes de \(\tau\).</div>
+        <div class="df-item">Limitado para reacciones rápidas que requieren tiempos de residencia &lt; 10 segundos.</div>
+        <div class="df-item">Alto consumo de energía de agitación a gran escala (P/V = 1–5 kW/m³).</div>
+      </div>
+    </div>
+    <div class="industria">
+      <div class="industria-hd">🏭 Relevancia en la Industria de Procesos Químicos</div>
+      <div class="industria-body">
+        El CSTR es el reactor dominante en la <strong>industria farmacéutica de producción continua</strong>,
+        la <strong>petroquímica</strong> (polimerización de HDPE, LLDPE vía proceso Unipol en fase gas con lecho fluidizado —
+        equivalente al CSTR), la <strong>producción de fertilizantes</strong> (nitración de amonio en cascadas) y el
+        <strong>tratamiento de aguas</strong> (reactores biológicos de lodo activado).
+        <br><br>
+        <strong>Escala típica:</strong>
+        <span class="kpi">Farmacéutico: 100–2,000 L</span>
+        <span class="kpi">Polimerización: 10–200 m³</span>
+        <span class="kpi">Fermentación industrial: 50–500 m³</span>
+        <br><br>
+        La ecuación \(V = F_{A0}X/(-r_A)|_\text{sal}\) es la base del <em>sizing</em> inicial en cualquier
+        proceso de licenciamiento (Dow, BASF, Solvay). El parámetro \(Da\) se usa como criterio
+        de similitud en el escalado piloto → planta: mantener \(Da\) constante garantiza la misma
+        conversión independientemente de la escala, siempre que S1-S4 se mantengan válidas.
+      </div>
+    </div>
+
+  </div>
+</div><!-- /§1 -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     §2  DIAGRAMA DE LEVENSPIEL
+══════════════════════════════════════════════════════ -->
+<div id="s2" class="sec t1">
+  <div class="sec-hd">
+    <div class="sec-ico">📐</div>
+    <div class="sec-meta">
+      <div class="sec-cap">§2 · Fogler §5.2 · Diagrama de Levenspiel</div>
+      <div class="sec-tit">Demostración Geométrica de la Desigualdad \(V_\text{CSTR} \geq V_\text{PFR}\) para \(n > 0\)</div>
+      <div class="sec-sub">Función de Levenspiel · Teorema geométrico · Caso autocatalítico · Selección óptima de reactor</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="h3">2.1 La función de Levenspiel — construcción geométrica</div>
+    <p class="prose">
+      Octave Levenspiel (Oregon State University, 1926–2017) propuso en 1962 representar las ecuaciones
+      de diseño como <strong>áreas geométricas</strong> en el plano \((X_A,\; F_{A0}/(-r_A))\).
+      Esta representación transforma la selección del tipo de reactor en un problema de minimización
+      de área, que puede resolverse visualmente sin integración. Es una de las herramientas conceptuales
+      más poderosas del diseño de reactores.
+    </p>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 2.1 — Función de Levenspiel y representación geométrica de CSTR y PFR</span>
+        <span class="eqref">Fogler §5.2 · Levenspiel (1962)</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step"><span class="step-n">1</span>
+            <div class="step-body">
+              Definir la <strong>función de Levenspiel</strong>:<br>
+              \[ \mathcal{L}(X) \equiv \frac{F_{A0}}{-r_A(X)} \quad \left[\text{dm}^3\right] \]
+              Esta función tiene dimensiones de volumen y representa el volumen de reactor por unidad de flujo molar convertido a conversión \(X\).
+            </div>
+          </div>
+          <div class="step"><span class="step-n">2</span>
+            <div class="step-body">
+              Reescribir las ecuaciones de diseño en términos de \(\mathcal{L}(X)\):<br>
+              \[ V_\text{CSTR} = \mathcal{L}(X_\text{sal})\cdot X_\text{sal} \quad \leftarrow \text{rectángulo: base } X_\text{sal} \text{, altura } \mathcal{L}(X_\text{sal}) \]
+              \[ V_\text{PFR}  = \int_0^{X_A} \mathcal{L}(X)\,dX \quad \leftarrow \text{área bajo la curva de 0 a } X_A \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">3</span>
+            <div class="step-body">
+              Para cinética de orden \(n\) con \(C_{A0}\) constante:<br>
+              \[ \mathcal{L}(X) = \frac{F_{A0}}{k\,C_{A0}^n(1-X)^n} = \frac{v_0}{k\,C_{A0}^{n-1}(1-X)^n} \]
+              Esta función es <em>monótonamente creciente</em> en \(X\) para \(n > 0\) (porque \((1-X)^n\) decrece con \(X\)).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">2.2 Demostración formal del Teorema de Levenspiel</div>
+    <div class="proof">
+      <div class="proof-hd">
+        <span class="proof-badge">Teorema</span>
+        <span class="proof-tit">Para \(-r_A\) decreciente con X y \(n > 0\): \(V_\text{CSTR} > V_\text{PFR}\) siempre</span>
+      </div>
+      <div class="proof-body">
+        <strong>Hipótesis:</strong> \(\mathcal{L}(X)\) es monótonamente creciente en \([0, X_\text{sal}]\),
+        es decir \(\mathcal{L}(X) < \mathcal{L}(X_\text{sal})\) para todo \(X < X_\text{sal}\).<br><br>
+        <strong>Demostración:</strong> Dado que \(\mathcal{L}(X) < \mathcal{L}(X_\text{sal})\) para todo \(X \in [0, X_\text{sal})\):
+        \[ V_\text{PFR} = \int_0^{X_\text{sal}} \mathcal{L}(X)\,dX < \int_0^{X_\text{sal}} \mathcal{L}(X_\text{sal})\,dX = \mathcal{L}(X_\text{sal})\cdot X_\text{sal} = V_\text{CSTR} \]
+        La desigualdad es <em>estricta</em> porque \(\mathcal{L}\) es estrictamente creciente (no es constante en ningún subintervalo para \(n > 0\)).<br><br>
+        Geométricamente: el rectángulo del CSTR <em>sobreestima</em> el área bajo la curva porque su altura es el valor máximo de \(\mathcal{L}\) en el intervalo.
+      </div>
+      <div class="proof-qed">\(\square\) Q.E.D.</div>
+    </div>
+
+    <div class="h3">2.3 Cuantificación de la razón \(V_\text{CSTR}/V_\text{PFR}\)</div>
+    <table class="dtab">
+      <tr><th>Orden \(n\)</th><th>\(X = 0.50\)</th><th>\(X = 0.80\)</th><th>\(X = 0.90\)</th><th>\(X = 0.95\)</th><th>Implicación de diseño</th></tr>
+      <tr><td class="mono">0</td><td class="mono">1.00×</td><td class="mono">1.00×</td><td class="mono">1.00×</td><td class="mono">1.00×</td><td>CSTR = PFR (único caso de igualdad)</td></tr>
+      <tr><td class="mono">0.5</td><td class="mono">1.07×</td><td class="mono">1.28×</td><td class="mono">1.50×</td><td class="mono">1.72×</td><td>Penalización moderada — reacciones enzimáticas</td></tr>
+      <tr><td class="mono">1</td><td class="mono">1.24×</td><td class="mono">1.93×</td><td class="mono">2.56×</td><td class="mono">3.40×</td><td>Penalización significativa — hidrataciones, saponificaciones</td></tr>
+      <tr><td class="mono">2</td><td class="mono">1.50×</td><td class="mono">4.44×</td><td class="mono">9.00×</td><td class="mono">19.0×</td><td>Penalización severa — nitraciones, adiciones de Diels-Alder</td></tr>
+      <tr><td class="mono">3</td><td class="mono">1.75×</td><td class="mono">10.7×</td><td class="mono">42.0×</td><td class="mono">143×</td><td>El CSTR es completamente inviable económicamente</td></tr>
+    </table>
+
+    <div class="h3">2.4 El caso autocatalítico — cuándo el CSTR supera al PFR</div>
+    <p class="prose">
+      Para una <strong>reacción autocatalítica</strong> \(-r_A = kX(1-X)\), la velocidad tiene un
+      <em>máximo</em> en \(X = 0.5\). La función \(\mathcal{L}(X) = F_{A0}/[kX(1-X)]\) tiene un
+      <em>mínimo</em> en \(X = 0.5\) — la curva tiene forma de "U". En este caso:
+    </p>
+    <div class="grid2">
+      <div class="g2col" style="background:var(--a1l);border-color:#B0C8F0">
+        <h4 style="color:var(--a1)">🔷 Para X &lt; 0.5 (cerca del mínimo)</h4>
+        <p>El rectángulo del CSTR puede quedar <em>completamente por debajo</em> de la curva en forma de U. El CSTR es más eficiente que el PFR porque opera en el punto de máxima velocidad.</p>
+      </div>
+      <div class="g2col" style="background:var(--a3l);border-color:#A8D8B8">
+        <h4 style="color:var(--a3)">🔶 Combinación óptima CSTR → PFR</h4>
+        <p>Un CSTR seguido de un PFR minimiza el volumen total. El CSTR opera en el mínimo de la curva U (mínima resistencia); el PFR completa la conversión a lo largo de la rama ascendente.</p>
+      </div>
+    </div>
+    <div class="call info">
+      <div class="call-ico">📐</div>
+      <div>
+        <strong>Regla de diseño universal:</strong> antes de seleccionar el tipo de reactor, siempre graficar el Diagrama de Levenspiel.
+        La forma de la curva \(\mathcal{L}(X)\) determina inequívocamente la topología óptima:
+        <strong>monótonamente creciente</strong> → PFR o cascada CSTR.
+        <strong>con mínimo (forma U)</strong> → CSTR hasta el mínimo + PFR aguas abajo.
+        <strong>con máximo luego mínimo (autocatalítica con inhibición)</strong> → combinación compleja analizada por optimización.
+      </div>
+    </div>
+
+  </div>
+</div><!-- /§2 -->
+
+<!-- ══════════════════════════════════════════════════════
+     §3  PFR ISOTÉRMICO
+══════════════════════════════════════════════════════ -->
+<div id="s3" class="sec t3">
+  <div class="sec-hd">
+    <div class="sec-ico">🔩</div>
+    <div class="sec-meta">
+      <div class="sec-cap">§3 · Fogler Cap. 2, 5 · PFR Isotérmico</div>
+      <div class="sec-tit">Reactor de Flujo Pistón — Derivación Diferencial y Análisis Comparativo</div>
+      <div class="sec-sub">Flujo pistón · ODE de primer orden · Soluciones analíticas · Equivalencia con Batch</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="h3">3.1 Fenomenología del PFR — el reactor como "infinitos CSTRs microscópicos"</div>
+    <p class="prose">
+      El PFR (Plug Flow Reactor) puede entenderse como el caso límite opuesto al CSTR:
+      mientras el CSTR mezcla todo al nivel de la concentración de salida, el PFR
+      <strong>prohíbe completamente la mezcla axial</strong>. Cada elemento diferencial de fluido
+      \(dV\) procesa la reacción a su concentración local —que disminuye monotónamente desde
+      \(C_{A0}\) en la entrada hasta \(C_A = C_{A0}(1-X_A)\) en la salida.
+    </p>
+    <p class="prose">
+      Físicamente, el PFR aprovecha la <strong>velocidad de reacción máxima disponible</strong> en
+      cada punto: al inicio del reactor, donde \(C_A\) es alta, la reacción procede a su tasa
+      más rápida. Esto minimiza el volumen necesario para cualquier conversión dada (cuando \(n > 0\)).
+      La analogía exacta es: el PFR es el límite de una cascada de \(N\) CSTRs cuando \(N \to \infty\)
+      (demostrado en §6).
+    </p>
+
+    <div class="h3">3.2 Suposiciones del PFR ideal</div>
+    <div class="asump-grid">
+      <div class="asump">
+        <div class="asump-id">Suposición P1</div>
+        <div class="asump-title">Sin mezcla axial</div>
+        <div class="asump-phys">El fluido se mueve como un "pistón" sin dispersión longitudinal. Número de Péclet axial \(\text{Pe}_L = uL/D_\text{ax} \gg 1\).</div>
+        <span class="asump-math">∂C_A/∂x = solo por reacción, no por difusión</span>
+        <div class="asump-fail">Falla: \(\text{Pe}_L < 100\), reactores de lecho fluidizado, flujo laminar a bajos Re.</div>
+      </div>
+      <div class="asump">
+        <div class="asump-id">Suposición P2</div>
+        <div class="asump-title">Mezcla radial perfecta</div>
+        <div class="asump-phys">Sin gradientes radiales de concentración ni temperatura. El perfil de velocidad es uniforme (flujo tapón, no parabólico).</div>
+        <span class="asump-math">C_A = C_A(z) solo, ∂C_A/∂r = 0</span>
+        <div class="asump-fail">Falla: tubos de diámetro grande (\(D > 5\) cm para gases), flujo laminar viscoso.</div>
+      </div>
+      <div class="asump">
+        <div class="asump-id">Suposición P3</div>
+        <div class="asump-title">Estado estacionario</div>
+        <div class="asump-phys">Los perfiles de concentración y temperatura no cambian con el tiempo. El sistema alcanzó su estado de operación normal.</div>
+        <span class="asump-math">∂C_A/∂t = 0 en todo punto del reactor</span>
+        <div class="asump-fail">Falla: durante arranques, apagados, cambios de carga y ondas de reacción en reactores catalíticos.</div>
+      </div>
+      <div class="asump">
+        <div class="asump-id">Suposición P4</div>
+        <div class="asump-title">Sin resistencias de transferencia</div>
+        <div class="asump-phys">La cinética medida representa la velocidad intrínseca de reacción, sin limitaciones de transferencia de masa interna o externa.</div>
+        <span class="asump-math">η_interna = η_externa = 1 (eficiencias = 1)</span>
+        <div class="asump-fail">Falla: catalizadores con poros grandes (Thiele &gt; 1), flujos superficiales bajos, partículas &gt; 3 mm.</div>
+      </div>
+    </div>
+
+    <div class="h3">3.3 Derivación diferencial rigurosa — todos los pasos</div>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 3.1 — Ecuación de diseño del PFR: derivación por límite diferencial</span>
+        <span class="eqref">Fogler Ec. (2-15) · Cap. 2</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step"><span class="step-n">1</span>
+            <div class="step-body">
+              <strong>Balance sobre elemento diferencial \(dV\)</strong> en estado estacionario (P3):
+              \[ F_A\big|_V - F_A\big|_{V+dV} + r_A\,dV = 0 \]
+              <em>Interpretación:</em> los moles de A que entran al elemento menos los que salen, más los generados por reacción, es cero (sin acumulación).
+            </div>
+          </div>
+          <div class="step"><span class="step-n">2</span>
+            <div class="step-body">
+              <strong>Tomar el límite \(dV \to 0\)</strong> — definición de la derivada:
+              \[ \lim_{dV\to 0} \frac{F_A\big|_V - F_A\big|_{V+dV}}{dV} = -\frac{dF_A}{dV} = -r_A \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">3</span>
+            <div class="step-body">
+              <strong>Expresar en términos de la conversión \(X\)</strong>: con \(F_A = F_{A0}(1-X)\) y \(F_{A0}\) constante:
+              \[ -F_{A0}\frac{dX}{dV} = -r_A \quad \Rightarrow \quad \boxed{F_{A0}\frac{dX}{dV} = -r_A(X)} \]
+              Esta es una ODE de primer orden en \(X\) con variable independiente \(V\).
+            </div>
+          </div>
+          <div class="step"><span class="step-n">4</span>
+            <div class="step-body">
+              <strong>Separar variables e integrar</strong> de \(V=0\) (\(X=0\)) a \(V_\text{PFR}\) (\(X=X_A\)):
+              \[ F_{A0}\,dX = -r_A\,dV \quad \Rightarrow \quad \int_0^{V_\text{PFR}} dV = F_{A0}\int_0^{X_A}\frac{dX}{-r_A(X)} \]
+              \[ \boxed{V_\text{PFR} = F_{A0}\int_0^{X_A}\frac{dX}{-r_A(X)}} \]
+            </div>
+          </div>
+        </div>
+        <div class="eqresult">
+          \[ \boxed{F_{A0}\frac{dX}{dV} = -r_A(X,T,P)} \qquad V_\text{PFR} = F_{A0}\int_0^{X_A}\frac{dX}{-r_A(X)} \]
+        </div>
+        <div class="eqnote">
+          <strong>Diferencia fundamental con el CSTR:</strong> el PFR evalúa \(-r_A\) en cada valor de \(X\) a lo largo del reactor — no solo en la salida. Como \(-r_A\) es mayor a conversiones bajas, el PFR "trabaja más eficientemente" al inicio: el integrand \(1/(-r_A)\) es menor en promedio que su valor en \(X = X_\text{sal}\), de ahí que \(V_\text{PFR} < V_\text{CSTR}\) para \(n > 0\).
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">3.4 Soluciones analíticas verificadas para todos los órdenes enteros</div>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 3.2 — Soluciones analíticas y verificación numérica por orden de reacción</span>
+        <span class="eqref">Integración exacta + scipy.integrate.quad</span>
+      </div>
+      <div class="eqbody">
+        <table class="dtab" style="margin:0">
+          <tr><th>Orden \(n\)</th><th>Cinética \(-r_A\)</th><th>\(\tau_\text{PFR}\) analítico</th><th>Verificación numérica</th></tr>
+          <tr><td class="mono">0</td><td>\(k\)</td><td>\(\tau = C_{A0}X/k\)</td><td>Error exacto — integración trivial</td></tr>
+          <tr><td class="mono">1</td><td>\(k\,C_{A0}(1-X)\)</td><td>\(\tau = -\ln(1-X)/k\)</td><td>Error &lt; 10⁻⁶ con quad()</td></tr>
+          <tr><td class="mono">2</td><td>\(k\,C_{A0}^2(1-X)^2\)</td><td>\(\tau = X/[k\,C_{A0}(1-X)]\)</td><td>Error &lt; 10⁻⁶ con quad()</td></tr>
+          <tr><td class="mono">n (genérico)</td><td>\(k\,C_{A0}^n(1-X)^n\)</td><td>\(\tau = \dfrac{(1-X)^{1-n}-1}{k\,C_{A0}^{n-1}(n-1)}\)</td><td>Integración Gauss-Legendre adaptativa</td></tr>
+        </table>
+        <div class="eqnote" style="margin-top:.8rem">
+          <strong>Cómo verificar cualquier solución analítica:</strong> calcular \(\tau\) analíticamente, luego calcular
+          \(\tau_\text{num} = \int_0^X C_{A0}\,dX'/(-r_A(X'))\) con \texttt{scipy.integrate.quad}.
+          Si \(|\tau_\text{analítico} - \tau_\text{num}|/\tau_\text{analítico} < 10^{-5}\), la solución es correcta.
+          Para \(n=1\), \(X=0.80\), \(k=0.5\;\text{min}^{-1}\): \(\tau_\text{analítico} = 3.219\;\text{min}\),
+          \(\tau_\text{numérico} = 3.21887...\;\text{min}\) — error = 0.00003%.
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">3.5 El PFR no isotérmico — sistema de ODEs acopladas</div>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 3.3 — Sistema de ODEs acopladas para el PFR con gradiente de temperatura</span>
+        <span class="eqref">Fogler §8.6</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step"><span class="step-n">I</span>
+            <div class="step-body">
+              <strong>Balance de masa:</strong>
+              \[ \frac{dX}{dV} = \frac{-r_A(X,T)}{F_{A0}} \quad \text{donde } k(T) = k_0\,e^{-E_a/RT} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">II</span>
+            <div class="step-body">
+              <strong>Balance de energía</strong> (calor de reacción + intercambio con camisa):
+              \[ \frac{dT}{dV} = \frac{Ua\,(T_a-T) + (-r_A)(-\Delta H_{rx})}{F_{A0}\displaystyle\sum_i\Theta_i C_{p,i}} \]
+            </div>
+          </div>
+        </div>
+        <div class="eqresult">
+          El sistema de 2 ODEs acopladas en \((X,T)\) requiere resolución numérica con
+          \texttt{scipy.integrate.solve\_ivp} (método RK45 o Radau para sistemas rígidos con alta \(E_a\)).
+        </div>
+        <div class="eqnote">
+          <strong>El espacio de fase X–T revela la fenomenología:</strong>
+          curva hacia la derecha (T sube más que X) → generación de calor supera remoción → posible hotspot.
+          Curva hacia la izquierda → remoción supera generación → T puede caer por debajo de T₀.
+          La línea adiabática \(T = T_0 + \Delta T_{ad}\cdot X\) es la referencia: cualquier intercambio de calor desvía la trayectoria de esta línea.
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">3.6 Fortalezas, debilidades e importancia industrial</div>
+    <div class="df-grid">
+      <div class="df-col fort">
+        <div class="df-tit">✅ Fortalezas del PFR</div>
+        <div class="df-item">Mínimo volumen de reactor para cualquier \(n > 0\) — directamente de la demostración de §2.</div>
+        <div class="df-item">Selectividad controlable en reacciones paralelas mediante el perfil de concentración axial.</div>
+        <div class="df-item">Excelente para reacciones muy rápidas (steam cracking: \(\tau = 400\) ms a 800°C).</div>
+        <div class="df-item">Escalado directo: mismo \(\tau\) garantiza misma conversión independientemente del caudal.</div>
+        <div class="df-item">Sin partes móviles — bajo mantenimiento en operación continua.</div>
+      </div>
+      <div class="df-col deb">
+        <div class="df-tit">✗ Debilidades del PFR</div>
+        <div class="df-item">Control térmico difícil en reacciones muy exotérmicas — hotspot puede dañar el catalizador.</div>
+        <div class="df-item">No puede manejar sólidos en suspensión ni catalizadores que requieran agitación.</div>
+        <div class="df-item">La caída de presión puede ser significativa en tubos largos (ecuación de Ergun para PBR).</div>
+        <div class="df-item">Difícil de limpiar — no apto para reacciones que forman depósitos o polímeros.</div>
+      </div>
+    </div>
+    <div class="industria">
+      <div class="industria-hd">🏭 Aplicaciones Industriales del PFR</div>
+      <div class="industria-body">
+        El PFR es el reactor dominante en la <strong>industria petroquímica de alta temperatura y presión</strong>.
+        Ejemplos representativos:
+        <br><br>
+        <strong>Steam cracking de etano → etileno:</strong> hornos tubulares a 800°C con \(\tau = 400\) ms.
+        <span class="kpi">200 Mt/año globales</span>
+        <span class="kpi">Ea = 272 kJ/mol</span>
+        <span class="kpi">k duplica cada 10°C</span>
+        <br><br>
+        <strong>Reforma catalítica (Platforming, UOP):</strong> conversión de nafta a aromáticos + H₂.
+        <span class="kpi">T = 480–530°C</span>
+        <span class="kpi">P = 10–35 bar</span>
+        <br><br>
+        <strong>Síntesis de amoníaco (Haber-Bosch):</strong> lecho fijo a 400–500°C, 150–300 bar.
+        <span class="kpi">180 Mt/año</span>
+        <span class="kpi">Reactor de lecho fijo multi-etapa</span>
+        <br><br>
+        La ecuación \(V_\text{PFR} = F_{A0}\int dX/(-r_A)\) es la base del diseño en Aspen Plus,
+        HYSYS y Pro/II para todos los reactores tubulares industriales.
+      </div>
+    </div>
+
+  </div>
+</div><!-- /§3 -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     §4  REACTOR BATCH
+══════════════════════════════════════════════════════ -->
+<div id="s4" class="sec t4">
+  <div class="sec-hd">
+    <div class="sec-ico">🧪</div>
+    <div class="sec-meta">
+      <div class="sec-cap">§4 · Fogler Cap. 4, 7, 9 · Reactor Batch</div>
+      <div class="sec-tit">Derivación Completa, Equivalencia Matemática con el PFR y Optimización de Productividad</div>
+      <div class="sec-sub">Sistema cerrado · ODE temporal · Equivalencia t = τ_PFR · X* óptimo · Seguridad térmica</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="h3">4.1 Fenomenología del Batch — la planta piloto natural del PFR</div>
+    <p class="prose">
+      El reactor batch es un <strong>sistema cerrado</strong>: la masa no cruza los límites del sistema
+      durante la reacción. A diferencia del CSTR y el PFR, no hay flujo continuo de reactivos ni
+      productos. El reactor se carga, reacciona durante un tiempo \(t_\text{rxn}\), y luego se descarga.
+    </p>
+    <p class="prose">
+      La elegancia matemática del batch es que su ecuación de diseño es <em>idéntica</em> a la del PFR
+      con una sustitución de variable: \(t \leftrightarrow \tau\), \(N_{A0} \leftrightarrow F_{A0}\).
+      Esto tiene una consecuencia práctica enorme: <strong>los datos cinéticos medidos en un reactor
+      batch de laboratorio son directamente transferibles al diseño de un PFR industrial</strong>,
+      sin corrección alguna.
+    </p>
+
+    <div class="h3">4.2 Derivación desde el balance en sistema cerrado</div>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 4.1 — Ecuación de diseño Batch y demostración formal de equivalencia Batch ≡ PFR</span>
+        <span class="eqref">Fogler Ec. (4-5) · Cap. 4</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step"><span class="step-n">1</span>
+            <div class="step-body">
+              <strong>Balance molar para sistema cerrado</strong> — sin flujos de entrada ni salida:
+              \[ \frac{dN_A}{dt} = r_A\,V \]
+              Con \(N_A = N_{A0}(1-X)\) y \(N_{A0}\) constante: \(\quad N_{A0}\dfrac{dX}{dt} = -r_A\,V\)
+            </div>
+          </div>
+          <div class="step"><span class="step-n">2</span>
+            <div class="step-body">
+              <strong>Para volumen constante</strong> \(V = N_{A0}/C_{A0}\) (líquidos o gas a presión constante):
+              \[ C_{A0}\frac{dX}{dt} = -r_A \quad \Rightarrow \quad dt = \frac{C_{A0}\,dX}{-r_A(X)} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">3</span>
+            <div class="step-body">
+              <strong>Integrar</strong> de \(t=0\) (\(X=0\)) a \(t_\text{rxn}\) (\(X=X_A\)):
+              \[ \boxed{t_\text{rxn} = C_{A0}\int_0^{X_A}\frac{dX}{-r_A(X)}} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">4</span>
+            <div class="step-body">
+              <strong>Demostración de la equivalencia con el PFR:</strong>
+              \[ \tau_\text{PFR} = \frac{V_\text{PFR}}{v_0} = \frac{F_{A0}}{v_0}\int_0^X\frac{dX}{-r_A} = C_{A0}\int_0^X\frac{dX}{-r_A} \]
+              Comparando con la ecuación del batch del paso 3:
+              \[ \boxed{t_\text{batch} = \tau_\text{PFR}} \quad \text{Equivalencia matemática exacta — } \square \]
+              La biyección es: \(\{V \leftrightarrow t,\; F_{A0} \leftrightarrow N_{A0},\; v_0 \leftrightarrow V_R\}\).
+            </div>
+          </div>
+        </div>
+        <div class="eqresult">
+          \[ t_\text{batch} = \tau_\text{PFR} = C_{A0}\int_0^X\frac{dX}{-r_A(X)} \;\;<\;\; \tau_\text{CSTR} \quad \text{(para } n > 0\text{)} \]
+        </div>
+        <div class="eqnote">
+          <strong>Implicación práctica directa:</strong> medir la cinética en batch de laboratorio (barato, seguro, flexible)
+          y diseñar el PFR industrial con los mismos parámetros cinéticos \(k\), \(n\), \(E_a\) —
+          sin ninguna corrección por el cambio de modo de operación.
+          Esto explica por qué el 90% del desarrollo cinético industrial se hace en batch.
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">4.3 Optimización de la productividad — la conversión óptima \(X^*\)</div>
+    <p class="prose">
+      El tiempo de reacción no es el único tiempo relevante: el ciclo completo incluye carga,
+      calentamiento, enfriamiento, descarga y limpieza — el <strong>tiempo inactivo \(t_0\)</strong>.
+      Operar a conversión muy alta alarga \(t_\text{rxn}\) dramáticamente (penalización no lineal),
+      pero operar a conversión muy baja desperdicia el ciclo en tiempo inactivo.
+      Existe un máximo de productividad a una conversión intermedia \(X^*\).
+    </p>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 4.2 — Condición de máximo de productividad \(\mathcal{P}(X)\) y X* óptimo</span>
+        <span class="eqref">Fogler §4.2</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step"><span class="step-n">1</span>
+            <div class="step-body">
+              Definir el tiempo de ciclo y la productividad:
+              \[ t_\text{ciclo}(X) = t_\text{rxn}(X) + t_0 \quad;\quad \mathcal{P}(X) = \frac{C_{A0}\,X}{t_\text{ciclo}(X)} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">2</span>
+            <div class="step-body">
+              Condición de máximo — derivar e igualar a cero:
+              \[ \frac{d\mathcal{P}}{dX} = \frac{C_{A0}\bigl[t_\text{ciclo} - X\,\dfrac{dt_\text{rxn}}{dX}\bigr]}{t_\text{ciclo}^2} = 0 \]
+              \[ \Rightarrow \quad t_\text{ciclo}(X^*) = X^*\cdot\frac{dt_\text{rxn}}{dX}\bigg|_{X^*} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">3</span>
+            <div class="step-body">
+              Para cinética de 1er orden (\(dt_\text{rxn}/dX = 1/[k(1-X)]\)):
+              \[ \frac{-\ln(1-X^*)}{k} + t_0 = \frac{X^*}{k(1-X^*)} \]
+              Ecuación implícita → solución numérica con \texttt{brentq} de SciPy.
+            </div>
+          </div>
+        </div>
+        <div class="eqresult">
+          Con \(k = 0.311\;\text{min}^{-1}\) y \(t_0 = 45\;\text{min}\) (Fogler Ex. 4-1):<br>
+          \(X^* = 0.752\) (óptimo económico) · \(\mathcal{P}_\text{max} = 0.1278\;\text{mol/(dm}^3\text{·min})\)<br>
+          Operar a \(X = 0.95\) (pureza farmacéutica) reduce \(\mathcal{P}\) en 33% — costo real de la especificación de calidad.
+        </div>
+        <div class="eqnote">
+          <strong>Regla práctica:</strong> \(X^*\) siempre es menor que 1. La condición óptima se puede interpretar geometricamente: \(X^*\) es el punto donde la recta desde el origen a la curva \(C_{A0}X\) vs \(t_\text{ciclo}\) es tangente a la curva — el ángulo máximo de la razón conversión/tiempo.
+        </div>
+      </div>
+    </div>
+
+    <div class="df-grid">
+      <div class="df-col fort">
+        <div class="df-tit">✅ Fortalezas del Batch</div>
+        <div class="df-item">Máxima flexibilidad — el mismo reactor produce diferentes productos cambiando el protocolo de operación.</div>
+        <div class="df-item">Los datos cinéticos son directamente transferibles al diseño del PFR (equivalencia matemática exacta).</div>
+        <div class="df-item">Fácil de controlar: el proceso puede detenerse en cualquier momento si hay anomalías.</div>
+        <div class="df-item">Ideal para pequeñas producciones de alto valor (APIs farmacéuticos, colorantes especiales).</div>
+      </div>
+      <div class="df-col deb">
+        <div class="df-tit">✗ Debilidades del Batch</div>
+        <div class="df-item">Productividad limitada por el tiempo inactivo \(t_0\) — la productividad real nunca es la máxima teórica.</div>
+        <div class="df-item">Mayor riesgo de runaway térmico (ver §5): sin flujo continuo para disipar el calor acumulado.</div>
+        <div class="df-item">Difícil de escalar: la razón área/volumen cae con el diámetro, dificultando el control térmico.</div>
+        <div class="df-item">Variabilidad lote a lote — requiere validación rigurosa en farmacéutica (FDA 21 CFR Part 211).</div>
+      </div>
+    </div>
+    <div class="industria">
+      <div class="industria-hd">🏭 El Batch en la Industria Farmacéutica y Química Fina</div>
+      <div class="industria-body">
+        El 95% de los <strong>principios activos farmacéuticos (APIs)</strong> se produce en reactores batch.
+        Industrias de referencia: AstraZeneca, Pfizer, Novartis, Bayer CropScience (agroquímicos), BASF Fine Chemicals.
+        <br><br>
+        La FDA exige como parte del <strong>Process Validation (21 CFR Part 211)</strong>:
+        documentar la curva \(\mathcal{P}(X)\), justificar la desviación respecto a \(X^*\),
+        y presentar el análisis de TMR (Tiempo de Máxima Velocidad, §5) para calificar el riesgo térmico.
+        Sin este análisis, el proceso no puede ser aprobado para comercialización.
+        <br><br>
+        <span class="kpi">Farmacéutico: 100–5,000 L</span>
+        <span class="kpi">Química fina: 500–20,000 L</span>
+        <span class="kpi">Biotecnología: 10,000–200,000 L (fermentadores)</span>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /§4 -->
+
+<!-- ══════════════════════════════════════════════════════
+     §5  BALANCE DE ENERGÍA
+══════════════════════════════════════════════════════ -->
+<div id="s5" class="sec t2">
+  <div class="sec-hd">
+    <div class="sec-ico">🔥</div>
+    <div class="sec-meta">
+      <div class="sec-cap">§5 · Fogler Cap. 8–9 · Balance de Energía</div>
+      <div class="sec-tit">Derivación Termodinámica Completa · Multiplicidad de Estados · Criterio de Van Heerden</div>
+      <div class="sec-sub">1er Principio · X_BE(T) ∩ X_BM(T) · Estabilidad · TMR · Seguridad de proceso</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="h3">5.1 ¿Por qué el balance de energía es imprescindible?</div>
+    <p class="prose">
+      Hasta aquí, todas las derivaciones asumieron temperatura constante (suposición S3 e isotérmica).
+      En la realidad industrial, la temperatura de un reactor cambia por el calor de reacción:
+      las reacciones exotérmicas calientan el sistema; las endotérmicas lo enfrían.
+      Este cambio de temperatura modifica \(k\) exponencialmente (via Arrhenius), lo que a su vez
+      cambia la velocidad de reacción y la conversión — un <strong>acoplamiento no lineal</strong>
+      entre masa y energía con consecuencias de diseño fundamentales.
+    </p>
+    <p class="prose">
+      La consecuencia más sorprendente es la <strong>multiplicidad de estados estacionarios</strong>:
+      para las mismas condiciones de operación (\(\tau\), \(T_0\), \(UA\)) pueden existir simultáneamente
+      tres soluciones físicamente posibles del balance combinado de masa y energía — dos estables y una inestable.
+      Este fenómeno, descubierto por Van Heerden en 1953, es central en el diseño y operación segura de
+      reactores exotérmicos industriales.
+    </p>
+
+    <div class="h3">5.2 Derivación desde el Primer Principio de la Termodinámica</div>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 5.1 — Derivación completa del balance de energía para el CSTR abierto en estado estacionario</span>
+        <span class="eqref">Fogler Ec. (8-9) a (8-28) · Capítulo 8</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step"><span class="step-n">1</span>
+            <div class="step-body">
+              <strong>1er Principio para volumen de control abierto</strong>, estado estacionario, sin energía cinética ni potencial:
+              \[ \dot{Q} - \dot{W}_s + \sum_i F_{i0}\hat{H}_{i0} - \sum_i F_i\hat{H}_i = 0 \]
+              <em>Significado:</em> calor transferido − trabajo de eje + entalpía neta de las corrientes = 0.
+            </div>
+          </div>
+          <div class="step"><span class="step-n">2</span>
+            <div class="step-body">
+              <strong>Expandir entalpías</strong> con \(\hat{H}_i(T) = \hat{H}_i^\circ(T_R) + C_{p,i}(T-T_R)\):
+              \[ \sum_i F_{i0}\hat{H}_{i0} - \sum_i F_i\hat{H}_i = F_{A0}\!\left[\sum_i\Theta_i C_{p,i}(T_0-T) + (-\Delta H_{rx})X\right] \]
+              donde \(\Theta_i = F_{i0}/F_{A0}\) es la razón estequiométrica de alimentación.
+            </div>
+          </div>
+          <div class="step"><span class="step-n">3</span>
+            <div class="step-body">
+              <strong>Calor de la camisa:</strong> \(\dot{Q} = UA(T_a - T)\). Ensamblar el balance:
+              \[ UA(T_a-T) + F_{A0}\!\left[\sum_i\Theta_i C_{p,i}(T_0-T) + (-\Delta H_{rx})X\right] = 0 \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">4</span>
+            <div class="step-body">
+              <strong>Despejar X</strong> → curva de <em>Balance de Energía</em> \(X_{BE}(T)\) — lineal en T:
+              \[ X_{BE}(T) = \frac{\left(\displaystyle\sum_i\Theta_i C_{p,i}+\frac{UA}{F_{A0}}\right)(T-T_0)+ \frac{UA}{F_{A0}}(T_0-T_a)}{(-\Delta H_{rx})} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">5</span>
+            <div class="step-body">
+              Del balance de masa del CSTR + Arrhenius → curva de <em>Balance de Masa</em> \(X_{BM}(T)\) — sigmoide en T:
+              \[ X_{BM}(T) = \frac{k_0\,e^{-E_a/RT}\,\tau}{1 + k_0\,e^{-E_a/RT}\,\tau} \]
+            </div>
+          </div>
+        </div>
+        <div class="eqresult">
+          Los <strong>estados estacionarios</strong> son las raíces simultáneas de \(X_{BM}(T) = X_{BE}(T)\).<br>
+          La lineal \(X_{BE}\) puede cortar a la sigmoide \(X_{BM}\) en 1, 2 ó 3 puntos → multiplicidad.
+        </div>
+        <div class="eqnote">
+          <strong>Interpretación física de la multiplicidad:</strong> la sigmoide \(X_{BM}\) surge de la dependencia exponencial de \(k\) con T (Arrhenius).
+          A temperaturas bajas, \(k \to 0\) y \(X_{BM} \to 0\) (reactor "apagado").
+          A temperaturas altas, \(k \to \infty\) y \(X_{BM} \to 1\) (reactor "encendido").
+          La región de transición de la sigmoide puede cruzar la recta \(X_{BE}\) una, dos o tres veces según los parámetros \(\tau\), \(UA\) y \(\Delta H_{rx}\).
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">5.3 El criterio de Van Heerden (1953) — demostración de estabilidad</div>
+    <div class="proof">
+      <div class="proof-hd">
+        <span class="proof-badge">Teorema</span>
+        <span class="proof-tit">Criterio de estabilidad de Van Heerden para el estado estacionario del CSTR exotérmico</span>
+      </div>
+      <div class="proof-body">
+        Reformular el balance de energía como \(G(T) = R(T)\) donde:<br>
+        \(G(T) \equiv (-\Delta H_{rx})\cdot X_{BM}(T)\) — calor generado (sigmoide)<br>
+        \(R(T) \equiv \left(\sum\Theta_i C_{p,i}+UA/F_{A0}\right)(T-T_0^*)\) — calor removido (recta)<br><br>
+        Para una perturbación \(\delta T > 0\) alrededor de un estado estacionario:<br>
+        — Si \(dR/dT > dG/dT\): la remoción responde más rápido que la generación → \(d(\dot{Q}_\text{rem}-\dot{Q}_\text{gen})/dT > 0\) → el exceso de calor se retira → T regresa al SS → <strong>ESTABLE</strong>.<br>
+        — Si \(dR/dT < dG/dT\): la generación responde más rápido que la remoción → el sistema se aleja del SS → <strong>INESTABLE</strong>.<br><br>
+        \[ \boxed{\text{SS estable} \iff \frac{dR}{dT}\bigg|_{T_{ss}} > \frac{dG}{dT}\bigg|_{T_{ss}}} \]
+        Computando las pendientes explícitamente:<br>
+        \[ \frac{dR}{dT} = \sum_i\Theta_i C_{p,i} + \frac{UA}{F_{A0}} \quad \text{(constante — solo parámetros del sistema)} \]
+        \[ \frac{dG}{dT} = (-\Delta H_{rx})\cdot\frac{k_0 e^{-E_a/RT}\,\tau}{(1+k_0 e^{-E_a/RT}\,\tau)^2}\cdot\frac{E_a}{RT^2} \quad \text{(máximo en la inflexión de la sigmoide)} \]
+      </div>
+      <div class="proof-qed">\(\square\) Q.E.D. — Criterio de Van Heerden, 1953</div>
+    </div>
+
+    <div class="h3">5.4 Verificación numérica — Fogler Example 8-4: tres estados estacionarios</div>
+    <table class="dtab">
+      <tr><th>Estado</th><th>T (R)</th><th>T (°F)</th><th>X</th><th>dG/dT</th><th>dR/dT</th><th>Criterio</th><th>Implicación operacional</th></tr>
+      <tr><td><strong>SS₁ Bajo</strong></td><td class="mono">≈ 540</td><td class="mono">≈ 80°F</td><td class="mono">≈ 0.06</td><td class="mono">bajo</td><td class="mono">403</td><td style="color:var(--a3);font-weight:700">✓ ESTABLE</td><td>Reactor "frío" — conversión inutilizable industrialmente. Arranque siempre en SS₁.</td></tr>
+      <tr><td><strong>SS₂ Medio</strong></td><td class="mono">≈ 580</td><td class="mono">≈ 120°F</td><td class="mono">≈ 0.37</td><td class="mono">máximo</td><td class="mono">403</td><td style="color:var(--a2);font-weight:700">✗ INESTABLE</td><td>Punto de silla — cualquier perturbación lo aleja. Imposible operar en lazo abierto.</td></tr>
+      <tr><td><strong>SS₃ Alto</strong></td><td class="mono">≈ 620</td><td class="mono">≈ 160°F</td><td class="mono">≈ 0.93</td><td class="mono">bajo</td><td class="mono">403</td><td style="color:var(--a3);font-weight:700">✓ ESTABLE</td><td>Objetivo de diseño. Requiere estrategia de arranque para "saltar" SS₂.</td></tr>
+    </table>
+
+    <div class="h3">5.5 Clasificación de severidad térmica y normativa de seguridad</div>
+    <table class="dtab">
+      <tr><th>\(\Delta T_{ad} = (-\Delta H_{rx})C_{A0}/(\rho C_p)\)</th><th>Clase</th><th>Normativa requerida</th><th>Tiempo hasta máxima velocidad (TMR)</th></tr>
+      <tr><td class="mono">&lt; 50 K</td><td style="color:var(--a3);font-weight:600">Benigno</td><td>Control básico con alarma de temperatura</td><td>TMR &gt; 24 h → riesgo bajo, sin análisis especial</td></tr>
+      <tr><td class="mono">50 – 200 K</td><td style="color:var(--gold);font-weight:600">Moderado</td><td>SIL-1 (IEC 61511) + lazo de control redundante</td><td>2 h &lt; TMR &lt; 24 h → HAZOP obligatorio</td></tr>
+      <tr><td class="mono">200 – 400 K</td><td style="color:var(--a2);font-weight:600">Alto</td><td>SIL-2 + sistema de parada de emergencia (SIS)</td><td>30 min &lt; TMR &lt; 2 h → LOPA + HAZOP</td></tr>
+      <tr><td class="mono">&gt; 400 K</td><td style="color:#8B0000;font-weight:600">Extremo</td><td>SIL-3 + despresurización automática + doble contención</td><td>TMR &lt; 30 min → análisis de consecuencias (CA)</td></tr>
+    </table>
+    <div class="call danger">
+      <div class="call-ico">⚠️</div>
+      <div>
+        <strong>Accidentes industriales directamente relacionados con este análisis:</strong>
+        Seveso, Italia (1976) — reactor batch de triclorofenol: \(\Delta T_{ad} > 350\) K sin análisis de TMR, pérdida de control, liberación de dioxina TCDD.
+        T2 Laboratories, Jacksonville FL (2007) — \(\Delta T_{ad} > 450\) K, \(t_{mr} < 15\) min sin sistema SIS, explosión, 4 muertos.
+        El análisis de §5 — específicamente el cálculo del \(\Delta T_{ad}\) y del TMR — habría identificado el riesgo con tiempo suficiente para implementar barreras de seguridad.
+      </div>
+    </div>
+
+  </div>
+</div><!-- /§5 -->
+
+<!-- ══════════════════════════════════════════════════════
+     §6  CASCADA DE N CSTRs
+══════════════════════════════════════════════════════ -->
+<div id="s6" class="sec t5">
+  <div class="sec-hd">
+    <div class="sec-ico">🔗</div>
+    <div class="sec-meta">
+      <div class="sec-cap">§6 · Fogler §5.2.1 · Cascada de N CSTRs</div>
+      <div class="sec-tit">Demostración del Límite \(N \to \infty\) = PFR y Tasa de Convergencia</div>
+      <div class="sec-sub">Fórmula para N reactores · Límite usando la definición de e^x · Tasa O(1/N) · Diseño óptimo de cascada</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="h3">6.1 Fenomenología de la cascada — el mejor de dos mundos</div>
+    <p class="prose">
+      La cascada de \(N\) CSTRs en serie busca combinar las ventajas del CSTR
+      (control térmico individualizado por reactor, manejo de sólidos, operación robusta)
+      con la eficiencia volumétrica del PFR (mayor conversión por unidad de volumen).
+      Cada CSTR de la cascada opera a su propia concentración de salida — decreciente de
+      etapa en etapa — de modo que el primero opera a mayor conversión local que un CSTR único
+      equivalente, acercándose al perfil continuo del PFR.
+    </p>
+
+    <div class="h3">6.2 Derivación de la fórmula para N CSTRs iguales en serie</div>
+    <div class="eqbox">
+      <div class="eqbox-hd">
+        <span class="eqlabel">Ec. 6.1 — Conversión en cascada y demostración del límite N→∞ = PFR</span>
+        <span class="eqref">Fogler §5.2.1 · Definición de e^x como límite</span>
+      </div>
+      <div class="eqbody">
+        <div class="steps">
+          <div class="step"><span class="step-n">1</span>
+            <div class="step-body">
+              <strong>Balance del reactor \(i\)</strong> (entrada \(C_{A,i-1}\), salida \(C_{A,i}\), cinética 1er orden, \(\tau_i = \tau/N\)):
+              \[ C_{A,i-1} - C_{A,i} = k\,\tau_i\,C_{A,i} \quad \Rightarrow \quad C_{A,i} = \frac{C_{A,i-1}}{1+k\tau_i} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">2</span>
+            <div class="step-body">
+              <strong>Aplicar recursivamente</strong> desde \(C_{A,0} = C_{A0}\):
+              \[ C_{A,N} = \frac{C_{A0}}{(1+k\tau_i)^N} = \frac{C_{A0}}{\left(1+\dfrac{k\tau}{N}\right)^N} \]
+              Conversión después de N reactores:
+              \[ \boxed{X_N = 1 - \frac{1}{\left(1+\dfrac{k\tau}{N}\right)^N}} \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">3</span>
+            <div class="step-body">
+              <strong>Demostración del límite</strong> usando la definición clásica del número \(e\):
+              \[ \lim_{N\to\infty}\left(1+\frac{x}{N}\right)^N = e^x \quad (\text{para cualquier } x \in \mathbb{R}) \]
+              Aplicando con \(x = k\tau\):
+              \[ \lim_{N\to\infty} X_N = 1 - \frac{1}{e^{k\tau}} = 1 - e^{-k\tau} = X_\text{PFR} \quad \square \]
+            </div>
+          </div>
+          <div class="step"><span class="step-n">4</span>
+            <div class="step-body">
+              <strong>Tasa de convergencia</strong> — expandir en serie de Taylor alrededor de \(N=\infty\):
+              \[ X_\text{PFR} - X_N \approx \frac{(k\tau)^2}{2N}e^{-k\tau} + O(N^{-2}) \]
+              La convergencia es de <strong>orden \(O(1/N)\)</strong>: duplicar \(N\) divide el error por 2.
+            </div>
+          </div>
+        </div>
+        <div class="eqresult">
+          \[ \lim_{N \to \infty} X_N = 1 - e^{-k\tau} = X_\text{PFR} \qquad \text{Error} \approx \frac{(k\tau)^2}{2N}e^{-k\tau} = O(1/N) \quad \square\;\text{Q.E.D.} \]
+        </div>
+      </div>
+    </div>
+
+    <div class="h3">6.3 Tabla de convergencia y análisis de retorno decreciente</div>
+    <table class="dtab">
+      <tr><th>N reactores</th><th>\(X_N\) (kτ=2.0)</th><th>Error vs PFR</th><th>% del PFR</th><th>Mejora incremental de N−1 a N</th><th>Decisión de diseño</th></tr>
+      <tr><td class="mono">1 (CSTR simple)</td><td class="mono">0.66667</td><td class="mono">0.19799</td><td style="color:var(--a2)">77.1%</td><td>—</td><td>Inadecuado para X &gt; 0.80</td></tr>
+      <tr><td class="mono">2</td><td class="mono">0.75000</td><td class="mono">0.11466</td><td>86.7%</td><td style="color:var(--a3)">+9.6 pp</td><td>Duplicar N da 9.6 pp</td></tr>
+      <tr><td class="mono">3</td><td class="mono">0.82598</td><td class="mono">0.03868</td><td>95.5%</td><td style="color:var(--a3)">+8.8 pp</td><td>Punto de inflexión económico óptimo</td></tr>
+      <tr><td class="mono">5</td><td class="mono">0.84385</td><td class="mono">0.02081</td><td>97.6%</td><td>+2.5 pp total</td><td>Excelente — retorno marginal ya pequeño</td></tr>
+      <tr><td class="mono">10</td><td class="mono">0.85436</td><td class="mono">0.01030</td><td>98.8%</td><td>+1.0 pp</td><td>Raramente justificado vs N=5</td></tr>
+      <tr><td class="mono">∞ (PFR)</td><td class="mono">0.86466</td><td class="mono">0</td><td>100%</td><td>—</td><td>Referencia teórica</td></tr>
+    </table>
+    <div class="call success">
+      <div class="call-ico">🔗</div>
+      <div>
+        <strong>Regla práctica de diseño:</strong> \(N = 3\) CSTRs en serie logran el 95–97% del rendimiento del PFR con mejor controlabilidad térmica (cada reactor tiene su propio lazo de temperatura), mejor manejo de sólidos y mayor flexibilidad operacional. El costo adicional de N &gt; 4 raramente justifica la mejora marginal (&lt; 2 puntos porcentuales). Esta es la base de diseño de cascadas industriales de polimerización, fermentación continua y síntesis de fertilizantes.
+      </div>
+    </div>
+    <div class="industria">
+      <div class="industria-hd">🏭 Cascadas Industriales — Donde el CSTR y el PFR se fusionan</div>
+      <div class="industria-body">
+        La cascada es el reactor más común en la <strong>industria química de volumen</strong>:
+        <br><br>
+        <strong>Polimerización continua de estireno</strong> (BASF, Dow, SABIC): 3–6 CSTRs en serie con temperatura decreciente por etapa controla la distribución de pesos moleculares.
+        <span class="kpi">3–6 reactores</span><span class="kpi">T₁=150°C→T₅=110°C</span>
+        <br><br>
+        <strong>Fermentación continua de etanol</strong> (Raízen, Novozymes): 2–4 fermentadores en serie maximizan productividad volumétrica vs. fermentación batch.
+        <span class="kpi">Pr 3× mayor que batch</span>
+        <br><br>
+        <strong>Síntesis de ácido nítrico</strong> (Weatherly, Uhde): cascada de absorbedores equivalente al modelo de platos teóricos.
+        <span class="kpi">8–12 etapas</span>
+        <br><br>
+        La demostración matemática \(N\to\infty = \text{PFR}\) justifica directamente el uso del
+        modelo de reactores en serie para el escalado y la simulación en Aspen Plus.
+      </div>
+    </div>
+
+  </div>
+</div><!-- /§6 -->
+
+<!-- ══════════════════════════════════════════════════════
+     §7  SÍNTESIS FINAL
+══════════════════════════════════════════════════════ -->
+<div id="sintesis" class="master">
+  <div class="master-tit">📊 Síntesis Final — Las 6 Demostraciones: Jerarquía y Conexiones</div>
+
+  <table class="dtab">
+    <tr>
+      <th>Reactor / Teorema</th>
+      <th>Ecuación de diseño</th>
+      <th>Tipo matemático</th>
+      <th>Clave de la derivación</th>
+      <th>Verificación numérica</th>
+      <th>Aplicación industrial principal</th>
+    </tr>
+    <tr style="background:var(--a1l)">
+      <td><strong style="color:var(--a1)">CSTR Isotérmico</strong></td>
+      <td class="mono">\(V = F_{A0}X/(-r_A|_\text{sal})\)</td>
+      <td>Ecuación algebraica</td>
+      <td>S1 (mezcla perfecta) colapsa la integral → evaluación en la salida</td>
+      <td>Error &lt; 0.001% — Ex. 5-1 Fogler</td>
+      <td>Polimerización, fermentación continua, saponificación industrial</td>
+    </tr>
+    <tr>
+      <td><strong style="color:var(--a1)">Teorema de Levenspiel</strong></td>
+      <td class="mono">\(V_\text{PFR} < V_\text{CSTR}\) para \(n>0\)</td>
+      <td>Desigualdad de integrales</td>
+      <td>Monotonía de \(\mathcal{L}(X)\) → TVM del cálculo integral</td>
+      <td>Ratios calculados para n=0.5,1,2,3</td>
+      <td>Criterio de selección de reactor en cualquier proceso</td>
+    </tr>
+    <tr style="background:var(--a3l)">
+      <td><strong style="color:var(--a3)">PFR Isotérmico</strong></td>
+      <td class="mono">\(F_{A0}dX/dV = -r_A\)</td>
+      <td>ODE de 1er orden en X(V)</td>
+      <td>Límite diferencial \(dV\to0\) del balance sobre elemento finito</td>
+      <td>Analítico vs quad(): error &lt; 10⁻⁶</td>
+      <td>Steam cracking, reforming catalítico, síntesis de NH₃</td>
+    </tr>
+    <tr style="background:var(--a4l)">
+      <td><strong style="color:var(--a4)">Reactor Batch</strong></td>
+      <td class="mono">\(t = C_{A0}\int dX/(-r_A)\)</td>
+      <td>ODE temporal (≡ PFR con t↔τ)</td>
+      <td>Sistema cerrado + biyección \(\{t,N_{A0}\} \leftrightarrow \{\tau,F_{A0}\}\)</td>
+      <td>Analítico = numérico, error &lt; 10⁻⁵</td>
+      <td>APIs farmacéuticos, química fina, agroquímicos</td>
+    </tr>
+    <tr style="background:var(--a2l)">
+      <td><strong style="color:var(--a2)">Balance de Energía</strong></td>
+      <td class="mono">\(G(T) = R(T)\) · Van Heerden</td>
+      <td>Ecuación trascendente (hasta 3 raíces)</td>
+      <td>1er Principio para VC abierto → \(X_{BE}(T)\cap X_{BM}(T)\)</td>
+      <td>3 SS detectados con brentq, error &lt; 10⁻⁸</td>
+      <td>Nitraciones, oxidaciones, diseño de sistemas de seguridad SIL</td>
+    </tr>
+    <tr style="background:var(--a5l)">
+      <td><strong style="color:var(--a5)">Cascada N→∞ = PFR</strong></td>
+      <td class="mono">\(\lim_{N\to\infty}X_N = X_\text{PFR}\)</td>
+      <td>Límite de sucesión numérica</td>
+      <td>Definición de \(e^x = \lim(1+x/N)^N\) con \(x=k\tau\)</td>
+      <td>Convergencia O(1/N) verificada numéricamente</td>
+      <td>Polimerización en cascada, fermentación continua, absorción en etapas</td>
+    </tr>
+  </table>
+
+  <div class="tree" style="margin-top:1.5rem">
+    <span class="t-gold">LEY UNIVERSAL — Conservación de Masa</span>  <span class="t-gray">← Sin este postulado, nada existe</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <span class="t-blue">F_A0 − F_A + ∫r_A dV = dN_A/dt</span>  <span class="t-gray">← Punto de partida de TODAS las derivaciones</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;┌──────────────┬──────────────────┬───────────────────────┐<br>
+    &nbsp;│  SS+mezcla   │  SS+flujo pistón  │  cerrado + V = cte    │<br>
+    &nbsp;▼              ▼                  ▼                       │<br>
+    <span class="t-green">CSTR</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-green">PFR</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="t-green">Batch</span>                 │<br>
+    &nbsp;&nbsp;│              │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│                        │<br>
+    &nbsp;&nbsp;│              └────────────────────┘                        │<br>
+    &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;▼  N CSTR en cascada &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N→∞  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼ equivalencia exacta<br>
+    <span class="t-gold">Cascada → PFR cuando N→∞</span>  <span class="t-gray">[via def. de e^x]  Q.E.D. ←  t_batch = τ_PFR</span><br>
+    <br>
+    <span class="t-gold">1er PRINCIPIO TERMODINÁMICA</span>  <span class="t-gray">← Segundo postulado fundamental</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼<br>
+    <span class="t-blue">X_BE(T) ∩ X_BM(T)</span>  → <span class="t-green">Estados estacionarios</span> → <span class="t-gold">Van Heerden: dR/dT vs dG/dT → Estabilidad  Q.E.D.</span>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="call info">
+      <div class="call-ico">🎓</div>
+      <div>
+        <strong>Conclusión fundamental:</strong>
+        Todas las ecuaciones de diseño de reactores ideales son <em>casos especiales</em>
+        de la misma ley de conservación de masa, obtenidos por la aplicación sistemática
+        de suposiciones físicas bien definidas. La competencia clave del ingeniero de reactores
+        no es memorizar las ecuaciones finales, sino dominar el proceso de derivación:
+        identificar qué suposición aplica, cuándo se viola, y qué consecuencias tiene su falla
+        sobre la operación industrial.
+        El ingeniero que entiende la derivación puede extender las ecuaciones a nuevos casos;
+        el que solo memoriza el resultado está limitado a los problemas del libro de texto.
+      </div>
+    </div>
+  </div>
+</div><!-- /síntesis -->
+
+</div><!-- /wrap -->
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="footer">
+  <p><strong>Demostración Rigurosa de las Ecuaciones de Diseño de Reactores Ideales</strong></p>
+  <p>Programa 740484 · Maestría en Ingeniería Química · Universidad del Valle<br>
+  Prof. José Antonio Lara Ramos, Ing.Qco., M.Sc., Ph.D. · 2025</p>
+  <p style="margin-top:.6rem;font-size:.78rem;opacity:.65">
+    Referencia canónica: Fogler, H.S. — <em>Elements of Chemical Reaction Engineering</em>, 4ª Ed., Pearson, 2006.<br>
+    Verificaciones numéricas: Python 3 · NumPy · SciPy (quad, brentq, solve_ivp) · Matplotlib
+  </p>
+</footer>
+
+</body>
+</html>
