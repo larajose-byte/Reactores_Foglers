@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reactor de Conversión — Guía Industrial Completa | Universidad del Valle</title>
+
+<!-- MathJax para ecuaciones tipográficas -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath:  [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]]
+  },
+  options: {
+    skipHtmlTags: ["script","noscript","style","textarea","pre"]
+  }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+<style>
+/* ══════════════════════════════════════════════════════
+   VARIABLES — Paleta oscura ámbar
+══════════════════════════════════════════════════════ */
+:root {
+  --amber:       #F59E0B;
+  --amber-light: #FCD34D;
+  --amber-dark:  #B45309;
+  --amber-dim:   rgba(245,158,11,0.15);
+  --coral:       #EF4444;
+  --teal:        #14B8A6;
+  --blue:        #3B82F6;
+  --green:       #22C55E;
+  --purple:      #A855F7;
+  --bg:          #0A0A0A;
+  --bg2:         #111111;
+  --bg3:         #1A1A1A;
+  --bg4:         #222222;
+  --bg5:         #2A2A2A;
+  --border:      rgba(255,255,255,0.08);
+  --border2:     rgba(255,255,255,0.12);
+  --text:        #F5F5F5;
+  --text2:       #A0A0A0;
+  --text3:       #606060;
+  /* Fuentes del sistema — sin dependencias externas */
+  --f-sans: 'Segoe UI', 'Liberation Sans', Arial, sans-serif;
+  --f-mono: 'Consolas', 'Courier New', monospace;
+  --f-serif: Georgia, 'Times New Roman', serif;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+body {
+  font-family: var(--f-sans);
+  background: var(--bg); color: var(--text);
+  overflow-x: hidden; line-height: 1.7;
+}
+code, pre, .mono { font-family: var(--f-mono); }
+
+/* ══════════════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(10,10,10,0.94);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 56px;
+}
+.nav-logo {
+  font-family: var(--f-mono); font-size: .74rem;
+  color: var(--amber); letter-spacing: .15em;
+}
+.nav-links { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+.nav-links a {
+  font-size: .72rem; color: var(--text2); text-decoration: none;
+  letter-spacing: .08em; text-transform: uppercase; transition: color .2s;
+}
+.nav-links a:hover { color: var(--amber); }
+#timer {
+  font-family: var(--f-mono); font-size: .72rem; color: var(--text3);
+  border: 1px solid var(--border); padding: .25rem .75rem; border-radius: 4px;
+  cursor: pointer; transition: color .2s;
+}
+#timer:hover { color: var(--amber); }
+#timer.running { color: var(--amber); }
+
+/* ══════════════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative; overflow: hidden; padding-top: 56px;
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(245,158,11,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245,158,11,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-glow {
+  position: absolute; top: 20%; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(245,158,11,0.14) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-tag {
+  font-family: var(--f-mono); font-size: .7rem; letter-spacing: .2em;
+  color: var(--amber); border: 1px solid rgba(245,158,11,0.3);
+  padding: .35rem 1rem; border-radius: 2px; margin-bottom: 2rem;
+  animation: fadeUp .8s ease both; position: relative;
+}
+.hero h1 {
+  font-family: var(--f-serif);
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  line-height: 1.05; text-align: center; max-width: 820px;
+  animation: fadeUp .8s ease .15s both; position: relative;
+}
+.hero h1 .hl { color: var(--amber); }
+.hero-sub {
+  font-size: 1.05rem; color: var(--text2); margin-top: 1.5rem;
+  text-align: center; max-width: 580px; line-height: 1.78;
+  animation: fadeUp .8s ease .3s both; position: relative;
+}
+.hero-chips {
+  display: flex; flex-wrap: wrap; gap: .65rem;
+  margin-top: 2.2rem; justify-content: center;
+  animation: fadeUp .8s ease .45s both; position: relative;
+}
+.chip {
+  font-size: .73rem; padding: .38rem .95rem;
+  border: 1px solid var(--border); border-radius: 2px;
+  color: var(--text2); background: var(--bg2); letter-spacing: .04em;
+}
+.scroll-hint {
+  position: absolute; bottom: 2.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  animation: fadeUp .8s ease .6s both;
+}
+.scroll-hint span { font-size: .68rem; color: var(--text3); letter-spacing: .1em; text-transform: uppercase; }
+.scroll-arrow {
+  width: 1px; height: 40px;
+  background: linear-gradient(transparent, var(--amber));
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════
+   SECCIONES
+══════════════════════════════════════════════════════ */
+section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+.section-label {
+  font-family: var(--f-mono); font-size: .65rem; letter-spacing: .2em;
+  color: var(--amber); text-transform: uppercase;
+  margin-bottom: 1rem; display: flex; align-items: center; gap: .75rem;
+}
+.section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--amber); }
+h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.15; margin-bottom: 1.8rem; }
+h3 { font-size: 1.18rem; margin-bottom: .9rem; color: var(--amber-light); }
+h4 { font-size: .98rem; color: var(--amber); margin-bottom: .6rem; font-weight: 600; }
+p { line-height: 1.80; color: var(--text2); margin-bottom: 1rem; }
+.hl { color: var(--amber); }
+
+/* Divider horizontal */
+.divider {
+  border: none; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 4rem auto; max-width: 600px;
+}
+
+/* ══════════════════════════════════════════════════════
+   TARJETAS DEFINICIÓN
+══════════════════════════════════════════════════════ */
+.def-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  padding: 1.8rem 2rem; border-radius: 4px; margin-bottom: 1.8rem;
+}
+.def-card p { margin-bottom: 0; }
+
+/* Fórmula monoespaciada */
+.formula {
+  font-family: var(--f-mono); font-size: 1.35rem; color: var(--amber-light);
+  background: var(--bg3); padding: 1.4rem 1.8rem;
+  border-radius: 4px; text-align: center;
+  border: 1px solid var(--border); margin: 1.4rem 0;
+}
+.formula small { display: block; font-size: .74rem; color: var(--text2); margin-top: .45rem; }
+
+/* Tabla de variables */
+.var-table { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: .88rem; }
+.var-table th {
+  background: var(--bg3); color: var(--amber); font-size: .72rem;
+  letter-spacing: .08em; text-transform: uppercase; font-weight: 600;
+  padding: .55rem .9rem; text-align: left; border-bottom: 1px solid var(--border2);
+}
+.var-table td { padding: .52rem .9rem; border-bottom: 1px solid var(--border); color: var(--text2); }
+.var-table tr:last-child td { border-bottom: none; }
+.var-table tr:hover td { background: var(--bg3); }
+.vt-sym { font-family: var(--f-mono); font-size: .86rem; color: var(--amber-light); }
+
+/* ══════════════════════════════════════════════════════
+   CONVERSIÓN RANGE INDICATOR
+══════════════════════════════════════════════════════ */
+.x-range-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.4rem 0;
+}
+.x-range {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.2rem 1.1rem; text-align: center;
+}
+.x-range-val {
+  font-family: var(--f-mono); font-size: 1.2rem;
+  color: var(--amber); font-weight: 600; margin-bottom: .4rem;
+}
+.x-range-desc { font-size: .82rem; color: var(--text2); line-height: 1.55; }
+
+/* ══════════════════════════════════════════════════════
+   BALANCES (cards)
+══════════════════════════════════════════════════════ */
+.balances-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+  gap: 1.2rem; margin: 1.8rem 0;
+}
+.bal-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.6rem; position: relative; overflow: hidden;
+}
+.bal-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.bal-card.masa::before   { background: var(--amber); }
+.bal-card.energy::before { background: var(--coral); }
+.bal-card.mom::before    { background: var(--teal); }
+.bal-num {
+  font-family: var(--f-mono); font-size: .65rem; letter-spacing: .15em;
+  color: var(--text3); margin-bottom: .6rem;
+}
+.bal-title { font-size: 1rem; font-weight: 700; margin-bottom: .55rem; }
+.bal-card.masa   .bal-title { color: var(--amber); }
+.bal-card.energy .bal-title { color: var(--coral); }
+.bal-card.mom    .bal-title { color: var(--teal); }
+.bal-eq {
+  font-family: var(--f-mono); font-size: .82rem;
+  background: var(--bg3); padding: .7rem 1rem;
+  border-radius: 3px; color: var(--amber-light);
+  margin: .8rem 0; border: 1px solid var(--border);
+}
+.bal-detail { font-size: .83rem; color: var(--text2); line-height: 1.65; }
+.bal-detail li { margin-left: 1.1rem; margin-bottom: .25rem; }
+
+/* ══════════════════════════════════════════════════════
+   TABS DE REACTORES
+══════════════════════════════════════════════════════ */
+.reactor-tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.8rem; }
+.rtab {
+  padding: .58rem 1.2rem; border: 1px solid var(--border);
+  border-radius: 3px; cursor: pointer; font-size: .84rem; color: var(--text2);
+  background: transparent; transition: all .2s; font-family: var(--f-sans);
+}
+.rtab:hover { border-color: var(--amber); color: var(--amber); }
+.rtab.active { background: var(--amber); color: #000; border-color: var(--amber); font-weight: 700; }
+.reactor-panel { display: none; }
+.reactor-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+@media(max-width:720px) { .reactor-panel.active { grid-template-columns: 1fr; } }
+
+.diagram-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.5rem;
+  display: flex; align-items: center; justify-content: center; min-height: 220px;
+}
+.rinfo h3 { color: var(--amber-light); font-size: 1.1rem; margin-bottom: .7rem; }
+.rinfo .formula { font-size: 1.1rem; padding: 1rem 1.2rem; }
+.info-list { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+.info-list li {
+  display: grid; grid-template-columns: auto 1fr; gap: .75rem;
+  font-size: .87rem; color: var(--text2);
+}
+.info-label {
+  font-family: var(--f-mono); font-size: .7rem; color: var(--amber);
+  font-weight: 600; letter-spacing: .05em; padding-top: .1rem;
+  white-space: nowrap;
+}
+/* Insight box */
+.rinsight {
+  grid-column: 1 / -1;
+  background: var(--amber-dim); border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 6px; padding: 1.2rem 1.4rem; margin-top: .5rem;
+}
+.rinsight h4 { color: var(--amber); font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .5rem; }
+.rinsight p  { color: var(--text2); font-size: .86rem; line-height: 1.68; margin: 0; }
+
+/* ══════════════════════════════════════════════════════
+   CALCULADORA
+══════════════════════════════════════════════════════ */
+.calc-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;
+  align-items: start; margin-top: 1.5rem;
+}
+@media(max-width:720px){ .calc-grid{ grid-template-columns:1fr; } }
+.calc-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 2rem; }
+.calc-panel h3 { color: var(--amber-light); font-size: .95rem; margin-bottom: 1.4rem; letter-spacing: .05em; }
+.sl-row { margin-bottom: 1.2rem; }
+.sl-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .45rem; }
+.sl-lbl { font-size: .82rem; color: var(--text2); }
+.sl-val { font-family: var(--f-mono); font-size: .88rem; color: var(--amber); }
+input[type=range] {
+  width: 100%; accent-color: var(--amber);
+  height: 4px; cursor: pointer;
+}
+.result-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg3); padding: .9rem 1.1rem; border-radius: 4px;
+  margin-bottom: .7rem; border: 1px solid var(--border);
+}
+.result-lbl { font-size: .82rem; color: var(--text2); }
+.result-val { font-family: var(--f-mono); font-size: 1.15rem; color: var(--amber-light); font-weight: 600; }
+.bar-wrap { margin-bottom: .6rem; }
+.bar-lbl { display: flex; justify-content: space-between; font-size: .74rem; color: var(--text3); margin-bottom: .3rem; }
+.bar-track { height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+.bar-fill { height: 100%; border-radius: 4px; transition: width .4s; }
+.bar-cstr { background: var(--amber); }
+.bar-pfr  { background: var(--teal); }
+.insight-box {
+  background: var(--amber-dim); border: 1px solid rgba(245,158,11,0.22);
+  border-radius: 4px; padding: .85rem 1rem;
+  font-size: .83rem; color: var(--text2); line-height: 1.65;
+  margin-top: 1.2rem; min-height: 60px;
+}
+
+/* ══════════════════════════════════════════════════════
+   HYSYS SECTION — nueva sección
+══════════════════════════════════════════════════════ */
+.hysys-hero {
+  background: linear-gradient(135deg, #0A1420, #0D1A2C, #0C1828);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 10px; padding: 2.2rem 2.4rem; margin-bottom: 2.5rem;
+  position: relative; overflow: hidden;
+}
+.hysys-hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+}
+.hysys-badge {
+  font-family: var(--f-mono); font-size: .65rem; font-weight: 600;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--blue); margin-bottom: .7rem;
+}
+.hysys-hero h3 { color: #90C8FF; font-size: 1.22rem; margin-bottom: .6rem; }
+.hysys-hero p  { color: var(--text2); font-size: .92rem; }
+
+.hysys-steps {
+  display: flex; flex-direction: column; gap: 1.3rem; margin: 2rem 0;
+}
+.hysys-step {
+  display: grid; grid-template-columns: 48px 1fr; gap: 1.2rem; align-items: start;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.4rem;
+  transition: border-color .2s;
+}
+.hysys-step:hover { border-color: rgba(59,130,246,0.35); }
+.hysys-step-n {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--f-mono); font-size: .88rem; font-weight: 700; color: var(--blue);
+  flex-shrink: 0;
+}
+.hysys-step-body h4 { color: #90C8FF; margin-bottom: .45rem; font-size: .96rem; }
+.hysys-step-body p  { color: var(--text2); font-size: .87rem; margin: 0; line-height: 1.68; }
+.hysys-step-body .code-block {
+  font-family: var(--f-mono); font-size: .8rem; color: var(--teal);
+  background: var(--bg3); padding: .6rem 1rem; border-radius: 3px;
+  border: 1px solid var(--border); margin-top: .65rem; line-height: 1.7;
+}
+
+.hysys-params {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+  gap: 1rem; margin: 1.8rem 0;
+}
+.hparam {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.3rem; border-top: 2px solid var(--blue);
+}
+.hparam-name {
+  font-family: var(--f-mono); font-size: .7rem; color: var(--blue);
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: .5rem;
+}
+.hparam-val { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: .35rem; }
+.hparam-desc { font-size: .82rem; color: var(--text2); line-height: 1.58; }
+
+.hysys-compare {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.8rem 0;
+}
+@media(max-width:640px){ .hysys-compare{ grid-template-columns:1fr; } }
+.hcol {
+  border-radius: 8px; padding: 1.5rem;
+}
+.hcol.manual { background: var(--bg2); border: 1px solid var(--border); }
+.hcol.hysys  { background: rgba(59,130,246,0.07); border: 1px solid rgba(59,130,246,0.25); }
+.hcol h4 { font-size: .9rem; margin-bottom: .9rem; font-weight: 700; }
+.hcol.manual h4 { color: var(--amber); }
+.hcol.hysys  h4 { color: var(--blue); }
+.hcol li { font-size: .84rem; color: var(--text2); margin-left: 1.1rem; margin-bottom: .35rem; line-height: 1.6; }
+
+.hysys-warning {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 6px; padding: 1.1rem 1.3rem; margin: 1.5rem 0;
+  font-size: .86rem; color: var(--text2); display: flex; gap: .8rem;
+}
+.hysys-tip {
+  background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 6px; padding: 1.1rem 1.3rem; margin: 1.2rem 0;
+  font-size: .86rem; color: var(--text2); display: flex; gap: .8rem;
+}
+
+/* ══════════════════════════════════════════════════════
+   APPS / INDUSTRIA
+══════════════════════════════════════════════════════ */
+.apps-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
+  gap: 1.2rem; margin-top: 1.8rem;
+}
+.app-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.5rem; transition: border-color .2s;
+}
+.app-card:hover { border-color: rgba(245,158,11,0.3); }
+.app-ico   { font-size: 1.8rem; margin-bottom: .7rem; }
+.app-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: .35rem; }
+.app-kpis  { display: flex; flex-wrap: wrap; gap: .4rem; margin: .6rem 0; }
+.akpi {
+  font-family: var(--f-mono); font-size: .7rem;
+  background: var(--bg3); border: 1px solid var(--border);
+  padding: .18rem .55rem; border-radius: 3px; color: var(--amber-light);
+}
+.app-desc { font-size: .84rem; color: var(--text2); line-height: 1.65; }
+
+/* ══════════════════════════════════════════════════════
+   PROS / CONS
+══════════════════════════════════════════════════════ */
+.proscons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.8rem; }
+@media(max-width:640px){ .proscons-grid{ grid-template-columns:1fr; } }
+.pro-card, .con-card {
+  border-radius: 6px; padding: 1.6rem;
+}
+.pro-card { background: rgba(34,197,94,0.07); border: 1px solid rgba(34,197,94,0.22); }
+.con-card { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.22); }
+.pro-card h3 { color: var(--green); }
+.con-card h3 { color: var(--coral); }
+.pc-list { list-style: none; display: flex; flex-direction: column; gap: .65rem; margin-top: .7rem; }
+.pc-list li { display: flex; gap: .65rem; font-size: .87rem; color: var(--text2); line-height: 1.58; }
+.pc-list li::before { flex-shrink: 0; font-size: .9rem; margin-top: .05rem; }
+.pro-card .pc-list li::before { content: '✓'; color: var(--green); }
+.con-card .pc-list li::before { content: '✗'; color: var(--coral); }
+
+/* ══════════════════════════════════════════════════════
+   CONSIDERACIONES INDUSTRIALES
+══════════════════════════════════════════════════════ */
+.consid-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 1.2rem; margin-top: 1.8rem;
+}
+.consid-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1.5rem; position: relative; overflow: hidden;
+}
+.consid-card::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+}
+.consid-card.s1::before { background: var(--coral); }
+.consid-card.s2::before { background: var(--amber); }
+.consid-card.s3::before { background: var(--teal); }
+.consid-card.s4::before { background: var(--blue); }
+.consid-card.s5::before { background: var(--purple); }
+.consid-card.s6::before { background: var(--green); }
+.consid-num {
+  font-family: var(--f-mono); font-size: .63rem; letter-spacing: .15em;
+  color: var(--text3); margin-bottom: .55rem;
+}
+.consid-tag {
+  font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; margin-bottom: .5rem;
+}
+.consid-card.s1 .consid-tag { color: var(--coral); }
+.consid-card.s2 .consid-tag { color: var(--amber); }
+.consid-card.s3 .consid-tag { color: var(--teal); }
+.consid-card.s4 .consid-tag { color: var(--blue); }
+.consid-card.s5 .consid-tag { color: var(--purple); }
+.consid-card.s6 .consid-tag { color: var(--green); }
+.consid-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: .6rem; }
+.consid-body { font-size: .85rem; color: var(--text2); line-height: 1.68; }
+.consid-body li { margin-left: 1rem; margin-bottom: .28rem; }
+
+/* ══════════════════════════════════════════════════════
+   COMPARATIVA (tabla)
+══════════════════════════════════════════════════════ */
+.comp-table { width: 100%; border-collapse: collapse; font-size: .83rem; margin-top: 1.5rem; }
+.comp-table th {
+  background: var(--bg3); color: var(--amber);
+  font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
+  padding: .6rem .9rem; text-align: left; border-bottom: 1px solid var(--border2);
+  font-weight: 600;
+}
+.comp-table td {
+  padding: .52rem .9rem; border-bottom: 1px solid var(--border);
+  color: var(--text2); line-height: 1.5; vertical-align: top;
+}
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: var(--bg3); }
+.comp-table .mono { font-family: var(--f-mono); color: var(--amber-light); font-size: .82rem; }
+
+/* ══════════════════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════════════════ */
+.quiz-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 2.2rem; max-width: 680px;
+}
+.quiz-progress { height: 3px; background: var(--bg4); border-radius: 2px; margin-bottom: 1.2rem; }
+.quiz-progress-fill { height: 100%; background: var(--amber); border-radius: 2px; transition: width .4s; }
+.quiz-counter { font-family: var(--f-mono); font-size: .72rem; color: var(--text3); margin-bottom: .7rem; letter-spacing: .08em; }
+.quiz-q { font-size: 1rem; color: var(--text); line-height: 1.65; font-weight: 500; }
+.quiz-options { display: flex; flex-direction: column; gap: .6rem; margin: 1.4rem 0; }
+.quiz-opt {
+  width: 100%; text-align: left; padding: .85rem 1.1rem;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 4px; cursor: pointer; font-size: .9rem; color: var(--text2);
+  transition: all .2s; font-family: var(--f-sans);
+}
+.quiz-opt:hover { border-color: var(--amber); color: var(--amber); }
+.quiz-opt.correct { background: rgba(34,197,94,0.15); border-color: var(--green); color: var(--green); }
+.quiz-opt.wrong   { background: rgba(239,68,68,0.12); border-color: var(--coral); color: var(--coral); }
+.quiz-feedback {
+  font-size: .86rem; line-height: 1.65; padding: .9rem 1.1rem;
+  border-radius: 4px; display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(34,197,94,0.1); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+.quiz-feedback.wrong-fb   { background: rgba(239,68,68,0.1);  color: var(--coral); border: 1px solid rgba(239,68,68,0.25); }
+.quiz-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 1.4rem; }
+.btn {
+  padding: .65rem 1.5rem; border-radius: 3px; cursor: pointer;
+  font-size: .85rem; font-weight: 600; border: none; transition: all .2s;
+  font-family: var(--f-sans); letter-spacing: .04em;
+}
+.btn-primary { background: var(--amber); color: #000; }
+.btn-primary:hover { background: var(--amber-light); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+.result-num { font-family: var(--f-mono); font-weight: 700; color: var(--amber); }
+
+/* ══════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 2rem; text-align: center; color: var(--text3);
+  font-size: .82rem; line-height: 1.7;
+}
+footer strong { color: var(--text2); }
+
+/* ══════════════════════════════════════════════════════
+   ANIMACIONES
+══════════════════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes scrollBounce {
+  0%,100% { opacity:.4; transform:scaleY(.8); }
+  50%      { opacity:1; transform:scaleY(1); }
+}
+.reveal { opacity:0; transform:translateY(16px); transition:opacity .6s, transform .6s; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body>
+
+
+<!-- ══════════ NAV ══════════ -->
+<nav>
+  <div class="nav-logo">REACTOR · CONVERSIÓN · UniValle · 740484</div>
+  <div class="nav-links">
+    <a href="#definicion">Concepto</a>
+    <a href="#funciona">Balances</a>
+    <a href="#tipos">Tipos</a>
+    <a href="#hysys">HYSYS</a>
+    <a href="#calc">Calculadora</a>
+    <a href="#apps">Industria</a>
+    <a href="#proscons">Análisis</a>
+    <a href="#quiz">Quiz</a>
+  </div>
+  <span id="timer" onclick="toggleTimer()">⏱ 20:00</span>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-tag">740484 · Diseño de Reactores · Maestría IQ · Universidad del Valle</div>
+  <h1>Reactor de<br><span class="hl">Conversión</span><br>Guía Industrial</h1>
+  <p class="hero-sub">
+    Fundamentos rigurosos, tipos, ecuaciones de diseño, simulación en HYSYS/Aspen,
+    aplicaciones petroquímicas y farmacéuticas. De la teoría de Fogler a la planta real.
+  </p>
+  <div class="hero-chips">
+    <span class="chip">X = (FA0 − FA) / FA0</span>
+    <span class="chip">CSTR · PFR · Batch · PBR</span>
+    <span class="chip">HYSYS — Reactores de conversión</span>
+    <span class="chip">Calculadora interactiva</span>
+    <span class="chip">Casos industriales reales</span>
+  </div>
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     §1  DEFINICIÓN Y CONVERSIÓN
+══════════════════════════════════════════════════════ -->
+<section id="definicion">
+  <div class="section-label reveal">01 — Concepto fundamental</div>
+  <h2 class="reveal">¿Qué es un <span class="hl">reactor de conversión</span>?</h2>
+
+  <p class="reveal">
+    Un <strong>reactor de conversión</strong> es todo recipiente o dispositivo en el que ocurren
+    reacciones químicas controladas para transformar reactivos en productos de valor comercial.
+    La variable central de diseño es la <strong>conversión X</strong>, que mide la fracción molar
+    del reactivo limitante que ha sido transformado. Esta única variable integra la cinética,
+    la termodinámica y el balance de masa en una sola expresión cuantificable.
+  </p>
+
+  <div class="def-card reveal">
+    <h4>Definición formal de la conversión (Fogler, Cap. 2)</h4>
+    <div class="formula">
+      X = (F<sub>A0</sub> − F<sub>A</sub>) / F<sub>A0</sub>
+      <small>F<sub>A0</sub> = flujo molar inicial del reactivo A [mol/s] &nbsp;·&nbsp; F<sub>A</sub> = flujo molar a la salida [mol/s]</small>
+    </div>
+    <p>
+      En un reactor batch, la conversión se expresa en términos de moles:
+    </p>
+    <div class="formula">
+      X = (N<sub>A0</sub> − N<sub>A</sub>) / N<sub>A0</sub>
+      <small>N<sub>A0</sub> = moles iniciales de A &nbsp;·&nbsp; N<sub>A</sub> = moles restantes al tiempo t</small>
+    </div>
+  </div>
+
+  <table class="var-table reveal">
+    <thead>
+      <tr><th>Variable</th><th>Símbolo</th><th>Unidades</th><th>Significado físico</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Flujo molar entrada</td><td class="vt-sym">F<sub>A0</sub></td><td>mol/s</td><td>Moles de A que entran al reactor por segundo</td></tr>
+      <tr><td>Flujo molar salida</td><td class="vt-sym">F<sub>A</sub></td><td>mol/s</td><td>Moles de A sin reaccionar que salen del reactor</td></tr>
+      <tr><td>Conversión</td><td class="vt-sym">X</td><td>adimensional [0,1]</td><td>Fracción del reactivo limitante A que reaccionó</td></tr>
+      <tr><td>Concentración de A</td><td class="vt-sym">C<sub>A</sub></td><td>mol/dm³</td><td>C<sub>A</sub> = C<sub>A0</sub>(1−X) para volumen constante</td></tr>
+      <tr><td>Flujo volumétrico</td><td class="vt-sym">v<sub>0</sub></td><td>dm³/s</td><td>Caudal volumétrico de la alimentación</td></tr>
+    </tbody>
+  </table>
+
+  <div class="x-range-grid reveal">
+    <div class="x-range">
+      <div class="x-range-val">X = 0</div>
+      <div class="x-range-desc">Sin reacción. El 100% del reactivo sale sin transformar. Punto de referencia para el cálculo.</div>
+    </div>
+    <div class="x-range">
+      <div class="x-range-val">0 &lt; X &lt; 1</div>
+      <div class="x-range-desc">Estado operativo típico. La elección de X afecta el volumen del reactor, la separación posterior y la rentabilidad.</div>
+    </div>
+    <div class="x-range">
+      <div class="x-range-val">X → 1</div>
+      <div class="x-range-desc">Conversión completa: teóricamente posible, prácticamente costosa. El volumen crece no linealmente cerca de X = 1.</div>
+    </div>
+  </div>
+
+  <div class="def-card reveal" style="border-left-color:var(--teal)">
+    <h4 style="color:var(--teal)">¿Por qué no siempre conviene X → 1?</h4>
+    <p>
+      Para reacciones de orden positivo, la velocidad de reacción cae a medida que X aumenta
+      (porque C<sub>A</sub> disminuye). Al acercarse a X = 1, el denominador de la ecuación de diseño
+      tiende a cero, lo que hace que el volumen necesario <strong>diverga hacia el infinito</strong>.
+      En práctica industrial, la conversión óptima se determina por el <em>análisis económico</em>:
+      costo del reactor + costo de separación + costo de materia prima no convertida.
+    </p>
+    <p style="margin:0">
+      Ejemplo: en el proceso de síntesis de amoníaco (Haber-Bosch), X por pasada es solo 15–25%,
+      con reciclo intensivo del N₂ y H₂ no convertidos. El equilibrio termodinámico es el límite real,
+      no la ecuación de diseño del reactor.
+    </p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════════════════════
+     §2  CÓMO FUNCIONA — TRES BALANCES
+══════════════════════════════════════════════════════ -->
+<section id="funciona">
+  <div class="section-label reveal">02 — Mecanismo fundamental</div>
+  <h2 class="reveal">Los tres <span class="hl">balances</span> acoplados</h2>
+  <p class="reveal">
+    El diseño y operación de cualquier reactor de conversión requiere resolver simultáneamente
+    tres balances acoplados. Ninguno puede ignorarse sin consecuencias en la precisión del diseño.
+    En reactores no isotérmicos, los tres se influyen mutuamente y deben resolverse como un
+    sistema de ecuaciones diferenciales ordinarias (ODEs).
+  </p>
+
+  <div class="balances-grid reveal">
+    <div class="bal-card masa">
+      <div class="bal-num">BALANCE 01</div>
+      <div class="bal-title">Molar (Masa)</div>
+      <div class="bal-eq">F_A0 − F_A + ∫r_A dV = dN_A/dt</div>
+      <p class="bal-detail">Define cuántas moles reaccionan y determina el tamaño del reactor. En estado estacionario, dN_A/dt = 0. La integral de r_A sobre el volumen es el término de generación.</p>
+      <ul class="bal-detail" style="margin-top:.6rem">
+        <li><strong>CSTR:</strong> ecuación algebraica → V = F<sub>A0</sub>X / (−r<sub>A</sub>|<sub>sal</sub>)</li>
+        <li><strong>PFR:</strong> ODE → F<sub>A0</sub>dX/dV = −r<sub>A</sub></li>
+        <li><strong>Batch:</strong> ODE → N<sub>A0</sub>dX/dt = −r<sub>A</sub>V</li>
+      </ul>
+    </div>
+
+    <div class="bal-card energy">
+      <div class="bal-num">BALANCE 02</div>
+      <div class="bal-title">Energético</div>
+      <div class="bal-eq">UA(T_a−T) + F_A0[ΣΘ_i C_pi(T_0−T) + (−ΔH_rx)X] = 0</div>
+      <p class="bal-detail">Determina la temperatura de operación y el sistema de intercambio térmico. Para reacciones exotérmicas (ΔH<sub>rx</sub> &lt; 0), el reactor genera calor que debe removerse para evitar el runaway térmico.</p>
+      <ul class="bal-detail" style="margin-top:.6rem">
+        <li>ΔH<sub>rx</sub> &lt; 0 → exotérmica → requiere enfriamiento (UA)</li>
+        <li>ΔH<sub>rx</sub> &gt; 0 → endotérmica → requiere calefacción</li>
+        <li>ΔT<sub>ad</sub> = (−ΔH<sub>rx</sub>)C<sub>A0</sub> / (ρ·C<sub>p</sub>) → criterio de severidad térmica</li>
+      </ul>
+    </div>
+
+    <div class="bal-card mom">
+      <div class="bal-num">BALANCE 03</div>
+      <div class="bal-title">Momentum (Caída de presión)</div>
+      <div class="bal-eq">dy/dW = −α/(2y) · (T/T₀) · (F_T/F_T0)</div>
+      <p class="bal-detail">Crítico en reactores de lecho empacado (PBR). La ecuación de Ergun describe la caída de presión a través del lecho de catalizador. La presión afecta las concentraciones de los gases y, por ende, la velocidad de reacción.</p>
+      <ul class="bal-detail" style="margin-top:.6rem">
+        <li>α = 2β₀ / [A<sub>c</sub>ρ<sub>c</sub>(1−φ)P<sub>0</sub>] → parámetro de Ergun</li>
+        <li>y = P/P₀ → presión adimensional (y &lt; 1 siempre)</li>
+        <li>Caída &gt;20% → subestimación de V en 15–40%</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="def-card reveal" style="border-left-color:var(--teal)">
+    <h4 style="color:var(--teal)">La velocidad de reacción r<sub>A</sub> — nexo entre los tres balances</h4>
+    <div class="formula">
+      −r<sub>A</sub> = k(T) · f(C<sub>A</sub>, C<sub>B</sub>, ...) &nbsp;&nbsp;[mol / (dm³ · s)]
+      <small>k(T) = A · exp(−E<sub>a</sub>/RT) &nbsp;(Arrhenius) &nbsp;·&nbsp; f = ley de velocidad (cinética)</small>
+    </div>
+    <p>
+      La constante cinética k depende <strong>exponencialmente de la temperatura</strong> (Arrhenius).
+      Esto crea el acoplamiento no lineal: la temperatura afecta k, que afecta r<sub>A</sub>,
+      que afecta el calor generado (balance de energía), que afecta la temperatura.
+      Esta retroalimentación es la causa del <em>runaway térmico</em> en reactores exotérmicos mal controlados.
+    </p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════════════════════
+     §3  TIPOS DE REACTORES
+══════════════════════════════════════════════════════ -->
+<section id="tipos">
+  <div class="section-label reveal">03 — Clasificación</div>
+  <h2 class="reveal">Tipos de <span class="hl">reactores</span></h2>
+  <p class="reveal">
+    Cada configuración tiene su ecuación de diseño característica, su distribución de tiempos
+    de residencia (DTR) y sus condiciones óptimas de aplicación. La selección correcta
+    del tipo de reactor es una de las decisiones de diseño más importantes del proceso.
+  </p>
+
+  <div class="reactor-tabs reveal">
+    <button class="rtab active" onclick="showReactor('batch',event)">Batch</button>
+    <button class="rtab" onclick="showReactor('cstr',event)">CSTR</button>
+    <button class="rtab" onclick="showReactor('pfr',event)">PFR</button>
+    <button class="rtab" onclick="showReactor('pbr',event)">PBR</button>
+  </div>
+
+  <!-- BATCH -->
+  <div id="panel-batch" class="reactor-panel active">
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 300 230" width="280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradiente líquido -->
+    <linearGradient id="liqB" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="rgba(245,158,11,0.25)"/>
+      <stop offset="100%" stop-color="rgba(245,158,11,0.08)"/>
+    </linearGradient>
+    <!-- Camisa gradient -->
+    <linearGradient id="camisaB" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(245,158,11,0.18)"/>
+      <stop offset="50%" stop-color="rgba(245,158,11,0.06)"/>
+      <stop offset="100%" stop-color="rgba(245,158,11,0.18)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Camisa térmica -->
+  <rect x="48" y="52" width="204" height="122" rx="12"
+        fill="url(#camisaB)" stroke="rgba(245,158,11,0.35)" stroke-width="8"
+        stroke-dasharray="5,4"/>
+  <!-- Tanque principal -->
+  <rect x="60" y="48" width="180" height="135" rx="8"
+        fill="#111111" stroke="#F59E0B" stroke-width="1.8"/>
+  <!-- Nivel líquido animado -->
+  <rect x="61" y="108" width="178" height="74" rx="0" fill="url(#liqB)">
+    <animate attributeName="y" values="108;104;108;112;108"
+             dur="3.5s" repeatCount="indefinite"/>
+    <animate attributeName="height" values="74;78;74;70;74"
+             dur="3.5s" repeatCount="indefinite"/>
+  </rect>
+  <!-- Ola superficie -->
+  <path d="M62,108 Q100,104 150,108 Q200,112 238,108" fill="none"
+        stroke="rgba(245,158,11,0.45)" stroke-width="1.5">
+    <animate attributeName="d"
+      values="M62,108 Q100,104 150,108 Q200,112 238,108;
+              M62,105 Q100,109 150,105 Q200,101 238,105;
+              M62,108 Q100,104 150,108 Q200,112 238,108"
+      dur="3.5s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Eje agitador -->
+  <line x1="150" y1="48" x2="150" y2="182" stroke="#555" stroke-width="2.5"/>
+  <!-- Paletas agitador — rotación continua -->
+  <g transform="translate(150,140)">
+    <animateTransform attributeName="transform" attributeType="XML"
+      type="rotate" from="0 0 0" to="360 0 0" dur="3s" repeatCount="indefinite"
+      additive="sum"/>
+    <line x1="-38" y1="0"  x2="38"  y2="0"  stroke="#F59E0B" stroke-width="3" stroke-linecap="round"/>
+    <line x1="-28" y1="-16" x2="28" y2="16" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+    <line x1="-28" y1="16" x2="28" y2="-16" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+  </g>
+
+  <!-- Motor -->
+  <ellipse cx="150" cy="36" rx="22" ry="13" fill="#1A1A1A" stroke="#F59E0B" stroke-width="1.8"/>
+  <text x="150" y="40" fill="#F59E0B" font-size="9" text-anchor="middle" font-family="Consolas" font-weight="bold">M</text>
+  <!-- Pulso motor -->
+  <ellipse cx="150" cy="36" rx="22" ry="13" fill="none" stroke="rgba(245,158,11,0.4)" stroke-width="2">
+    <animate attributeName="rx" values="22;27;22" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="ry" values="13;17;13" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Burbujas internas -->
+  <circle cx="100" cy="165" r="3" fill="rgba(245,158,11,0.5)">
+    <animate attributeName="cy" values="165;115;165" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.6;0" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="130" cy="170" r="2" fill="rgba(245,158,11,0.4)">
+    <animate attributeName="cy" values="170;120;170" dur="2.8s" begin="0.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.5;0" dur="2.8s" begin="0.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="165" cy="168" r="3.5" fill="rgba(245,158,11,0.35)">
+    <animate attributeName="cy" values="168;118;168" dur="2.5s" begin="0.9s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.55;0" dur="2.5s" begin="0.9s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="195" cy="162" r="2.5" fill="rgba(245,158,11,0.45)">
+    <animate attributeName="cy" values="162;112;162" dur="3s" begin="1.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.5;0" dur="3s" begin="1.4s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Etiquetas -->
+  <text x="150" y="100" fill="#606060" font-size="8.5" text-anchor="middle" font-family="Consolas">T uniforme</text>
+  <text x="34" y="115" fill="rgba(245,158,11,0.5)" font-size="7" font-family="Consolas"
+        transform="rotate(-90 34 115)">camisa térmica</text>
+  <text x="150" y="220" fill="rgba(245,158,11,0.55)" font-size="7.5" text-anchor="middle" font-family="Consolas">carga → reacción → descarga</text>
+</svg>
+    </div>
+    <div class="rinfo">
+      <h3>Reactor Batch (Discontinuo)</h3>
+      <p>Se carga una cantidad definida de reactivos, se deja reaccionar durante un tiempo <em>t</em>, y luego se descarga el producto. No hay flujo continuo de entrada ni salida durante la reacción. Equivale matemáticamente al PFR con la sustitución t ↔ τ.</p>
+      <div class="formula">t = N<sub>A0</sub> ∫<sub>0</sub><sup>X</sup> dX / (−r<sub>A</sub>·V)<small>El tiempo de reacción es la variable de diseño</small></div>
+      <ul class="info-list">
+        <li><span class="info-label">DTR</span><span>δ(t−τ): todas las moléculas permanecen exactamente el mismo tiempo</span></li>
+        <li><span class="info-label">Uso</span><span>Farmacéuticos (APIs), fermentación, síntesis de alto valor, biotecnología</span></li>
+        <li><span class="info-label">Escala</span><span>100 mL – 200 m³; fermentadores hasta 200,000 L</span></li>
+        <li><span class="info-label">Ventaja</span><span>Máxima flexibilidad; un reactor produce múltiples productos</span></li>
+        <li><span class="info-label">Limitación</span><span>Productividad limitada por tiempo inactivo t₀; X* óptimo &lt; 1</span></li>
+        <li><span class="info-label">Cinética</span><span>Datos cinéticos del batch son transferibles directamente al PFR</span></li>
+      </ul>
+    </div>
+    <div class="rinsight">
+      <h4>Insight clave — El X* óptimo</h4>
+      <p>Maximizar la productividad P(X) = C<sub>A0</sub>·X / (t<sub>rxn</sub> + t₀) da un X* &lt; 1. Operar a X = 0.95 en lugar de X* = 0.75 puede reducir la productividad un 30–40%. La FDA exige documentar esta curva para producción de APIs (21 CFR Part 211).</p>
+    </div>
+  </div>
+
+  <!-- CSTR -->
+  <div id="panel-cstr" class="reactor-panel">
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 300 230" width="280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="liqC" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="rgba(245,158,11,0.22)"/>
+      <stop offset="100%" stop-color="rgba(245,158,11,0.07)"/>
+    </linearGradient>
+    <marker id="arrC" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#F59E0B"/>
+    </marker>
+    <marker id="arrCt" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#14B8A6"/>
+    </marker>
+  </defs>
+
+  <!-- Camisa -->
+  <rect x="52" y="55" width="196" height="118" rx="10"
+        fill="none" stroke="rgba(245,158,11,0.28)" stroke-width="9" stroke-dasharray="5,3"/>
+  <!-- Tanque -->
+  <rect x="65" y="48" width="170" height="132" rx="7"
+        fill="#111111" stroke="#F59E0B" stroke-width="1.8"/>
+  <!-- Contenido -->
+  <rect x="66" y="108" width="168" height="71" fill="url(#liqC)">
+    <animate attributeName="y" values="108;105;108;111;108" dur="4s" repeatCount="indefinite"/>
+    <animate attributeName="height" values="71;74;71;68;71" dur="4s" repeatCount="indefinite"/>
+  </rect>
+  <!-- Ola -->
+  <path d="M66,108 Q110,104 150,108 Q190,112 234,108" fill="none"
+        stroke="rgba(245,158,11,0.4)" stroke-width="1.5">
+    <animate attributeName="d"
+      values="M66,108 Q110,104 150,108 Q190,112 234,108;
+              M66,106 Q110,110 150,106 Q190,102 234,106;
+              M66,108 Q110,104 150,108 Q190,112 234,108"
+      dur="4s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Eje agitador -->
+  <line x1="150" y1="48" x2="150" y2="178" stroke="#555" stroke-width="2.5"/>
+  <!-- Paletas múltiples giratorias -->
+  <g transform="translate(150,138)">
+    <animateTransform attributeName="transform" attributeType="XML"
+      type="rotate" from="0 0 0" to="360 0 0" dur="2.5s" repeatCount="indefinite"
+      additive="sum"/>
+    <line x1="-36" y1="0"  x2="36"  y2="0"  stroke="#F59E0B" stroke-width="2.8" stroke-linecap="round"/>
+    <line x1="-26" y1="-15" x2="26" y2="15" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>
+    <line x1="26"  y1="-15" x2="-26" y2="15" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>
+  </g>
+  <g transform="translate(150,158)">
+    <animateTransform attributeName="transform" attributeType="XML"
+      type="rotate" from="0 0 0" to="360 0 0" dur="2.5s" repeatCount="indefinite"
+      additive="sum"/>
+    <line x1="-24" y1="0"  x2="24"  y2="0"  stroke="#F59E0B" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+  </g>
+
+  <!-- Motor -->
+  <ellipse cx="150" cy="36" rx="20" ry="12" fill="#1A1A1A" stroke="#F59E0B" stroke-width="1.8"/>
+  <text x="150" y="40" fill="#F59E0B" font-size="8" text-anchor="middle" font-family="Consolas" font-weight="bold">M</text>
+  <ellipse cx="150" cy="36" rx="20" ry="12" fill="none" stroke="rgba(245,158,11,0.35)" stroke-width="2">
+    <animate attributeName="rx" values="20;26;20" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="ry" values="12;16;12" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.35;0;0.35" dur="2.5s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Flujo entrada — partículas animadas -->
+  <line x1="8" y1="82" x2="65" y2="82" stroke="#F59E0B" stroke-width="1.8" marker-end="url(#arrC)"/>
+  <text x="10" y="76" fill="#A0A0A0" font-size="8" font-family="Consolas">F_A0</text>
+  <!-- Partícula que entra -->
+  <circle cx="8" cy="82" r="3" fill="#F59E0B" opacity="0.9">
+    <animate attributeName="cx" values="8;62;8" dur="1.8s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.9;0.2;0.9" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Flujo salida — partícula que sale -->
+  <line x1="235" y1="148" x2="292" y2="148" stroke="#14B8A6" stroke-width="1.8" marker-end="url(#arrCt)"/>
+  <text x="240" y="142" fill="#14B8A6" font-size="8" font-family="Consolas">F_A</text>
+  <circle cx="235" cy="148" r="3" fill="#14B8A6" opacity="0.9">
+    <animate attributeName="cx" values="235;288;235" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    <animate attributeName="opacity" values="0.2;0.9;0.2" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+  </circle>
+
+  <!-- Burbujas mezcla -->
+  <circle cx="95" cy="170" r="2.5" fill="rgba(245,158,11,0.45)">
+    <animate attributeName="cy" values="170;115;170" dur="2.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.6;0" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="155" cy="172" r="3" fill="rgba(245,158,11,0.4)">
+    <animate attributeName="cy" values="172;118;172" dur="2.9s" begin="0.6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.55;0" dur="2.9s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="210" cy="168" r="2" fill="rgba(245,158,11,0.5)">
+    <animate attributeName="cy" values="168;114;168" dur="2.1s" begin="1.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.6;0" dur="2.1s" begin="1.2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Label temperatura uniforme -->
+  <text x="150" y="97" fill="#606060" font-size="8" text-anchor="middle" font-family="Consolas">mezcla perfecta · T uniforme</text>
+  <text x="36" y="115" fill="rgba(245,158,11,0.45)" font-size="7" font-family="Consolas"
+        transform="rotate(-90 36 115)">camisa</text>
+  <text x="150" y="220" fill="#606060" font-size="7.5" text-anchor="middle" font-family="Consolas">C_A = C_Asal = uniforme</text>
+</svg>
+    </div>
+    <div class="rinfo">
+      <h3>CSTR — Reactor de Tanque Agitado Continuo</h3>
+      <p>Opera con <strong>mezcla perfecta</strong>: composición y temperatura uniformes en todo el volumen. Como consecuencia, el reactor trabaja siempre a la concentración de salida (la más baja). Esto simplifica el diseño a una ecuación algebraica pero implica mayor volumen que el PFR.</p>
+      <div class="formula">V = F<sub>A0</sub> · X / (−r<sub>A</sub>|<sub>sal</sub>)<small>Evaluado a las condiciones de salida — ecuación algebraica, no ODE</small></div>
+      <ul class="info-list">
+        <li><span class="info-label">DTR</span><span>E(t) = (1/τ)·e<sup>−t/τ</sup> — exponencial; el 63.2% sale antes de τ</span></li>
+        <li><span class="info-label">Da</span><span>Número de Damköhler: Da = kτC<sub>A0</sub><sup>n−1</sup>; para n=1: X = Da/(1+Da)</span></li>
+        <li><span class="info-label">Uso</span><span>Polimerización, fermentación continua, tratamiento de aguas</span></li>
+        <li><span class="info-label">Ventaja</span><span>Control térmico perfecto — temperatura uniforme sin puntos calientes</span></li>
+        <li><span class="info-label">Limitación</span><span>V<sub>CSTR</sub> &gt; V<sub>PFR</sub> para n &gt; 0 — consecuencia directa de mezcla perfecta</span></li>
+      </ul>
+    </div>
+    <div class="rinsight">
+      <h4>Insight clave — La penalización volumétrica</h4>
+      <p>El ratio V<sub>CSTR</sub>/V<sub>PFR</sub> crece exponencialmente con X y el orden n. Para n=2 y X=0.90, el CSTR necesita 9× más volumen que el PFR. Esta es la base cuantitativa del Diagrama de Levenspiel: el rectángulo del CSTR siempre sobreestima el área bajo la curva del PFR.</p>
+    </div>
+  </div>
+
+  <!-- PFR -->
+  <div id="panel-pfr" class="reactor-panel">
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 320 185" width="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="pfrGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="rgba(245,158,11,0.55)">
+        <animate attributeName="stop-color"
+          values="rgba(245,158,11,0.55);rgba(245,158,11,0.65);rgba(245,158,11,0.55)"
+          dur="3s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="50%"  stop-color="rgba(245,158,11,0.22)"/>
+      <stop offset="100%" stop-color="rgba(245,158,11,0.05)">
+        <animate attributeName="stop-color"
+          values="rgba(245,158,11,0.05);rgba(245,158,11,0.02);rgba(245,158,11,0.05)"
+          dur="3s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+    <marker id="arrPF" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#F59E0B"/>
+    </marker>
+    <marker id="arrPFt" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+      <polygon points="0,0 8,3 0,6" fill="#14B8A6"/>
+    </marker>
+    <!-- Clip para el tubo -->
+    <clipPath id="tubeClip">
+      <rect x="40" y="60" width="240" height="60" rx="30"/>
+    </clipPath>
+  </defs>
+
+  <!-- Sombra tubo -->
+  <rect x="42" y="64" width="240" height="60" rx="30" fill="rgba(0,0,0,0.4)"/>
+  <!-- Tubo principal -->
+  <rect x="40" y="60" width="240" height="60" rx="30"
+        fill="#111111" stroke="#F59E0B" stroke-width="1.8"/>
+  <!-- Gradiente de concentración vivo -->
+  <rect x="41" y="61" width="238" height="58" rx="29" fill="url(#pfrGrad)"/>
+
+  <!-- Partículas fluyendo dentro del tubo (flujo pistón) -->
+  <g clip-path="url(#tubeClip)">
+    <!-- Fila de partículas que avanzan juntas (flujo pistón) -->
+    <circle cx="0" cy="85" r="4" fill="rgba(245,158,11,0.7)">
+      <animate attributeName="cx" values="40;280;40" dur="2.5s" repeatCount="indefinite" calcMode="linear"/>
+    </circle>
+    <circle cx="0" cy="78" r="3" fill="rgba(245,158,11,0.5)">
+      <animate attributeName="cx" values="40;280;40" dur="2.5s" repeatCount="indefinite" calcMode="linear" begin="0s"/>
+    </circle>
+    <circle cx="0" cy="100" r="3.5" fill="rgba(245,158,11,0.5)">
+      <animate attributeName="cx" values="40;280;40" dur="2.5s" repeatCount="indefinite" calcMode="linear" begin="0s"/>
+    </circle>
+    <!-- Segunda "oleada" -->
+    <circle cx="0" cy="88" r="4" fill="rgba(245,158,11,0.55)">
+      <animate attributeName="cx" values="-80;160;-80" dur="2.5s" repeatCount="indefinite" begin="1.25s" calcMode="linear"/>
+    </circle>
+    <circle cx="0" cy="76" r="3" fill="rgba(245,158,11,0.4)">
+      <animate attributeName="cx" values="-80;160;-80" dur="2.5s" repeatCount="indefinite" begin="1.25s" calcMode="linear"/>
+    </circle>
+    <circle cx="0" cy="102" r="3" fill="rgba(245,158,11,0.45)">
+      <animate attributeName="cx" values="-80;160;-80" dur="2.5s" repeatCount="indefinite" begin="1.25s" calcMode="linear"/>
+    </circle>
+  </g>
+
+  <!-- Flecha sección dV -->
+  <rect x="148" y="62" width="24" height="56" fill="rgba(245,158,11,0.10)"
+        stroke="rgba(245,158,11,0.55)" stroke-width="1" stroke-dasharray="2,2">
+    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+  </rect>
+  <text x="155" y="132" fill="rgba(245,158,11,0.7)" font-size="8" font-family="Consolas">dV</text>
+
+  <!-- Entrada -->
+  <line x1="8" y1="90" x2="40" y2="90" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrPF)"/>
+  <text x="5"  y="80"  fill="#A0A0A0" font-size="8" font-family="Consolas">X=0</text>
+  <text x="5"  y="105" fill="#A0A0A0" font-size="7" font-family="Consolas">C_A0</text>
+
+  <!-- Salida -->
+  <line x1="280" y1="90" x2="312" y2="90" stroke="#14B8A6" stroke-width="2" marker-end="url(#arrPFt)"/>
+  <text x="283" y="80" fill="#14B8A6" font-size="8" font-family="Consolas">X=X_A</text>
+  <text x="283" y="105" fill="#14B8A6" font-size="7" font-family="Consolas">C_Af</text>
+
+  <!-- Etiquetas de concentración -->
+  <text x="72"  y="56" fill="rgba(245,158,11,0.85)" font-size="8" font-family="Consolas" font-weight="bold">C_A alto</text>
+  <text x="218" y="56" fill="rgba(245,158,11,0.35)" font-size="8" font-family="Consolas">C_A bajo</text>
+  <text x="150" y="56" fill="#555" font-size="8" font-family="Consolas" text-anchor="middle">X crece →</text>
+
+  <!-- Perfil de conversión debajo -->
+  <path d="M40,152 Q100,155 160,160 Q220,165 280,170" fill="none"
+        stroke="rgba(245,158,11,0.35)" stroke-width="1.5" stroke-dasharray="3,2">
+    <animate attributeName="d"
+      values="M40,152 Q100,155 160,160 Q220,165 280,170;
+              M40,150 Q100,153 160,158 Q220,164 280,169;
+              M40,152 Q100,155 160,160 Q220,165 280,170"
+      dur="3s" repeatCount="indefinite"/>
+  </path>
+  <text x="40"  y="182" fill="#606060" font-size="7" font-family="Consolas">X=0</text>
+  <text x="252" y="182" fill="#606060" font-size="7" font-family="Consolas">X=X_A</text>
+  <text x="150" y="182" fill="#555" font-size="7" font-family="Consolas" text-anchor="middle">Perfil X(V)</text>
+</svg>
+    </div>
+    <div class="rinfo">
+      <h3>PFR — Reactor de Flujo Pistón (Tubular)</h3>
+      <p>Sin mezcla axial: la composición varía continuamente con la posición axial. Trabaja a la <strong>concentración local</strong> en cada punto — alta al inicio, baja al final. Esto maximiza la velocidad media de reacción, minimizando el volumen necesario.</p>
+      <div class="formula">F<sub>A0</sub> dX/dV = −r<sub>A</sub>(X,T)<small>ODE de primer orden — integración numérica (RK45) o analítica</small></div>
+      <ul class="info-list">
+        <li><span class="info-label">DTR</span><span>E(t) = δ(t−τ): todas las moléculas permanecen exactamente τ</span></li>
+        <li><span class="info-label">Uso</span><span>Steam cracking (800°C, τ=400ms), reforming catalítico, síntesis de NH₃</span></li>
+        <li><span class="info-label">Escala</span><span>Desde τ=100ms hasta horas; hasta 300 bar (síntesis NH₃)</span></li>
+        <li><span class="info-label">Ventaja</span><span>Mínimo volumen para n &gt; 0; sin partes móviles; alta T y P</span></li>
+        <li><span class="info-label">Limitación</span><span>Difícil control térmico; no maneja sólidos en suspensión</span></li>
+      </ul>
+    </div>
+    <div class="rinsight">
+      <h4>Insight clave — Equivalencia exacta con el Batch</h4>
+      <p>t<sub>batch</sub> = τ<sub>PFR</sub> es una equivalencia matemática exacta. Los datos cinéticos medidos en un reactor batch de laboratorio se transfieren directamente al diseño del PFR industrial sin corrección alguna. Esta es la justificación rigurosa del uso del batch como "planta piloto natural del PFR".</p>
+    </div>
+  </div>
+
+  <!-- PBR -->
+  <div id="panel-pbr" class="reactor-panel">
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 300 210" width="280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="catG" cx="50%" cy="40%" r="60%">
+      <stop offset="0%"   stop-color="rgba(245,158,11,0.45)"/>
+      <stop offset="100%" stop-color="rgba(245,158,11,0.12)"/>
+    </radialGradient>
+    <marker id="arrBR" markerWidth="7" markerHeight="5" refX="5" refY="2.5" orient="auto">
+      <polygon points="0,0 7,2.5 0,5" fill="#F59E0B"/>
+    </marker>
+    <marker id="arrBRt" markerWidth="7" markerHeight="5" refX="5" refY="2.5" orient="auto">
+      <polygon points="0,0 7,2.5 0,5" fill="#14B8A6"/>
+    </marker>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Cuerpo del reactor -->
+  <rect x="58" y="38" width="184" height="148" rx="7"
+        fill="#0E0E0E" stroke="#F59E0B" stroke-width="1.8"/>
+  <!-- Distribuidor entrada -->
+  <rect x="60" y="40" width="180" height="15" rx="4"
+        fill="#1A1A1A" stroke="rgba(245,158,11,0.5)" stroke-width="1"/>
+  <text x="150" y="51" fill="rgba(245,158,11,0.65)" font-size="7"
+        text-anchor="middle" font-family="Consolas">distribuidor</text>
+  <!-- Recolector salida -->
+  <rect x="60" y="163" width="180" height="20" rx="4"
+        fill="#1A1A1A" stroke="rgba(20,184,166,0.5)" stroke-width="1"/>
+  <text x="150" y="176" fill="rgba(20,184,166,0.65)" font-size="7"
+        text-anchor="middle" font-family="Consolas">recolector</text>
+
+  <!-- Partículas de catalizador con pulso de actividad -->
+  <!-- Fila 1 -->
+  <circle cx="82"  cy="73"  r="7.5" fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.9;0.4;0.9" dur="2.1s" begin="0s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="101" cy="80"  r="6.5" fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="120" cy="70"  r="8"   fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.9;0.3;0.9" dur="2.4s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="140" cy="78"  r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.45)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="2.0s" begin="0.9s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="160" cy="68"  r="7.5" fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.9;0.4;0.9" dur="1.9s" begin="1.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="180" cy="77"  r="6"   fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="2.3s" begin="0.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="200" cy="72"  r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.9;0.3;0.9" dur="2.1s" begin="0.7s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="220" cy="79"  r="6.5" fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="1.7s" begin="1.0s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Fila 2 -->
+  <circle cx="88"  cy="97"  r="6.5" fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.7;0.3;0.7" dur="2.2s" begin="0.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="110" cy="91"  r="8"   fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="2.5s" begin="0.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="132" cy="100" r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.45)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.8;0.3;0.8" dur="1.8s" begin="0.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="153" cy="93"  r="6"   fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.4;0.8;0.4" dur="2.0s" begin="1.1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="173" cy="100" r="7.5" fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.8;0.3;0.8" dur="2.3s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="195" cy="92"  r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.45)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="1.9s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="215" cy="98"  r="6.5" fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.7;0.3;0.7" dur="2.1s" begin="0.9s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Fila 3 -->
+  <circle cx="80"  cy="117" r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.45)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="2.2s" begin="0.1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="102" cy="112" r="8"   fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.9;0.4;0.9" dur="1.9s" begin="0.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="125" cy="120" r="6.5" fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.4;0.8;0.4" dur="2.5s" begin="0.7s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="147" cy="113" r="7.5" fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.8;0.3;0.8" dur="2.0s" begin="1.0s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="168" cy="120" r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.45)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.3;0.9;0.3" dur="1.8s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="190" cy="114" r="6"   fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.9;0.3;0.9" dur="2.3s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="212" cy="119" r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.45)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.5;0.9;0.5" dur="2.1s" begin="0.9s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Fila 4 -->
+  <circle cx="90"  cy="140" r="6.5" fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.8;0.3;0.8" dur="2.0s" begin="0.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="112" cy="134" r="7.5" fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="2.4s" begin="0.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="135" cy="142" r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.45)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.8;0.4;0.8" dur="1.9s" begin="0.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="157" cy="136" r="6"   fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="2.2s" begin="1.1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="178" cy="143" r="7.5" fill="url(#catG)" stroke="rgba(245,158,11,0.5)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.9;0.3;0.9" dur="2.0s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="200" cy="137" r="6.5" fill="url(#catG)" stroke="rgba(245,158,11,0.4)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="1.8s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="220" cy="141" r="7"   fill="url(#catG)" stroke="rgba(245,158,11,0.45)" stroke-width="0.8">
+    <animate attributeName="fill-opacity" values="0.7;0.3;0.7" dur="2.1s" begin="0.9s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Flujo de gas descendente (partículas pequeñas entre poros) -->
+  <circle cx="95" cy="56" r="2" fill="rgba(245,158,11,0.7)">
+    <animate attributeName="cy" values="56;160;56" dur="1.6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="150" cy="56" r="2.5" fill="rgba(245,158,11,0.6)">
+    <animate attributeName="cy" values="56;160;56" dur="2.0s" begin="0.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.1;0.7" dur="2.0s" begin="0.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="210" cy="56" r="2" fill="rgba(245,158,11,0.65)">
+    <animate attributeName="cy" values="56;160;56" dur="1.8s" begin="0.8s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.75;0.15;0.75" dur="1.8s" begin="0.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="122" cy="56" r="1.8" fill="rgba(245,158,11,0.55)">
+    <animate attributeName="cy" values="56;160;56" dur="2.2s" begin="1.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0.1;0.6" dur="2.2s" begin="1.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="178" cy="56" r="2.2" fill="rgba(245,158,11,0.6)">
+    <animate attributeName="cy" values="56;160;56" dur="1.9s" begin="0.6s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.9s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Entrada gas -->
+  <line x1="150" y1="8"  x2="150" y2="38" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrBR)"/>
+  <text x="158" y="26"  fill="#A0A0A0" font-size="7.5" font-family="Consolas">Gas/Liq</text>
+  <!-- Salida -->
+  <line x1="150" y1="183" x2="150" y2="203" stroke="#14B8A6" stroke-width="2" marker-end="url(#arrBRt)"/>
+  <text x="158" y="198" fill="#14B8A6" font-size="7.5" font-family="Consolas">Producto</text>
+
+  <!-- Labels -->
+  <text x="32" y="115" fill="rgba(245,158,11,0.4)" font-size="7" font-family="Consolas"
+        transform="rotate(-90 32 115)">ΔP — Ergun</text>
+  <text x="258" y="115" fill="#555" font-size="7" font-family="Consolas"
+        transform="rotate(90 258 115)">W [kg cat]</text>
+</svg>
+    </div>
+    <div class="rinfo">
+      <h3>PBR — Reactor de Lecho Empacado</h3>
+      <p>Reactor tubular relleno con partículas de catalizador sólido. La reacción ocurre en la <strong>superficie del catalizador</strong>. La variable de diseño es la <em>masa de catalizador W</em> [kg], no el volumen. La presión cae a lo largo del lecho según la ecuación de Ergun.</p>
+      <div class="formula">F<sub>A0</sub> dX/dW = −r'<sub>A</sub>(X,T,P)<small>r'<sub>A</sub> en mol/(kg<sub>cat</sub>·s) — ODE en W + ODE de Ergun en P</small></div>
+      <ul class="info-list">
+        <li><span class="info-label">Ergun</span><span>dy/dW = −α/(2y)·(T/T₀) — α encapsula D<sub>p</sub>, φ, G, μ, ρ del lecho</span></li>
+        <li><span class="info-label">LHHW</span><span>Cinética mecanística de superficie: −r'<sub>A</sub> = k·C<sub>A</sub>C<sub>B</sub>/(1+K<sub>A</sub>C<sub>A</sub>+K<sub>B</sub>C<sub>B</sub>)²</span></li>
+        <li><span class="info-label">Uso</span><span>HDS diesel (&lt;10 ppm S), síntesis NH₃ (180 Mt/año), metanol</span></li>
+        <li><span class="info-label">S. BET</span><span>Al₂O₃: 200–400 m²/g; zeolitas: 400–1,000 m²/g</span></li>
+        <li><span class="info-label">Desact.</span><span>a(t) = e<sup>−k_d·t</sup> — ciclo de regeneración cada semanas/meses</span></li>
+      </ul>
+    </div>
+    <div class="rinsight">
+      <h4>Insight clave — El catalizador multiplica la velocidad ×250</h4>
+      <p>Sin catalizador (HDS homogénea a 350°C): V necesario ≈ 10⁶ dm³. Con catalizador CoMo/Al₂O₃: W* ≈ 3,200 kg → V<sub>lecho</sub> ≈ 4,000 dm³. La catálisis heterogénea reduce el reactor 250×. La ecuación de Ergun impone una restricción real: caídas &gt;20% de presión pueden reducir la conversión en 10–15% respecto al diseño.</p>
+    </div>
+  </div>
+
+  <!-- Tabla comparativa -->
+  <div style="margin-top:3rem" class="reveal">
+    <h3 style="color:var(--amber-light);margin-bottom:1rem">Comparativa rápida de configuraciones</h3>
+    <div style="overflow-x:auto">
+    <table class="comp-table">
+      <thead><tr>
+        <th>Reactor</th><th>Ecuación diseño</th><th>V vs PFR</th>
+        <th>DTR</th><th>Control T</th><th>Aplicación típica</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><strong>Batch</strong></td><td class="mono">t = NA0∫dX/(−rA·V)</td><td>= PFR (t=τ)</td><td>δ(t−τ)</td><td>⭐⭐⭐⭐</td><td>APIs, biotech, síntesis fina</td></tr>
+        <tr><td><strong>CSTR</strong></td><td class="mono">V = FA0·X/(−rA|sal)</td><td>Mayor (n&gt;0)</td><td>e<sup>−t/τ</sup></td><td>⭐⭐⭐⭐⭐</td><td>Polimerización, fermentación</td></tr>
+        <tr><td><strong>PFR</strong></td><td class="mono">FA0·dX/dV = −rA</td><td>Mínimo</td><td>δ(t−τ)</td><td>⭐⭐</td><td>Steam cracking, reforming</td></tr>
+        <tr><td><strong>PBR</strong></td><td class="mono">FA0·dX/dW = −r'A</td><td>≈ PFR</td><td>≈ δ(t−τ)</td><td>⭐⭐</td><td>HDS, NH₃, metanol, FT</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════════════════════
+     §4  REACTORES DE CONVERSIÓN EN HYSYS — sección nueva
+══════════════════════════════════════════════════════ -->
+<section id="hysys">
+  <div class="section-label reveal">04 — Simulación profesional</div>
+  <h2 class="reveal">Reactores de conversión <span class="hl">en HYSYS</span></h2>
+
+  <div class="hysys-hero reveal">
+    <div class="hysys-badge">Aspen HYSYS v12+ · Aspen Plus v14+ · UniSim Design</div>
+    <h3>¿Qué es el modelo de "reactor de conversión" en HYSYS?</h3>
+    <p>
+      En Aspen HYSYS, el <strong>Conversion Reactor</strong> (también llamado <em>Stoichiometric Reactor</em>
+      en Aspen Plus) es un modelo de simulación que calcula el estado de salida de un reactor
+      cuando se <strong>especifica directamente la conversión X de uno o más reactivos</strong>,
+      sin necesidad de datos cinéticos explícitos. Es el primer nivel de modelado de reactores
+      en simulación de procesos — más simple que el Equilibrium Reactor o el Plug Flow Reactor de HYSYS,
+      pero fundamental en etapas de diseño preliminar y análisis de sensibilidad.
+    </p>
+    <p style="margin-top:.7rem">
+      A diferencia del enfoque de Fogler (resolver la ODE de diseño con la cinética r<sub>A</sub>),
+      el Conversion Reactor de HYSYS requiere que el ingeniero <em>especifique X como input</em>
+      y calcula automáticamente: composición de salida, temperatura de salida (con balance de energía),
+      flujos de todas las especies y el calor de reacción intercambiado con la utilidad.
+    </p>
+  </div>
+
+  <!-- Paso a paso configuración -->
+  <h3 class="reveal" style="margin-bottom:1.2rem">Configuración paso a paso en Aspen HYSYS</h3>
+  <div class="hysys-steps reveal">
+
+    <div class="hysys-step">
+      <div class="hysys-step-n">01</div>
+      <div class="hysys-step-body">
+        <h4>Definir el paquete de propiedades termodinámicas</h4>
+        <p>Antes de agregar el reactor, seleccionar el <em>Fluid Package</em> apropiado para el sistema. Para hidrocarburos ligeros: Peng-Robinson (PR) o SRK. Para sistemas polares o acuosos: NRTL, UNIQUAC o Wilson. Para gases ideales a baja presión: Ideal o Lee-Kesler.</p>
+        <div class="code-block">
+          Simulation → Fluid Packages → Add → PR (Peng-Robinson)<br>
+          → Components: agregar todos los reactivos y productos<br>
+          → BIPs: verificar parámetros de interacción binaria
+        </div>
+      </div>
+    </div>
+
+    <div class="hysys-step">
+      <div class="hysys-step-n">02</div>
+      <div class="hysys-step-body">
+        <h4>Definir las corrientes de alimentación</h4>
+        <p>Especificar la corriente de entrada al reactor con: composición (fracción molar o flujo molar de cada componente), temperatura, presión y flujo total. En HYSYS, se necesitan al menos dos de tres variables (T, P, flujo) para que la corriente esté completamente especificada.</p>
+        <div class="code-block">
+          Feed Stream → Conditions: T = 350°C, P = 50 bar<br>
+          → Composition: C₂H₆ = 0.95, N₂ = 0.05 (fracción molar)<br>
+          → Flow Rate: 1,000 kmol/h
+        </div>
+      </div>
+    </div>
+
+    <div class="hysys-step">
+      <div class="hysys-step-n">03</div>
+      <div class="hysys-step-body">
+        <h4>Insertar el Conversion Reactor</h4>
+        <p>En el PFD (Process Flow Diagram), agregar el bloque de Conversion Reactor desde la paleta de operaciones unitarias. Conectar la corriente de alimentación a la entrada del reactor y crear las corrientes de salida: producto líquido/gas y corriente de calor (Q).</p>
+        <div class="code-block">
+          PFD → Reactors → Conversion Reactor<br>
+          → Inlet: Feed Stream<br>
+          → Outlet Product: Product Stream<br>
+          → Energy: Q_rxn (corriente de calor)
+        </div>
+      </div>
+    </div>
+
+    <div class="hysys-step">
+      <div class="hysys-step-n">04</div>
+      <div class="hysys-step-body">
+        <h4>Especificar las reacciones y conversiones</h4>
+        <p>En la pestaña <em>Reactions</em> del reactor, definir cada reacción estequiométrica con su conversión. HYSYS permite especificar la conversión como valor fijo, como función de la temperatura (tabla o expresión), o como dependiente de otra variable de proceso via una hoja de cálculo interna.</p>
+        <div class="code-block">
+          Reactions → Add Reaction → Conversion Reaction<br>
+          → Stoichiometry: C₂H₆ → C₂H₄ + H₂<br>
+          → Base Component: C₂H₆ (reactivo limitante)<br>
+          → Conversion X = 0.60 (valor fijo)<br>
+          → O bien: X = f(T) mediante tabla de datos
+        </div>
+      </div>
+    </div>
+
+    <div class="hysys-step">
+      <div class="hysys-step-n">05</div>
+      <div class="hysys-step-body">
+        <h4>Configurar el balance de energía</h4>
+        <p>El Conversion Reactor puede operar en tres modos térmicos: (a) <strong>Adiabático</strong>: Q=0, T salida calculada; (b) <strong>Temperatura fija</strong>: T especificada, Q calculado; (c) <strong>Duty especificado</strong>: Q fijo, T calculada. El calor de reacción se obtiene del calor de formación (ΔHf) de los componentes definidos en el paquete termodinámico.</p>
+        <div class="code-block">
+          Parameters → Pressure Drop: 5 kPa (opcional)<br>
+          Energy → Mode: Adiabatic | Fixed T | Fixed Q<br>
+          → Si Fixed T: T_outlet = 800°C<br>
+          → HYSYS calcula Q usando ΔHf estándar (NIST)
+        </div>
+      </div>
+    </div>
+
+    <div class="hysys-step">
+      <div class="hysys-step-n">06</div>
+      <div class="hysys-step-body">
+        <h4>Verificar resultados y análisis de sensibilidad</h4>
+        <p>Revisar la convergencia (verde en HYSYS): composición de salida, temperatura, flujos, y calor de reacción. Usar la herramienta <em>Case Study</em> o <em>Sensitivity Analysis</em> para explorar cómo varía la corriente de salida al cambiar X, T o la composición de alimentación.</p>
+        <div class="code-block">
+          Results → Product Stream: verificar composición y T<br>
+          → Q_rxn: calor generado/consumido [kW]<br>
+          Tools → Case Study → Variable: Conversion X (0.1 a 0.99)<br>
+          → Respuesta: T_sal, flujo de C₂H₄, Q_rxn
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Parámetros críticos -->
+  <h3 class="reveal" style="margin:2.5rem 0 1.2rem">Parámetros críticos del Conversion Reactor en HYSYS</h3>
+  <div class="hysys-params reveal">
+    <div class="hparam">
+      <div class="hparam-name">Conversion X</div>
+      <div class="hparam-val">0 – 1 (adimensional)</div>
+      <div class="hparam-desc">Fracción del reactivo base que reacciona. Puede ser constante, función de T (tabla), o dependiente de otra variable via Expression. Es el input más importante del modelo.</div>
+    </div>
+    <div class="hparam">
+      <div class="hparam-name">Base Component</div>
+      <div class="hparam-val">Reactivo limitante</div>
+      <div class="hparam-desc">El componente sobre el que se define X. HYSYS calcula todos los demás flujos estequiométricamente a partir de la conversión del reactivo base especificado.</div>
+    </div>
+    <div class="hparam">
+      <div class="hparam-name">Calor de reacción ΔH_rx</div>
+      <div class="hparam-val">kJ/kmol (automático)</div>
+      <div class="hparam-desc">HYSYS lo calcula automáticamente de los calores de formación ΔHf del paquete termodinámico. Exotérmico (ΔH &lt; 0): genera calor; endotérmico (ΔH &gt; 0): absorbe calor.</div>
+    </div>
+    <div class="hparam">
+      <div class="hparam-name">Presión de salida</div>
+      <div class="hparam-val">bar (especificada o ΔP)</div>
+      <div class="hparam-desc">Se puede especificar la presión de salida directamente o la caída de presión ΔP. Para PBR, usar el modelo de lecho empacado de HYSYS que incorpora la ecuación de Ergun internamente.</div>
+    </div>
+    <div class="hparam">
+      <div class="hparam-name">Modo energético</div>
+      <div class="hparam-val">Adiabático / T fija / Q fijo</div>
+      <div class="hparam-desc">Define cómo se resuelve el balance de energía. "Adiabático" es el más común en diseño preliminar. "T fija" corresponde a reactores isotérmicos con control perfecto de la camisa.</div>
+    </div>
+    <div class="hparam">
+      <div class="hparam-name">Múltiples reacciones</div>
+      <div class="hparam-val">Conjunto de reacciones</div>
+      <div class="hparam-desc">HYSYS permite agregar múltiples reacciones simultáneas (reacciones paralelas y en serie) con conversiones independientes para cada una, calculando el balance global de masa y energía.</div>
+    </div>
+  </div>
+
+  <!-- Comparación enfoque manual vs HYSYS -->
+  <h3 class="reveal" style="margin:2.5rem 0 1.2rem">Diseño manual (Fogler) vs simulación en HYSYS</h3>
+  <div class="hysys-compare reveal">
+    <div class="hcol manual">
+      <h4>📐 Enfoque Fogler (manual / Python)</h4>
+      <ul>
+        <li>Requiere datos cinéticos: k(T), Ea, orden n — debe medirse experimentalmente</li>
+        <li>Resuelve la ODE de diseño integrando r<sub>A</sub>(X) → calcula V o W necesario</li>
+        <li>Permite diseño desde primeros principios: entender el mecanismo físico</li>
+        <li>Control total sobre el modelo cinético y sus suposiciones</li>
+        <li>Ideal para: diseño nuevo, investigación, análisis de sensibilidad paramétrica</li>
+        <li>Herramienta: Python (scipy.integrate.solve_ivp), MATLAB, Mathematica</li>
+      </ul>
+    </div>
+    <div class="hcol hysys">
+      <h4 style="color:var(--blue)">💻 Enfoque HYSYS (Conversion Reactor)</h4>
+      <ul>
+        <li>Solo requiere especificar X — no necesita datos cinéticos explícitos</li>
+        <li>Calcula automáticamente composición, T y Q usando termodinámica rigurosa</li>
+        <li>Integrado con el resto del proceso: separadores, intercambiadores, compresores</li>
+        <li>Análisis de sensibilidad y optimización con el motor de HYSYS (Activated Analysis)</li>
+        <li>Ideal para: diseño de proceso completo, integración energética, OPEX/CAPEX</li>
+        <li>Herramienta: Aspen HYSYS, Aspen Plus, UniSim Design (Honeywell)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Advertencias y tips -->
+  <div class="hysys-warning reveal">
+    <span style="font-size:1.3rem;flex-shrink:0">⚠️</span>
+    <div>
+      <strong style="color:var(--coral)">Limitación fundamental del Conversion Reactor:</strong>
+      El modelo asume que la conversión X es un dato conocido, no un resultado calculado de la cinética.
+      Esto significa que <strong>no predice la conversión real</strong> — el ingeniero debe proveerla como input.
+      Para predecir X a partir de condiciones de operación (T, P, τ), se requiere el modelo de PFR o CSTR
+      de HYSYS con datos cinéticos, o el modelo de equilibrio (Gibbs Reactor / Equilibrium Reactor).
+    </div>
+  </div>
+
+  <div class="hysys-tip reveal">
+    <span style="font-size:1.3rem;flex-shrink:0">💡</span>
+    <div>
+      <strong style="color:var(--green)">Flujo de trabajo recomendado en ingeniería de procesos:</strong>
+      (1) Usar el Conversion Reactor para el diseño conceptual y el balance de masa/energía inicial.
+      (2) Validar la conversión supuesta con datos experimentales o con el modelo cinético de Fogler.
+      (3) Reemplazar por el modelo PFR/CSTR de HYSYS con cinética para el diseño detallado.
+      (4) Integrar con el diagrama de flujo completo (PFD) para el análisis de energía y costos.
+    </div>
+  </div>
+
+  <!-- Ejemplo numérico en HYSYS -->
+  <div class="def-card reveal" style="border-left-color:var(--blue);margin-top:2rem">
+    <h4 style="color:var(--blue)">Ejemplo completo: Steam Cracking de Etano en HYSYS</h4>
+    <p>
+      <strong>Reacción:</strong> C₂H₆ → C₂H₄ + H₂ &nbsp;·&nbsp; ΔH°<sub>rx</sub> = +137 kJ/mol (endotérmica)
+    </p>
+    <div class="formula" style="font-size:.88rem;text-align:left;padding:1.1rem 1.3rem">
+      Alimentación: 1,000 kmol/h de etano, T₀ = 650°C, P = 1.5 atm<br>
+      X especificada = 0.60 → HYSYS calcula:<br>
+      ─────────────────────────────────────────<br>
+      Producto: C₂H₄ = 600 kmol/h · H₂ = 600 kmol/h · C₂H₆ = 400 kmol/h<br>
+      Q requerido = 1,000 × 0.60 × 137 = 82,200 kJ/h = 22.8 MW (calefacción)<br>
+      T salida (adiabático sin Q): ≈ 315°C — inviable industrialmente<br>
+      T salida (modo T fija = 800°C): Q = 22.8 MW suministrado por el horno
+    </div>
+    <p style="margin-bottom:0">
+      El balance de energía muestra por qué el steam cracking requiere hornos a 800–900°C:
+      la reacción endotérmica necesita 22.8 MW por 1,000 kmol/h de etano. En HYSYS,
+      la corriente Q del reactor representa exactamente la carga térmica que debe
+      suministrar el horno de craqueo (PFR tubular real).
+    </p>
+  </div>
+
+  <!-- X como función de T -->
+  <h3 class="reveal" style="margin:2.5rem 0 1rem">Conversión como función de la temperatura: X = f(T)</h3>
+  <p class="reveal">
+    Una característica avanzada del Conversion Reactor de HYSYS es que la conversión puede
+    especificarse como una <strong>tabla de datos X vs T</strong> (interpolación lineal o spline)
+    o como una <strong>expresión matemática</strong> vinculada a una hoja de cálculo interna.
+    Esto permite modelar el comportamiento real de un catalizador sin definir explícitamente la cinética.
+  </p>
+  <div class="def-card reveal" style="border-left-color:var(--blue)">
+    <h4 style="color:var(--blue)">Ejemplo: X = f(T) para HDS catalítica (CoMo/Al₂O₃)</h4>
+    <table class="var-table">
+      <thead><tr><th>T (°C)</th><th>X (conversión de azufre)</th><th>Interpretación</th></tr></thead>
+      <tbody>
+        <tr><td>280</td><td class="vt-sym">0.72</td><td>Temperatura mínima de operación industrial</td></tr>
+        <tr><td>320</td><td class="vt-sym">0.91</td><td>Operación SOR (Start-of-Run) con catalizador fresco</td></tr>
+        <tr><td>360</td><td class="vt-sym">0.997</td><td>Operación EOR (End-of-Run) con catalizador parcialmente desactivado</td></tr>
+        <tr><td>400</td><td class="vt-sym">0.999</td><td>Temperatura máxima — límite metalúrgico del reactor</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-bottom:0">
+      Esta tabla, ingresada en HYSYS como X = f(T), permite simular el ciclo de vida del catalizador:
+      a medida que el catalizador se desactiva (a(t) decrece), el operador eleva T para compensar,
+      manteniendo X ≥ 0.997 (norma EU: &lt;10 ppm S en diesel). HYSYS calcula automáticamente
+      el calor intercambiado en cada punto del ciclo.
+    </p>
+  </div>
+
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════════════════════
+     §5  CALCULADORA INTERACTIVA
+══════════════════════════════════════════════════════ -->
+<section id="calc">
+  <div class="section-label reveal">05 — Herramienta interactiva</div>
+  <h2 class="reveal">Calculadora de <span class="hl">diseño</span></h2>
+  <p class="reveal">
+    Estima el volumen de reactor para una reacción de primer orden, comparando el CSTR y el PFR.
+    Modifica los parámetros y observa cómo cambia el volumen y la relación entre ambas configuraciones.
+  </p>
+
+  <div class="calc-grid reveal">
+    <div class="calc-panel">
+      <h3>Parámetros de entrada</h3>
+      <div class="sl-row">
+        <div class="sl-top"><span class="sl-lbl">Conversión deseada (X)</span><span class="sl-val" id="val-x">0.80</span></div>
+        <input type="range" id="sl-x" min="10" max="99" step="1" value="80" oninput="updateCalc()">
+      </div>
+      <div class="sl-row">
+        <div class="sl-top"><span class="sl-lbl">Flujo molar F<sub>A0</sub> (mol/s)</span><span class="sl-val" id="val-fa0">2.0</span></div>
+        <input type="range" id="sl-fa0" min="1" max="100" step="1" value="20" oninput="updateCalc()">
+      </div>
+      <div class="sl-row">
+        <div class="sl-top"><span class="sl-lbl">Constante de velocidad k (s⁻¹)</span><span class="sl-val" id="val-k">0.10</span></div>
+        <input type="range" id="sl-k" min="1" max="100" step="1" value="10" oninput="updateCalc()">
+      </div>
+      <div class="sl-row">
+        <div class="sl-top"><span class="sl-lbl">Concentración inicial C<sub>A0</sub> (mol/L)</span><span class="sl-val" id="val-ca0">1.0</span></div>
+        <input type="range" id="sl-ca0" min="1" max="100" step="1" value="10" oninput="updateCalc()">
+      </div>
+      <div class="insight-box" id="insight-box"></div>
+    </div>
+
+    <div class="calc-panel">
+      <h3>Resultados — Volumen de reactor</h3>
+      <div class="result-row">
+        <span class="result-lbl">V<sub>CSTR</sub></span>
+        <span class="result-val"><span id="res-cstr">—</span> <small style="font-size:.7rem;color:var(--text3)">L</small></span>
+      </div>
+      <div class="result-row">
+        <span class="result-lbl">V<sub>PFR</sub></span>
+        <span class="result-val"><span id="res-pfr">—</span> <small style="font-size:.7rem;color:var(--text3)">L</small></span>
+      </div>
+      <div style="height:1px;background:var(--border);margin:1rem 0"></div>
+      <div class="bar-wrap">
+        <div class="bar-lbl"><span>CSTR</span><span id="lbl-cstr-pct"></span></div>
+        <div class="bar-track"><div class="bar-fill bar-cstr" id="bar-cstr"></div></div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-lbl"><span>PFR</span><span id="lbl-pfr-pct"></span></div>
+        <div class="bar-track"><div class="bar-fill bar-pfr" id="bar-pfr"></div></div>
+      </div>
+      <div style="margin-top:1.5rem;padding:1rem;background:var(--bg3);border-radius:4px;border:1px solid var(--border)">
+        <div style="font-family:var(--f-mono);font-size:.7rem;color:var(--text3);margin-bottom:.5rem">ECUACIONES APLICADAS</div>
+        <div style="font-family:var(--f-mono);font-size:.78rem;color:var(--amber-light);line-height:1.8">
+          V_CSTR = (FA0·X) / (k·CA0·(1−X))<br>
+          V_PFR  = (FA0/k·CA0) · ln(1/(1−X))<br>
+          Ratio  = V_CSTR / V_PFR
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════════════════════
+     §6  APLICACIONES INDUSTRIALES
+══════════════════════════════════════════════════════ -->
+<section id="apps">
+  <div class="section-label reveal">06 — Usos</div>
+  <h2 class="reveal">Aplicaciones <span class="hl">industriales</span></h2>
+  <p class="reveal">
+    Los reactores de conversión son el corazón de toda la industria química y petroquímica global.
+    Cada proceso implica la selección del tipo de reactor, el cálculo de la conversión óptima
+    y el balance energético completo.
+  </p>
+
+  <div class="apps-grid reveal">
+    <div class="app-card">
+      <div class="app-ico">🛢️</div>
+      <div class="app-title">Refinación de Petróleo</div>
+      <div class="app-kpis">
+        <span class="akpi">FCC — 40% gasolina mundial</span>
+        <span class="akpi">HDS &lt;10 ppm S</span>
+        <span class="akpi">PBR + Trickle Bed</span>
+      </div>
+      <p class="app-desc">Cracking catalítico fluido (FCC), hidrodesulfuración (HDS), reformado catalítico. La HDS usa PBR con CoMo/Al₂O₃, presión 30–80 bar, T=320–380°C para cumplir norma EU de &lt;10 ppm de azufre en diesel.</p>
+    </div>
+
+    <div class="app-card">
+      <div class="app-ico">⚗️</div>
+      <div class="app-title">Síntesis de Amoniaco (Haber-Bosch)</div>
+      <div class="app-kpis">
+        <span class="akpi">180 Mt/año global</span>
+        <span class="akpi">150–300 atm</span>
+        <span class="akpi">Fe/K₂O catalizador</span>
+      </div>
+      <p class="app-desc">N₂ + 3H₂ → 2NH₃ en PBR a 400–500°C. X por pasada = 15–25% (limitado por equilibrio). Reciclo intensivo. Base de toda la industria de fertilizantes y plásticos nitrogenados. Haldor Topsoe, KBR, Casale.</p>
+    </div>
+
+    <div class="app-card">
+      <div class="app-ico">🔥</div>
+      <div class="app-title">Steam Cracking de Etano</div>
+      <div class="app-kpis">
+        <span class="akpi">200 Mt/año etileno</span>
+        <span class="akpi">τ = 400 ms</span>
+        <span class="akpi">T = 800–900°C</span>
+      </div>
+      <p class="app-desc">PFR tubular a 800–900°C con tiempo de residencia de 400 ms. Ea = 272 kJ/mol → k duplica cada 10°C. El CSTR es inviable (mecánica y energéticamente). Tecnologías: Linde, KBR, Lummus, Technip.</p>
+    </div>
+
+    <div class="app-card">
+      <div class="app-ico">💊</div>
+      <div class="app-title">Industria Farmacéutica</div>
+      <div class="app-kpis">
+        <span class="akpi">95% APIs en batch</span>
+        <span class="akpi">FDA 21 CFR 211</span>
+        <span class="akpi">V = 100L – 10,000L</span>
+      </div>
+      <p class="app-desc">Síntesis de principios activos (APIs), fermentación de antibióticos y anticuerpos monoclonales (mAbs). Uso intensivo de reactores batch y semibatch. Validación de proceso obligatoria con análisis de X*(productividad óptima).</p>
+    </div>
+
+    <div class="app-card">
+      <div class="app-ico">🧴</div>
+      <div class="app-title">Polímeros y Plásticos</div>
+      <div class="app-kpis">
+        <span class="akpi">HDPE — 80 Mt/año</span>
+        <span class="akpi">CSTR / Lecho fluido</span>
+        <span class="akpi">Dow Unipol</span>
+      </div>
+      <p class="app-desc">Polimerización de etileno (HDPE, LLDPE) en reactores de lecho fluidizado (Unipol, Dow) a 70–90°C y 20–30 bar. Catalizador Ziegler-Natta o metaloceno. La DTR del reactor controla la distribución de pesos moleculares.</p>
+    </div>
+
+    <div class="app-card">
+      <div class="app-ico">🌱</div>
+      <div class="app-title">Síntesis de Metanol</div>
+      <div class="app-kpis">
+        <span class="akpi">100 Mt/año</span>
+        <span class="akpi">CuZnO/Al₂O₃</span>
+        <span class="akpi">T = 220–280°C</span>
+      </div>
+      <p class="app-desc">CO + 2H₂ → CH₃OH en PBR a 50–100 bar. Catalizador CuZnO/Al₂O₃. X por pasada = 20–30% con reciclo intensivo. Proceso ICI/Synetix, Davy, Lurgi. Base del ciclo de producción de biodiesel (transesterificación).</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════════════════════
+     §7  PROS Y CONS
+══════════════════════════════════════════════════════ -->
+<section id="proscons">
+  <div class="section-label reveal">07 — Evaluación</div>
+  <h2 class="reveal">Fortalezas y <span class="hl">limitaciones</span></h2>
+
+  <div class="proscons-grid reveal">
+    <div class="pro-card">
+      <h3>✓ Fortalezas</h3>
+      <ul class="pc-list">
+        <li>Alta eficiencia de transformación: conversiones de hasta 99.9% en sistemas optimizados con catalizadores selectivos de alta actividad.</li>
+        <li>Operación continua (CSTR, PFR) permite throughput de miles de toneladas por año en un solo tren de proceso, con factores de utilización &gt;95%.</li>
+        <li>Integración energética: el calor de reacciones exotérmicas recuperado puede precalentar la alimentación (intercambiadores shell-and-tube integrados).</li>
+        <li>Control preciso de selectividad mediante catalizadores bifuncionales y condiciones de operación optimizadas (T, P, τ, concentración).</li>
+        <li>Economías de escala notables: el costo por kilogramo de producto disminuye con la escala siguiendo la regla del 0.6 (Six-tenths rule).</li>
+        <li>Amplio conocimiento acumulado: décadas de operación industrial documentada permiten diseños confiables con márgenes de seguridad bien establecidos.</li>
+      </ul>
+    </div>
+    <div class="con-card">
+      <h3>✗ Limitaciones</h3>
+      <ul class="pc-list">
+        <li>Riesgo de runaway térmico en reacciones exotérmicas de alta energía (ΔT<sub>ad</sub> &gt; 200K): sistemas de seguridad SIL-2/SIL-3 obligatorios.</li>
+        <li>Desactivación del catalizador (envenenamiento por S, Pb; sinterización a alta T; deposición de coque): reduce X real, requiere regeneración periódica.</li>
+        <li>Limitaciones termodinámicas de equilibrio: X no puede superar X<sub>eq</sub> sin eliminar productos del sistema (membranas) o usar exceso de un reactivo.</li>
+        <li>La conversión muy alta (X → 1) implica volúmenes que divergen y costos de separación de producto residual muy elevados: el óptimo económico siempre es X* &lt; 1.</li>
+        <li>Alta inversión de capital (CAPEX) para reactores a alta presión (&gt;100 bar) o alta temperatura (&gt;500°C): materiales especiales (Inconel, Hastelloy).</li>
+        <li>Reacciones con sólidos en suspensión o formación de coque requieren operaciones de limpieza periódicas que reducen la disponibilidad de la planta.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════════════════════
+     §8  CONSIDERACIONES INDUSTRIALES
+══════════════════════════════════════════════════════ -->
+<section id="industrial">
+  <div class="section-label reveal">08 — Ingeniería avanzada</div>
+  <h2 class="reveal">Consideraciones <span class="hl">industriales</span></h2>
+
+  <div class="consid-grid reveal">
+    <div class="consid-card s1">
+      <div class="consid-num">[ 01 ]  SEGURIDAD</div>
+      <div class="consid-tag">Gestión térmica y de presión</div>
+      <div class="consid-title">Runaway térmico y sistemas de protección</div>
+      <div class="consid-body">
+        El runaway es la falla más crítica en reactores exotérmicos. La retroalimentación T → k → r<sub>A</sub> → calor → T puede ser incontrolable si dG/dT &gt; dR/dT (criterio de Van Heerden). Sistemas de protección:
+        <ul>
+          <li>Análisis HAZOP con identificación de escenarios de fuga de temperatura</li>
+          <li>Sistemas SIL-2/SIL-3 (IEC 61511): lógica de parada de emergencia</li>
+          <li>Enfriamiento de emergencia (quench) con agua o vapor en reactor de bypass</li>
+          <li>Discos de ruptura y válvulas de seguridad calibradas para la presión de diseño</li>
+          <li>Cálculo de ΔT<sub>ad</sub> y TMR (Tiempo de Máxima Velocidad) como criterio de riesgo</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="consid-card s2">
+      <div class="consid-num">[ 02 ]  CATÁLISIS</div>
+      <div class="consid-tag">Selección y ciclo de vida del catalizador</div>
+      <div class="consid-title">Actividad, selectividad y regeneración</div>
+      <div class="consid-body">
+        El catalizador determina velocidad, selectividad y T de operación. Parámetros clave:
+        <ul>
+          <li>Área superficial BET: Al₂O₃ (200–400 m²/g), zeolitas (400–1,000 m²/g)</li>
+          <li>Actividad inicial y estabilidad: curvas a(t) = e<sup>−k_d·t</sup> determinan el ciclo</li>
+          <li>Resistencia al envenenamiento por S, Cl, metales pesados (Pb, As, Hg)</li>
+          <li>Sinterización a alta T: pérdida irreversible de área superficial</li>
+          <li>Regeneración: oxidación del coque a &gt;400°C; sulfuración de CoMo/Al₂O₃</li>
+          <li>Estrategia SOR→EOR: elevar T de operación 1–3°C/semana para compensar la desactivación</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="consid-card s3">
+      <div class="consid-num">[ 03 ]  OPTIMIZACIÓN</div>
+      <div class="consid-tag">Punto de operación óptimo</div>
+      <div class="consid-title">Conversión óptima y análisis económico</div>
+      <div class="consid-body">
+        La conversión de diseño X no es arbitraria: se optimiza minimizando el costo total anualizado (TAC = CAPEX/vida + OPEX):
+        <ul>
+          <li>CAPEX↑ con X (reactor más grande, materiales especiales)</li>
+          <li>Separación↑ con baja X (más reciclo, más energía)</li>
+          <li>Materia prima perdida↓ con alta X</li>
+          <li>Función objetivo: min[C<sub>reactor</sub>(X) + C<sub>separación</sub>(X) + C<sub>feedstock</sub>(1−X)]</li>
+          <li>Para batch: adicionar t₀ (tiempo muerto) al análisis → X* &lt; 1 siempre</li>
+          <li>Herramienta: Aspen Economic Analyzer integrado con HYSYS para TAC automático</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="consid-card s4">
+      <div class="consid-num">[ 04 ]  ESCALADO</div>
+      <div class="consid-tag">Ampliación de escala</div>
+      <div class="consid-title">Scale-up: del laboratorio a la planta</div>
+      <div class="consid-body">
+        El scale-up de reactores es uno de los problemas más complejos de la ingeniería química:
+        <ul>
+          <li>Criterio de similitud: Da (Damköhler) constante garantiza X constante</li>
+          <li>Problema de mezcla: t<sub>mix</sub> crece con el volumen (P/V disminuye)</li>
+          <li>Transferencia de calor: área/volumen disminuye con la escala → ΔT mayor</li>
+          <li>Distribución de flujo en PBR: canalizaciones y zonas muertas a escala industrial</li>
+          <li>Estrategia: laboratorio (mL) → planta piloto (L) → demo (m³) → planta (100+ m³)</li>
+          <li>Rule of 10: factor 10 entre escalas con validación experimental en cada paso</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="consid-card s5">
+      <div class="consid-num">[ 05 ]  MATERIALES</div>
+      <div class="consid-tag">Selección de materiales de construcción</div>
+      <div class="consid-title">Corrosión, temperatura y presión</div>
+      <div class="consid-body">
+        Los materiales del reactor deben resistir las condiciones extremas del proceso:
+        <ul>
+          <li>Acero inoxidable 316L: hasta 300°C, ambientes moderadamente corrosivos</li>
+          <li>Inconel 625 / Hastelloy X: hasta 980°C (steam cracking, reforming)</li>
+          <li>Vidrio borosilicato: reactores de laboratorio y ambientes muy corrosivos (HF, HCl conc.)</li>
+          <li>Titanio: ambientes oxidantes, ácido nítrico, cloruros</li>
+          <li>PTFE-lined (revestido): ácidos fuertes a baja temperatura y presión</li>
+          <li>Criterio: NACE MR0175 para ambientes con H₂S (sour service)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="consid-card s6">
+      <div class="consid-num">[ 06 ]  DIGITAL</div>
+      <div class="consid-tag">Simulación y gemelo digital</div>
+      <div class="consid-title">Digital twin del reactor</div>
+      <div class="consid-body">
+        El gemelo digital (Digital Twin) del reactor integra el modelo de HYSYS con datos en tiempo real del DCS (Sistema de Control Distribuido):
+        <ul>
+          <li>Modelo HYSYS actualizado con mediciones de T, P, flujo y composición</li>
+          <li>Predicción de la conversión real vs la de diseño → detecta desactivación del catalizador</li>
+          <li>Optimización en tiempo real: ajuste de T de operación para compensar a(t)</li>
+          <li>Planificación de regeneración del catalizador antes de la falla operacional</li>
+          <li>Plataformas: Aspen DMC3, AspenTech APC, Yokogawa OpreX, Honeywell Profit Suite</li>
+          <li>Regulación: API 754 (KPIs de seguridad de proceso) y ISA-18.2 (gestión de alarmas)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ══════════════════════════════════════════════════════
+     §9  QUIZ
+══════════════════════════════════════════════════════ -->
+<section id="quiz">
+  <div class="section-label reveal">09 — Actividad</div>
+  <h2 class="reveal">Quiz <span class="hl">interactivo</span></h2>
+  <p class="reveal" style="max-width:580px;margin-bottom:2.5rem">
+    5 preguntas de opción múltiple sobre diseño de reactores y simulación en HYSYS.
+  </p>
+  <div class="quiz-card reveal">
+    <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress"></div></div>
+    <div class="quiz-counter" id="quiz-counter"></div>
+    <div class="quiz-q" id="quiz-question" style="margin-top:1rem"></div>
+    <div class="quiz-options" id="quiz-options"></div>
+    <div class="quiz-feedback" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <button class="btn btn-primary" id="quiz-btn" onclick="nextQuestion()">Siguiente →</button>
+      <span id="quiz-score" style="font-size:.8rem;color:var(--text3);font-family:var(--f-mono)"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer>
+  <p><strong>Reactor de Conversión — Guía Industrial Completa</strong></p>
+  <p>Programa 740484 · Maestría en Ingeniería Química · Universidad del Valle<br>
+  Prof. José Antonio Lara Ramos, Ing.Qco., M.Sc., Ph.D. · 2025</p>
+  <p style="margin-top:.6rem;font-size:.78rem;opacity:.6">
+    Referencia: Fogler, H.S. — <em>Elements of Chemical Reaction Engineering</em>, 4ª Ed., Pearson.<br>
+    Aspen HYSYS v12+ · Aspen Plus v14+ · UniSim Design — Honeywell
+  </p>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════
+     JAVASCRIPT ÚNICO
+══════════════════════════════════════════════════════ -->
+<script>
+/* ─── TIMER ─── */
+var timerInterval=null, timerSec=20*60, running=false;
+function toggleTimer(){
+  if(running){ clearInterval(timerInterval); running=false; document.getElementById('timer').classList.remove('running'); }
+  else { running=true; document.getElementById('timer').classList.add('running'); timerInterval=setInterval(tickTimer,1000); }
+}
+function tickTimer(){
+  timerSec--; if(timerSec<0)timerSec=0;
+  var m=Math.floor(timerSec/60), s=timerSec%60;
+  document.getElementById('timer').textContent='⏱ '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  if(timerSec===0){ clearInterval(timerInterval); running=false; document.getElementById('timer').style.color='var(--coral)'; }
+}
+
+/* ─── REACTOR TABS ─── */
+function showReactor(id,event){
+  document.querySelectorAll('.rtab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.reactor-panel').forEach(function(p){ p.classList.remove('active'); });
+  event.currentTarget.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+}
+
+/* ─── CALCULADORA ─── */
+function updateCalc(){
+  var X   = parseFloat(document.getElementById('sl-x').value)/100;
+  var Fa0 = parseFloat(document.getElementById('sl-fa0').value)/10;
+  var k   = parseFloat(document.getElementById('sl-k').value)/100;
+  var Ca0 = parseFloat(document.getElementById('sl-ca0').value)/10;
+  document.getElementById('val-x').textContent   = X.toFixed(2);
+  document.getElementById('val-fa0').textContent = Fa0.toFixed(1);
+  document.getElementById('val-k').textContent   = k.toFixed(2);
+  document.getElementById('val-ca0').textContent = Ca0.toFixed(1);
+  var v0 = Fa0/Ca0;
+  var Vcstr = v0*X/(k*(1-X));
+  var Vpfr  = v0/k*Math.log(1/(1-X));
+  document.getElementById('res-cstr').textContent = Vcstr.toFixed(1);
+  document.getElementById('res-pfr').textContent  = Vpfr.toFixed(1);
+  var maxV = Math.max(Vcstr,Vpfr);
+  var pctC = Math.min(97, Vcstr/maxV*95);
+  var pctP = Math.min(97, Vpfr/maxV*95);
+  document.getElementById('bar-cstr').style.width = pctC+'%';
+  document.getElementById('bar-pfr').style.width  = pctP+'%';
+  document.getElementById('lbl-cstr-pct').textContent = Vcstr.toFixed(1)+' L';
+  document.getElementById('lbl-pfr-pct').textContent  = Vpfr.toFixed(1)+' L';
+  var ratio = (Vcstr/Vpfr).toFixed(2);
+  var msg='';
+  if(X<0.5) msg='Para X='+X.toFixed(2)+', CSTR y PFR son similares (factor '+ratio+'×). Ambas configuraciones son viables económicamente.';
+  else if(X<0.8) msg='A X='+X.toFixed(2)+', el PFR requiere '+ratio+'× menos volumen que el CSTR. La diferencia ya es significativa en el diseño.';
+  else msg='Alta conversión X='+X.toFixed(2)+' — el CSTR penaliza severamente: necesita '+ratio+'× el volumen del PFR. Se recomiendan reactores en serie o PFR.';
+  document.getElementById('insight-box').textContent = msg;
+}
+updateCalc();
+
+/* ─── QUIZ con preguntas sobre HYSYS incluidas ─── */
+var questions = [
+  {q:'¿Qué representa la conversión X = 0.75 en un reactor de flujo pistón?',
+   opts:['El 75% del reactivo A ha reaccionado','Solo el 25% del reactivo ha reaccionado','La temperatura del reactor aumentó 75°C','El reactor opera al 75% de su capacidad'],
+   ans:0, fb:'X = (FA0−FA)/FA0 = 0.75 significa que el 75% del reactivo limitante A se ha transformado en productos. El 25% restante sale sin reaccionar y generalmente se recicla o separa.'},
+  {q:'¿Cuál es la ecuación de diseño correcta para un CSTR en estado estacionario?',
+   opts:['V = FA0 ∫dX/(−rA)','V = FA0·X / (−rA|salida)','dFA/dW = r\'A','NA0·dX/dt = −rA·V'],
+   ans:1, fb:'El CSTR opera con mezcla perfecta, evaluando la velocidad a las condiciones de salida. Esto da una ecuación algebraica. El CSTR requiere más volumen que el PFR porque opera siempre a la concentración más baja.'},
+  {q:'¿Cuál es la principal limitación del modelo "Conversion Reactor" en Aspen HYSYS?',
+   opts:['No puede calcular el calor de reacción','Requiere datos de cinética química detallados','La conversión X es un input del usuario, no un resultado predicho a partir de la cinética','No puede manejar múltiples reacciones simultáneas'],
+   ans:2, fb:'El Conversion Reactor de HYSYS requiere que el ingeniero especifique X directamente — no lo calcula a partir de la cinética. Para predecir X de las condiciones de operación (T, P, τ), se necesita el modelo PFR o CSTR de HYSYS con datos cinéticos.'},
+  {q:'En un PBR de HYSYS, ¿cuál es la ecuación que modela la caída de presión a lo largo del lecho?',
+   opts:['Ecuación de Hagen-Poiseuille','Ecuación de Bernoulli','Ecuación de Ergun: dy/dW = −α/(2y)·(T/T₀)·(FT/FT0)','Ecuación de Darcy-Weisbach'],
+   ans:2, fb:'La ecuación de Ergun en forma compacta dy/dW es la ODE que modela la caída de presión en el PBR. El parámetro α encapsula las propiedades geométricas del lecho (Dp, φ) y las propiedades del fluido. HYSYS la resuelve simultáneamente con el balance de masa.'},
+  {q:'¿Cuál es el peligro principal del runaway térmico en reactores industriales?',
+   opts:['La velocidad de flujo supera el diseño del sistema de bombeo','La reacción exotérmica genera calor que eleva T → k sube → más calor → T sube aún más, en un ciclo incontrolable','El catalizador pierde actividad por sobrecalentamiento localizado','La presión supera el límite del recipiente a presión'],
+   ans:1, fb:'El runaway es retroalimentación positiva: T↑ → k(T)↑ (Arrhenius exponencial) → reacción más rápida → más calor → T↑ aún más. El criterio de Van Heerden (dR/dT < dG/dT) identifica los estados inestables. Sistemas SIL-2/SIL-3 son obligatorios para reactores con ΔTad > 200K.'}
+];
+var qIdx=0, score=0, answered=false;
+function renderQuestion(){
+  var q=questions[qIdx];
+  document.getElementById('quiz-counter').textContent='Pregunta '+(qIdx+1)+' de '+questions.length;
+  document.getElementById('quiz-progress').style.width=((qIdx/questions.length)*100)+'%';
+  document.getElementById('quiz-question').textContent=q.q;
+  var optDiv=document.getElementById('quiz-options'); optDiv.innerHTML='';
+  q.opts.forEach(function(o,i){
+    var btn=document.createElement('button');
+    btn.className='quiz-opt'; btn.textContent=o;
+    btn.onclick=function(){ selectAnswer(i); };
+    optDiv.appendChild(btn);
+  });
+  document.getElementById('quiz-feedback').className='quiz-feedback';
+  document.getElementById('quiz-feedback').textContent='';
+  document.getElementById('quiz-btn').textContent=qIdx<questions.length-1?'Siguiente →':'Ver resultado';
+  answered=false;
+}
+function selectAnswer(i){
+  if(answered)return; answered=true;
+  var q=questions[qIdx];
+  var opts=document.querySelectorAll('.quiz-opt');
+  opts[q.ans].classList.add('correct');
+  if(i!==q.ans){ opts[i].classList.add('wrong'); } else { score++; }
+  var fb=document.getElementById('quiz-feedback');
+  fb.textContent=q.fb; fb.className='quiz-feedback show '+(i===q.ans?'correct-fb':'wrong-fb');
+  document.getElementById('quiz-score').textContent='Puntaje: '+score+'/'+(qIdx+1);
+}
+function nextQuestion(){
+  if(!answered)return; qIdx++;
+  if(qIdx>=questions.length){ showResult(); return; }
+  renderQuestion();
+}
+function showResult(){
+  var pct=Math.round(score/questions.length*100);
+  var emoji=pct===100?'🏆':pct>=80?'🎉':pct>=60?'👍':'📚';
+  document.querySelector('.quiz-card').innerHTML='<div style="text-align:center;padding:2rem 1rem;">'
+    +'<div style="font-size:3rem;margin-bottom:1rem;">'+emoji+'</div>'
+    +'<div class="result-num" style="font-size:3rem;">'+score+'/'+questions.length+'</div>'
+    +'<div style="font-size:.9rem;color:var(--text2);margin:.75rem 0 2rem;">'+pct+'% de respuestas correctas</div>'
+    +'<p style="max-width:440px;margin:0 auto 2rem;font-size:.9rem;color:var(--text2);">'
+    +(pct===100?'¡Perfecto! Dominás los fundamentos de diseño y simulación de reactores en HYSYS.'
+      :pct>=80?'¡Muy bien! Tenés una comprensión sólida del tema. Repasar la sección de HYSYS.'
+      :pct>=60?'Buen intento. Revisar las ecuaciones de diseño y el Conversion Reactor de HYSYS.'
+      :'Recomendamos repasar toda la guía, especialmente los balances y la sección HYSYS.')+'</p>'
+    +'<button class="btn btn-ghost" onclick="resetQuiz()">↺ Intentar de nuevo</button></div>';
+}
+function resetQuiz(){
+  qIdx=0; score=0; answered=false;
+  document.querySelector('.quiz-card').innerHTML=
+    '<div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress"></div></div>'
+    +'<div class="quiz-counter" id="quiz-counter"></div>'
+    +'<div class="quiz-q" id="quiz-question" style="margin-top:1rem"></div>'
+    +'<div class="quiz-options" id="quiz-options"></div>'
+    +'<div class="quiz-feedback" id="quiz-feedback"></div>'
+    +'<div class="quiz-nav"><button class="btn btn-primary" id="quiz-btn" onclick="nextQuestion()">Siguiente →</button>'
+    +'<span id="quiz-score" style="font-size:.8rem;color:var(--text3);font-family:var(--f-mono)"></span></div>';
+  renderQuestion();
+}
+renderQuestion();
+
+/* ─── REVEAL ON SCROLL ─── */
+var observer=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(function(el){ observer.observe(el); });
+</script>
+</body>
+</html>
